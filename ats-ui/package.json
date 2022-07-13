@@ -1,0 +1,29 @@
+{
+  "name": "ats-ui",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "devDependencies": {
+    "@smui/button": "^6.0.0-beta.16",
+    "@smui/card": "^6.0.0-beta.16",
+    "@smui/data-table": "^6.0.0-beta.16",
+    "@smui/paper": "^6.0.0-beta.16",
+    "@smui/select": "^6.0.0-beta.16",
+    "@smui/tab": "^6.0.0-beta.16",
+    "@smui/tab-bar": "^6.0.0-beta.16",
+    "@smui/textfield": "^6.0.0-beta.16",
+    "@sveltejs/vite-plugin-svelte": "^1.0.0-next.30",
+    "svelte": "^3.44.0",
+    "svelte-navigator": "^3.1.6",
+    "vite": "^2.9.9"
+  },
+  "dependencies": {
+    "svelte-forms-lib": "^2.0.1",
+    "svelte-material-ui": "^6.0.0-beta.16"
+  }
+}

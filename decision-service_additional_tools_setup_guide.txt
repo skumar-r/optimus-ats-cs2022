@@ -1,0 +1,27 @@
+Kogito Data Index Service
+
+Prerequities
+1. Infinispan server
+2. Kafka (https://www.conduktor.io/kafka/how-to-start-kafka-using-docker)
+
+1. Download https://repository.jboss.org/org/kie/kogito/data-index-service-infinispan/1.9.2-SNAPSHOT/data-index-service-infinispan-1.9.2-20210806.055449-5-runner.jar
+
+2. Run 
+	java  -Dquarkus.infinispan-client.auth-username=admin -Dquarkus.infinispan-client.auth-password=changeme  -jar data-index-service-infinispan-1.9.2-20210806.055449-5-runner.jar
+	
+
+
+
+management-console 
+
+Prerequities
+1. Running Kogito Data Index Service
+2. 
+1. Download https://repository.jboss.org/org/kie/kogito/management-console/1.9.2-SNAPSHOT/management-console-1.9.2-20210805.085932-3-runner.jar
+2. Run 
+    java -Dquarkus.http.port=8280 -jar management-console-1.9.2-20210805.085932-3-runner.jar
+	java -Dkogito.dataindex.http.url=http://localhost:8180 -Dquarkus.http.port=8280 -jar management-console-1.9.2-20210805.085932-3-runner.jar
+	
+	
+	
+	
