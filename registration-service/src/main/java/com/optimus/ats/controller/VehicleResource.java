@@ -1,10 +1,7 @@
 package com.optimus.ats.controller;
 
-import com.optimus.ats.dto.EmployeeDto;
 import com.optimus.ats.dto.VehicleDto;
-import com.optimus.ats.model.Employee;
 import com.optimus.ats.model.Vehicle;
-import com.optimus.ats.service.EmployeeService;
 import com.optimus.ats.service.VehicleService;
 import org.jboss.resteasy.reactive.MultipartForm;
 
@@ -47,7 +44,7 @@ public class VehicleResource {
 	@Produces(MediaType.APPLICATION_JSON)
 	@Consumes(MULTIPART_FORM_DATA)
 	public Response create(@MultipartForm VehicleDto vehicleDto) {
-		System.out.println("Reg No:"+vehicleDto.getRegNo());
+		System.out.println("Reg No:" + vehicleDto.getRegNo());
 		try {
 			return vehicleService.saveVehicle(vehicleDto);
 		} catch (IOException e) {
@@ -61,7 +58,7 @@ public class VehicleResource {
 	@Transactional
 	public Response deleteById(@PathParam("id") Long id) {
 		boolean deleted = Vehicle.deleteById(id);
-		if(deleted) {
+		if (deleted) {
 			return Response.noContent().build();
 		}
 		return Response.status(Response.Status.BAD_REQUEST).build();
