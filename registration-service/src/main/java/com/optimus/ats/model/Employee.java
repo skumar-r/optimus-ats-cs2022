@@ -30,6 +30,12 @@ public class Employee extends PanacheEntityBase {
 	@Column(name = "IS_S3PHOTO")
 	private boolean hasS3Photo;
 
+	@Column(name = "DEPARTMENT")
+	private String department;
+
+	@Column(name = "DESIGNATION")
+	private String designation;
+
 	public Long getId() {
 		return id;
 	}
@@ -84,5 +90,21 @@ public class Employee extends PanacheEntityBase {
 
 	public void setHasS3Photo(boolean hasS3Photo) {
 		this.hasS3Photo = hasS3Photo;
+	}
+
+	public String getDepartment() {
+		return department;
+	}
+
+	public void setDepartment(String department) {
+		this.department = department;
+	}
+
+	public String getDesignation() {
+		return designation;
+	}
+
+	public void setDesignation(String designation) {
+		this.designation = designation;
 	}
 }

@@ -24,6 +24,14 @@ public class EmployeeDto {
 	@PartType(MediaType.TEXT_PLAIN)
 	private boolean hasS3Photo;
 
+	@RestForm
+	@PartType(MediaType.TEXT_PLAIN)
+	private String department;
+
+	@RestForm
+	@PartType(MediaType.TEXT_PLAIN)
+	private String designation;
+
 	private String photoFront;
 	private String photoIdCard;
 	@RestForm("photoFrontFile")
@@ -93,5 +101,21 @@ public class EmployeeDto {
 
 	public void setPhotoIDCardFile(File photoIDCardFile) {
 		this.photoIDCardFile = photoIDCardFile;
+	}
+
+	public String getDepartment() {
+		return department;
+	}
+
+	public void setDepartment(String department) {
+		this.department = department;
+	}
+
+	public String getDesignation() {
+		return designation;
+	}
+
+	public void setDesignation(String designation) {
+		this.designation = designation;
 	}
 }
