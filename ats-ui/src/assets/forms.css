@@ -92,4 +92,7 @@
     color: var(--red);
     margin-top: 10px;
   }
-  
+
+  .box  {
+    padding: 0 !important;
+  }

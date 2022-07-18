@@ -1,14 +1,10 @@
 <script lang="js">
-  import DataTable, {
-    Head,
-    Body,
-    Row,
-    Cell,
-    Label,
-    SortValue,
-  } from "@smui/data-table";
+  import DataTable, { Head, Body, Row, Cell, Label } from "@smui/data-table";
   import IconButton from "@smui/icon-button";
-  import Paper, { Title, Subtitle, Content } from '@smui/paper';
+  import Paper, { Title, Content } from "@smui/paper";
+  import Card, { Actions } from "@smui/card";
+  import { navigate } from "svelte-navigator";
+  import Button from "@smui/button";
 
   let items = [];
   let sort = "id";
@@ -36,21 +32,41 @@
   }
 </script>
 
-<div class="paper-container">
-  <Paper color="primary" variant="outlined" class="mdc-theme--primary">
-    <Title>Employee Vehicle List</Title>
-    <Content>
-      <DataTable
-        sortable
-        bind:sort
-        bind:sortDirection
-        on:SMUIDataTable:sorted={handleSort}
-        table$aria-label="User list"
-        style="width: 100%;"
-      >
-        <Head>
-          <Row>
-            <!--
+<div>
+  <div class="card-container">
+    <Card>
+      <Actions>
+        <Button
+          variant="outlined"
+          on:click={() => navigate("vehicle/verify", { replace: true })}
+        >
+          <Label>Verify a Vehicle</Label>
+        </Button>
+        <Button
+          variant="outlined"
+          on:click={() => navigate("vehicle/new", { replace: true })}
+        >
+          <Label>Register a New Vehicle</Label>
+        </Button>
+      </Actions>
+    </Card>
+  </div>
+  <div style="padding: 0;">
+    <div class="paper-container">
+      <Paper color="primary" variant="outlined" class="mdc-theme--primary">
+        <Title>Employee Vehicle List</Title>
+        <Content>
+          <DataTable
+            sortable
+            bind:sort
+            bind:sortDirection
+            on:SMUIDataTable:sorted={handleSort}
+            table$aria-label="User list"
+            style="width: 100%;"
+          >
+            <Head>
+              <Row>
+                <!--
         Note: whatever you supply to "columnId" is
         appended with "-status-label" and used as an ID
         for the hidden label that describes the sort
@@ -60,43 +76,45 @@
         "sortAscendingAriaLabel" and
         "sortDescendingAriaLabel" props on the DataTable.
       -->
-            <Cell numeric columnId="id">
-              <!-- For numeric columns, icon comes first. -->
-              <IconButton class="material-icons">arrow_upward</IconButton>
-              <Label>Vehicle ID</Label>
-            </Cell>
-            <Cell columnId="employeeId" style="width: 100%;">
-              <Label>Employee Id</Label>
-              <!-- For non-numeric columns, icon comes second. -->
-              <IconButton class="material-icons">arrow_upward</IconButton>
-            </Cell>
-            <Cell columnId="employeeName">
-              <Label>Employee Name</Label>
-              <IconButton class="material-icons">arrow_upward</IconButton>
-            </Cell>
-            <Cell columnId="vehicleBrand" l>
-              <Label>Vehicle Brand</Label>
-              <IconButton class="material-icons">arrow_upward</IconButton>
-            </Cell>
-            <!-- You can turn off sorting for a column. -->
-            <Cell columnId="vehicleModel" l>
-              <Label>Vehicle Model</Label>
-              <IconButton class="material-icons">arrow_upward</IconButton>
-            </Cell>
-          </Row>
-        </Head>
-        <Body>
-          {#each items as item (item.id)}
-            <Row>
-              <Cell numeric>{item.id}</Cell>
-              <Cell>{item.employeeId}</Cell>
-              <Cell>{item.employeeName}</Cell>
-              <Cell>{item.vehicleBrand}</Cell>
-              <Cell>{item.vehicleModel}</Cell>
-            </Row>
-          {/each}
-        </Body>
-      </DataTable>
-    </Content>
-  </Paper>
+                <Cell numeric columnId="id">
+                  <!-- For numeric columns, icon comes first. -->
+                  <IconButton class="material-icons">arrow_upward</IconButton>
+                  <Label>Vehicle ID</Label>
+                </Cell>
+                <Cell columnId="employeeId" style="width: 100%;">
+                  <Label>Employee Id</Label>
+                  <!-- For non-numeric columns, icon comes second. -->
+                  <IconButton class="material-icons">arrow_upward</IconButton>
+                </Cell>
+                <Cell columnId="employeeName">
+                  <Label>Employee Name</Label>
+                  <IconButton class="material-icons">arrow_upward</IconButton>
+                </Cell>
+                <Cell columnId="vehicleBrand" l>
+                  <Label>Vehicle Brand</Label>
+                  <IconButton class="material-icons">arrow_upward</IconButton>
+                </Cell>
+                <!-- You can turn off sorting for a column. -->
+                <Cell columnId="vehicleModel" l>
+                  <Label>Vehicle Model</Label>
+                  <IconButton class="material-icons">arrow_upward</IconButton>
+                </Cell>
+              </Row>
+            </Head>
+            <Body>
+              {#each items as item (item.id)}
+                <Row>
+                  <Cell numeric>{item.id}</Cell>
+                  <Cell>{item.employeeId}</Cell>
+                  <Cell>{item.employeeName}</Cell>
+                  <Cell>{item.vehicleBrand}</Cell>
+                  <Cell>{item.vehicleModel}</Cell>
+                </Row>
+              {/each}
+            </Body>
+          </DataTable>
+        </Content>
+      </Paper>
+    </div>
+  </div>
 </div>
