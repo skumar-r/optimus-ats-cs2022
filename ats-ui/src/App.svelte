@@ -11,7 +11,7 @@
   <Route path="vehicle/verify"><VehicleVerify /></Route>
 </Router>
 <script lang="js">  
-  import { Router, Route, Link, navigate } from "svelte-navigator";
+  import { Router, Route, Link } from "svelte-navigator";
   import EmployeeList from './lib/EmployeeList.svelte';
   import Dashboard from './lib/Dashboard.svelte';
   import EmployeeNew from './lib/EmployeeNew.svelte';

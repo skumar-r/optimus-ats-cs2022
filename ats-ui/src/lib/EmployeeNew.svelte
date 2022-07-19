@@ -34,7 +34,7 @@
     };
   };
 </script>
-
+<div>
 <div class="paper-container">
   <Paper color="primary" variant="outlined" class="mdc-theme--primary">
     <Title>Add a New Employee</Title>
@@ -145,6 +145,8 @@
     </Content>
   </Paper>
 </div>
+</div>
+
 
 <style>
   .upload {
