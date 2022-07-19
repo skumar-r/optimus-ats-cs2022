@@ -10,6 +10,8 @@ import com.optimus.ats.common.StatusType;
 import com.optimus.ats.dto.RecognitionDto;
 import com.optimus.ats.model.Employee;
 import com.optimus.ats.model.EmployeeRecognition;
+import com.optimus.ats.model.Vehicle;
+import com.optimus.ats.model.VehicleRecognition;
 import com.optimus.ats.service.RecognitionService;
 import org.apache.commons.io.IOUtils;
 import org.eclipse.microprofile.config.inject.ConfigProperty;
@@ -23,8 +25,8 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.ByteBuffer;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.NoSuchElementException;
 
 @ApplicationScoped
 public class RecognitionServiceImpl extends CommonResource implements RecognitionService {
@@ -48,7 +50,7 @@ public class RecognitionServiceImpl extends CommonResource implements Recognitio
 				if (StringUtils.equals("employee", dto.getType())) {
 					EmployeeRecognition.persist(getParseEmployeeObject(getEmployeeMatchedRecord(dto.getFormData())));
 				} else {
-
+					VehicleRecognition.persist(getParseVehicleObject(getVehicleMatchedRecord(dto.getFormData())));
 				}
 			}
 		} catch (Exception e) {
@@ -64,6 +66,13 @@ public class RecognitionServiceImpl extends CommonResource implements Recognitio
 		recognition.setStatus(StatusType.FULL_MATCH.getType());
 		return recognition;
 	}
+	private VehicleRecognition getParseVehicleObject(Vehicle vehicle) {
+		VehicleRecognition recognition = new VehicleRecognition();
+		recognition.setEmployeeId(vehicle.getId());
+		recognition.setHasMatched(true);
+		recognition.setStatus(StatusType.FULL_MATCH.getType());
+		return recognition;
+	}
 
 	private Employee getEmployeeMatchedRecord(File targetImage) {
 		List<Employee> employees = Employee.listAll();
@@ -71,9 +80,11 @@ public class RecognitionServiceImpl extends CommonResource implements Recognitio
 			return hasFaceMatched(emp.isHasS3Photo(), emp.getPhotoFront(), targetImage);
 		}).findFirst().get();
 	}
-
-	private boolean hasVehicleMatched() {
-		return true;
+	private Vehicle getVehicleMatchedRecord(File targetImage) {
+		List<Vehicle> vehicles = Vehicle.listAll();
+		return vehicles.stream().filter(veh -> {
+			return hasVehicleMatched(veh.isHasS3Photo(), veh.getPhotoFront(), targetImage,veh.getRegNo());
+		}).findFirst().get();
 	}
 
 	private boolean hasFaceMatched(boolean hasS3Photo, String sourceImage, File targetImage) {
@@ -110,5 +121,70 @@ public class RecognitionServiceImpl extends CommonResource implements Recognitio
 			e.printStackTrace();
 		}
 		return false;
+	}
+
+	private boolean hasVehicleMatched(boolean hasS3Photo, String sourceImage, File targetImage, String regNo) {
+
+		String detectedRegNo = getDetectedText(targetImage).stream().filter(text->text.contains(regNo)).findFirst().orElse("");
+		BasicAWSCredentials credentials = new BasicAWSCredentials(ACCESS_KEY, SECRET_KEY);
+		AmazonRekognition rekognitionClient = AmazonRekognitionClientBuilder.standard().withCredentials(new AWSStaticCredentialsProvider(credentials)).withRegion(region).build();
+
+
+		try (InputStream targetImgStream = new FileInputStream(targetImage)){
+			List<TextDetection> textDetections = null;
+			if (hasS3Photo) {
+				System.out.println("s3");
+				DetectTextRequest request = new DetectTextRequest()
+						.withImage(new Image()
+								.withS3Object(new S3Object()
+										.withName(sourceImage)
+										.withBucket(bucketName)));
+				DetectTextResult result = rekognitionClient.detectText(request);
+				textDetections = result.getTextDetections();
+			} else {
+				System.out.println("local");
+				DetectTextRequest request = new DetectTextRequest()
+						.withImage(new Image().withBytes(ByteBuffer.wrap(IOUtils.toByteArray(targetImgStream))));
+				DetectTextResult result = rekognitionClient.detectText(request);
+				textDetections = result.getTextDetections();
+			}
+
+				System.out.println("Detected lines and words for " + sourceImage);
+				for (TextDetection text : textDetections) {
+
+					System.out.println("Detected: " + text.getDetectedText());
+					System.out.println("Confidence: " + text.getConfidence().toString());
+					System.out.println("Id : " + text.getId());
+					System.out.println("Parent Id: " + text.getParentId());
+					System.out.println("Type: " + text.getType());
+					System.out.println();
+					return  (StringUtils.isNotBlank(detectedRegNo) && detectedRegNo.contains(text.getDetectedText()));
+
+				}
+
+		} catch(AmazonRekognitionException |  IOException e) {
+			e.printStackTrace();
+		}
+
+		return false;
+	}
+
+	private List<String> getDetectedText(File targetImage) {
+		BasicAWSCredentials credentials = new BasicAWSCredentials(ACCESS_KEY, SECRET_KEY);
+		AmazonRekognition rekognitionClient = AmazonRekognitionClientBuilder.standard().withCredentials(new AWSStaticCredentialsProvider(credentials)).withRegion(region).build();
+		List<String> detectedText = new ArrayList<>();
+		try (InputStream targetImgStream = new FileInputStream(targetImage)) {
+			DetectTextRequest request = new DetectTextRequest()
+					.withImage(new Image().withBytes(ByteBuffer.wrap(IOUtils.toByteArray(targetImgStream))));
+			DetectTextResult result = rekognitionClient.detectText(request);
+			List<TextDetection> textDetections = result.getTextDetections();
+			for (TextDetection text : textDetections) {
+				System.out.println("Detected: " + text.getDetectedText());
+				detectedText.add(text.getDetectedText());
+			}
+		}catch(AmazonRekognitionException |  IOException e) {
+			e.printStackTrace();
+		}
+		return detectedText;
 	}
 }

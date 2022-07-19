@@ -5,8 +5,6 @@ import com.optimus.ats.common.FormData;
 import com.optimus.ats.dto.EmployeeDto;
 import com.optimus.ats.model.Employee;
 import com.optimus.ats.service.EmployeeService;
-import io.quarkus.runtime.util.StringUtil;
-import org.apache.commons.io.IOUtils;
 import org.eclipse.microprofile.config.inject.ConfigProperty;
 import software.amazon.awssdk.core.sync.RequestBody;
 import software.amazon.awssdk.services.s3.S3Client;
@@ -60,7 +58,6 @@ public class EmployeeServiceImpl extends CommonResource implements EmployeeServi
 			PutObjectResponse photoLeft = s3.putObject(buildPutRequest(photoLeftObj),
 					RequestBody.fromFile(employee.getPhotoIDCardFile()));
 
-
 			if (photoFront != null && photoLeft != null) {
 				emp.setPhotoFront(photoFrontObj.getFilename());
 				emp.setPhotoIdcard(photoLeftObj.getFilename());
@@ -69,19 +66,19 @@ public class EmployeeServiceImpl extends CommonResource implements EmployeeServi
 			} else {
 				return Response.serverError().build();
 			}
-		} else{
+		} else {
 			File customDir = new File(uploadDir);
-			System.out.println("local storage:"+ uploadDir+"  "+customDir.getAbsolutePath());
-			if(customDir.exists()) {
+			System.out.println("local storage:" + uploadDir + "  " + customDir.getAbsolutePath());
+			if (customDir.exists()) {
 				System.out.println("local storage exists");
 				String photoFrontFileName = customDir.getAbsolutePath() +
 						File.separator + photoFrontPrefix + "_" + emp.getId() + ".png";
-				System.out.println("photoFrontPrefix="+ photoFrontFileName);
+				System.out.println("photoFrontPrefix=" + photoFrontFileName);
 				Files.write(Paths.get(photoFrontFileName), Files.readAllBytes(employee.getPhotoFrontFile().toPath()),
 						StandardOpenOption.CREATE_NEW);
 				String photoLeftFileName = customDir.getAbsolutePath() +
 						File.separator + photoIDPrefix + "_" + emp.getId() + ".png";
-				System.out.println("photoLeftPrefix="+ photoLeftFileName);
+				System.out.println("photoLeftPrefix=" + photoLeftFileName);
 				Files.write(Paths.get(photoLeftFileName), Files.readAllBytes(employee.getPhotoIDCardFile().toPath()),
 						StandardOpenOption.CREATE_NEW);
 
@@ -98,12 +95,15 @@ public class EmployeeServiceImpl extends CommonResource implements EmployeeServi
 			return Response.serverError().build();
 		}
 	}
+
 	public Employee getParseEmployeeDto(EmployeeDto employee) {
-		Employee emp =  new Employee();
+		Employee emp = new Employee();
 		emp.setEmployeeName(employee.getEmployeeName());
 		emp.setEmail(employee.getEmail());
 		emp.setMobile(employee.getMobile());
 		emp.setHasS3Photo(employee.isHasS3Photo());
+		emp.setDepartment(employee.getDepartment());
+		emp.setDesignation(employee.getDesignation());
 		return emp;
 	}
 }

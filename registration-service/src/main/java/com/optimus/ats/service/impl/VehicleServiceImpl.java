@@ -2,11 +2,8 @@ package com.optimus.ats.service.impl;
 
 import com.optimus.ats.common.CommonResource;
 import com.optimus.ats.common.FormData;
-import com.optimus.ats.dto.EmployeeDto;
 import com.optimus.ats.dto.VehicleDto;
-import com.optimus.ats.model.Employee;
 import com.optimus.ats.model.Vehicle;
-import com.optimus.ats.service.EmployeeService;
 import com.optimus.ats.service.VehicleService;
 import org.eclipse.microprofile.config.inject.ConfigProperty;
 import software.amazon.awssdk.core.sync.RequestBody;
@@ -61,7 +58,6 @@ public class VehicleServiceImpl extends CommonResource implements VehicleService
 			PutObjectResponse photoRear = s3.putObject(buildPutRequest(photoRearObj),
 					RequestBody.fromFile(vehicleDto.getPhotoRearFile()));
 
-
 			if (photoFront != null && photoRear != null) {
 				veh.setPhotoFront(photoFrontObj.getFilename());
 				veh.setPhotoRear(photoRearObj.getFilename());
@@ -70,19 +66,19 @@ public class VehicleServiceImpl extends CommonResource implements VehicleService
 			} else {
 				return Response.serverError().build();
 			}
-		} else{
+		} else {
 			File customDir = new File(uploadDir);
-			System.out.println("local storage:"+ uploadDir+"  "+customDir.getAbsolutePath());
-			if(customDir.exists()) {
+			System.out.println("local storage:" + uploadDir + "  " + customDir.getAbsolutePath());
+			if (customDir.exists()) {
 				System.out.println("local storage exists");
 				String photoFrontFileName = customDir.getAbsolutePath() +
 						File.separator + photoFrontPrefix + "_" + veh.getId() + ".png";
-				System.out.println("photoFrontPrefix="+ photoFrontFileName);
+				System.out.println("photoFrontPrefix=" + photoFrontFileName);
 				Files.write(Paths.get(photoFrontFileName), Files.readAllBytes(vehicleDto.getPhotoFrontFile().toPath()),
 						StandardOpenOption.CREATE_NEW);
 				String photoRearFileName = customDir.getAbsolutePath() +
 						File.separator + photoRearPrefix + "_" + veh.getId() + ".png";
-				System.out.println("photoRearPrefix="+ photoRearFileName);
+				System.out.println("photoRearPrefix=" + photoRearFileName);
 				Files.write(Paths.get(photoRearFileName), Files.readAllBytes(vehicleDto.getPhotoRearFile().toPath()),
 						StandardOpenOption.CREATE_NEW);
 
@@ -99,8 +95,9 @@ public class VehicleServiceImpl extends CommonResource implements VehicleService
 			return Response.serverError().build();
 		}
 	}
+
 	public Vehicle getParseVehicleDto(VehicleDto vehicleDto) {
-		Vehicle veh =  new Vehicle();
+		Vehicle veh = new Vehicle();
 		veh.setRegNo(vehicleDto.getRegNo());
 		veh.setVehicleDetails(vehicleDto.getVehicleDetails());
 		veh.setEmployeeId(vehicleDto.getEmployeeId());

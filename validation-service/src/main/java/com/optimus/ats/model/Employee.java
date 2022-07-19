@@ -1,6 +1,7 @@
 package com.optimus.ats.model;
 
 import io.quarkus.hibernate.orm.panache.PanacheEntityBase;
+
 import javax.persistence.*;
 
 @Entity()
