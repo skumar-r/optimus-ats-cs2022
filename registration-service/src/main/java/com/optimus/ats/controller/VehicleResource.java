@@ -17,7 +17,7 @@ import java.util.List;
 import static javax.ws.rs.core.MediaType.MULTIPART_FORM_DATA;
 
 @ApplicationScoped
-@Path("/vehicle-registration")
+@Path("/vehicle")
 public class VehicleResource {
 
 	@Inject
