@@ -20,9 +20,7 @@ public class DecisionService {
     EmployeeRepository employeeRepository;
 
     public InternalDataDto initProcess(Integer id){
-        System.out.println("Init");
-        InternalDataDto dto = new InternalDataDto();
-        
+        InternalDataDto dto = new InternalDataDto();        
         DecisionWorkflowRequest retrieved = decisionRepository.findById(Long.valueOf(id));
         EmployeeData employee = employeeRepository.findById(retrieved.getEmployeeId());
         dto.setValidRequest(Objects.isNull(retrieved)? false: true);
