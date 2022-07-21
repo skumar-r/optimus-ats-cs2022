@@ -7,6 +7,8 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.Table;
 
+import org.hibernate.annotations.CreationTimestamp;
+
 import io.quarkus.hibernate.orm.panache.PanacheEntity;
 
 /**
@@ -30,17 +32,18 @@ import io.quarkus.hibernate.orm.panache.PanacheEntity;
 @Entity
 @Table(name = "t_decision_request")
 public class DecisionWorkflowRequest  {
+    @Id
+    @GeneratedValue
     private Long id;
     private Long employeeId;
     private Long managerId;
     private String workflowTaskId;
     private String approvalRemarks;
     private boolean  approved;
+    @CreationTimestamp
     private Date createdDate;
     private Date approvedDate;
 
-    @Id
-    @GeneratedValue
     public Long getId() {
         return id;
     }
