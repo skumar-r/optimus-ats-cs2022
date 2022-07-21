@@ -77,8 +77,8 @@
           -->
                 <Cell numeric columnId="id">
                   <!-- For numeric columns, icon comes first. -->
-                  <IconButton class="material-icons">arrow_upward</IconButton>
                   <Label>ID</Label>
+                  <IconButton class="material-icons">arrow_upward</IconButton>
                 </Cell>
                 <Cell columnId="name" style="width: 100%;">
                   <Label>Name</Label>
@@ -114,4 +114,3 @@
     </div>
   </div>
 </div>
-

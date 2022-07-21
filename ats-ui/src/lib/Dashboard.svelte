@@ -8,8 +8,7 @@
   let items = [
     { label: "Employee Management", value: 1, component: EmployeeTab },
     { label: "Vehicle Management", value: 2, component: VehicleTab },
-    { label: "Approval Tracking", value: 3, component: ApprovalTab },
+    { label: "Others", value: 3, component: ApprovalTab },
   ];
 </script>
-
 <Tabs {items} />
