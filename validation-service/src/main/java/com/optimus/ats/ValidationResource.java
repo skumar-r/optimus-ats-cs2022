@@ -6,9 +6,13 @@ import io.vertx.mutiny.core.eventbus.EventBus;
 
 
 import javax.inject.Inject;
+import javax.json.JsonObject;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
 import javax.ws.rs.QueryParam;
+
+import com.optimus.ats.service.ValidationService;
 
 @Path("/validation/api")
 public class ValidationResource {
@@ -22,11 +26,20 @@ public class ValidationResource {
 
     @Inject
     EventBus bus;
+
+    @Inject
+    ValidationService validationService;
     
     @GET
     @Path("/echo")
     public Uni<String> hello(@QueryParam("name") String name) {     
         return bus.<String>request("echo1", name)               
                 .onItem().transform(response -> response.body().toUpperCase());   
+    }
+
+    @GET
+    @Path("/decision/dummy/{employeeId}/{managerId}")
+    public String hello2(@PathParam("employeeId") Long employeeId, @PathParam("managerId") Long managerId) throws Exception {     
+        return validationService.invokeDecisionService(employeeId, managerId);
     }
 }
