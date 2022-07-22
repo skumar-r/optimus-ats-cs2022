@@ -6,6 +6,9 @@ import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 import javax.transaction.Transactional;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.optimus.ats.model.DecisionWorkflowRequest;
 import com.optimus.ats.model.EmployeeData;
 import com.optimus.ats.model.InternalDataDto;
@@ -14,6 +17,8 @@ import com.optimus.ats.repository.EmployeeRepository;
 
 @ApplicationScoped
 public class DecisionService {
+    
+    static final Logger log = LoggerFactory.getLogger(DecisionService.class);
     
     @Inject
     DecisionRepository decisionRepository;
@@ -40,8 +45,11 @@ public class DecisionService {
         System.out.println("Start");
     }
 
-    public void postProcess(DecisionWorkflowRequest data){
+    @Transactional
+    public void postProcess(Boolean approved, String remarks, Long incomingId){
         System.out.println("After process");
+        log.info("approved:{},remarks:{},incomingId:{}",approved, remarks,incomingId);
+        decisionRepository.update("approved=?1,approvalRemarks=?2 where id=?3", approved, remarks, incomingId);
     }
 
     @Transactional

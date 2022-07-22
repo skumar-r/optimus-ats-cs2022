@@ -37,7 +37,8 @@ public class DecisionWorkflowRequest  {
     private Long id;
     private Long employeeId;
     private Long managerId;
-    private String workflowTaskId;
+    private String processTaskId;
+    private String processInstanceId;
     private String approvalRemarks;
     private boolean  approved;
     @CreationTimestamp
@@ -67,13 +68,22 @@ public class DecisionWorkflowRequest  {
     public void setManagerId(Long managerId) {
         this.managerId = managerId;
     }
+   
 
-    public String getWorkflowTaskId() {
-        return workflowTaskId;
+    public String getProcessTaskId() {
+        return processTaskId;
     }
 
-    public void setWorkflowTaskId(String workflowTaskId) {
-        this.workflowTaskId = workflowTaskId;
+    public void setProcessTaskId(String processTaskId) {
+        this.processTaskId = processTaskId;
+    }
+
+    public String getProcessInstanceId() {
+        return processInstanceId;
+    }
+
+    public void setProcessInstanceId(String processInstanceId) {
+        this.processInstanceId = processInstanceId;
     }
 
     public String getApprovalRemarks() {
