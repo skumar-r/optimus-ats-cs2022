@@ -10,6 +10,7 @@ import javax.ws.rs.core.MediaType;
 
 import org.eclipse.microprofile.rest.client.inject.RegisterRestClient;
 
+import com.optimus.ats.dto.ApprovalDto;
 import com.optimus.ats.dto.ProcessDto;
 
 
@@ -27,8 +28,8 @@ public interface WorkflowRemoteRestService {
     @Produces(MediaType.APPLICATION_JSON)
     String getTasks(@PathParam("instanceId") String instanceId);
 
-    @GET
+    @POST
     @Path("/approvals/{instanceId}/ManagerApproval/{taskId}")
     @Produces(MediaType.APPLICATION_JSON)
-    String updateTaskStatus(@PathParam("instanceId") String instanceId, @PathParam("taskId") String taskId);
+    String updateTaskStatus(@PathParam("instanceId") String instanceId, @PathParam("taskId") String taskId, ApprovalDto dto);
 }

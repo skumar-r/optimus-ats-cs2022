@@ -8,6 +8,7 @@
   import Button from "@smui/button";
   import LinearProgress from '@smui/linear-progress';
   import { onMount, onDestroy } from 'svelte';
+  import { toasts, ToastContainer, FlatToast, BootstrapToast }  from "svelte-toasts";
 
   let items = [];
   let actionItem = {};
@@ -19,6 +20,20 @@
   let closed = true;
   let timer;
   let disabled = false;
+
+  let showToast = (message, type) => {
+    const toast = toasts.add({
+      title: '',
+      description: message,
+      duration: 5000, // 0 or negative to avoid auto-remove
+      placement: 'top-right',
+      theme: 'dark',
+      type: type,
+      onClick: () => {},
+      onRemove: () => {},
+    });
+
+  };
 
   onMount(reset);
  
@@ -74,7 +89,7 @@
         body: JSON.stringify({
           workflowId: actionItem.id,
           approved: action,
-          approvalRemarks: actionItem.approvalRemarks
+          remarks: actionItem.approvalRemarks
         }),
       })
       .then((response) => {          
@@ -84,9 +99,9 @@
             disabled=false;
             clearInterval(timer);
             if( "INTERNAL_SERVER_ERROR" == data.status){
-
+              showToast("Request failed. Please try after some time", "error");
             }else{
-              
+              showToast("Success", "success");
             }
           });
           
@@ -190,6 +205,9 @@
             </Button>
         </Actions>
       </Dialog>
+      <ToastContainer placement="bottom-right" let:data={data}>
+        <FlatToast {data} /> <!-- Provider template for your toasts -->
+      </ToastContainer>
     </div>
   </div>
 </div>

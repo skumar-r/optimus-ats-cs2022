@@ -71,7 +71,7 @@ public class ValidationService {
         if (Objects.nonNull(workflowRequest) && Objects.nonNull(workflowRequest.getProcessInstanceId())
                 && Objects.nonNull(workflowRequest.getProcessTaskId())) {
             try{
-                return workflowService.approveWorkflow(workflowRequest);
+                return workflowService.approveWorkflow(workflowRequest, aDto);
             } catch(Exception e){
                 log.error("excepion", e);
                 return ResponseDto.createResponse(Status.INTERNAL_SERVER_ERROR);
@@ -82,7 +82,7 @@ public class ValidationService {
     }
 
     public List<DecisionWorkflowRequest> getAll() {
-        List<DecisionWorkflowRequest> list = DecisionWorkflowRequest.list("approved=?1 and processInstanceId != null and processTaskId != null",false);
+        List<DecisionWorkflowRequest> list = DecisionWorkflowRequest.list("approved=?1 and processInstanceId != null and processTaskId != null and (workflowStatus != 3 or workflowStatus is null)",false);
         return list;
     }
 

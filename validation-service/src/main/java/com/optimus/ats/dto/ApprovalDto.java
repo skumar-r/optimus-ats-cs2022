@@ -4,8 +4,8 @@ public class ApprovalDto {
 
     Long workflowId;
     boolean approved;
-    String approvalRemarks;
-    
+    String remarks;
+
     public Long getWorkflowId() {
         return workflowId;
     }
@@ -18,13 +18,11 @@ public class ApprovalDto {
     public void setApproved(boolean approved) {
         this.approved = approved;
     }
-    public String getApprovalRemarks() {
-        return approvalRemarks;
+    public String getRemarks() {
+        return remarks;
     }
-    public void setApprovalRemarks(String approvalRemarks) {
-        this.approvalRemarks = approvalRemarks;
-    }
-
-        
+    public void setRemarks(String remarks) {
+        this.remarks = remarks;
+    }        
     
 }

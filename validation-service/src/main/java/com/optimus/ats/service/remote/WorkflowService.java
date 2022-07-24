@@ -7,6 +7,7 @@ import java.util.Objects;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 import javax.transaction.Transactional;
+import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Response.Status;
 
 import org.eclipse.microprofile.rest.client.inject.RestClient;
@@ -58,11 +59,21 @@ public class WorkflowService {
         return taskInstanceId;
     }
 
-    public ResponseDto approveWorkflow(DecisionWorkflowRequest workflowRequest)
+    public ResponseDto approveWorkflow(DecisionWorkflowRequest workflowRequest, ApprovalDto aDto)
             throws JsonMappingException, JsonProcessingException {
         ObjectMapper mapper = new ObjectMapper();
-        String res = workflowRemoteService.updateTaskStatus(workflowRequest.getProcessInstanceId(),
-                workflowRequest.getProcessTaskId());
+        log.info("Request for updateTaskStatus, ProcessInstanceId:{}, ProcessTaskId:{}", workflowRequest.getProcessInstanceId(),workflowRequest.getProcessTaskId() );
+        String res="";
+        try{
+            res = workflowRemoteService.updateTaskStatus(workflowRequest.getProcessInstanceId(),
+            workflowRequest.getProcessTaskId(), aDto);
+        } catch ( WebApplicationException e){
+                if(e.getResponse().getStatus()==404){
+                    updateWorkflowRequestForWorkflowStatus(workflowRequest);
+                }
+                throw e;
+        }
+        
         log.info("Response for updateTaskStatus:{}", res);
         Map resMap = mapper.readValue(res, Map.class);
         if (Objects.nonNull(resMap.get("id"))) {
@@ -90,6 +101,12 @@ public class WorkflowService {
     public Integer updateWorkflowRequestForTaskInstance(DecisionWorkflowRequest request) {
         String updateQuery = "processTaskId=?1 where id=?2";
         return DecisionWorkflowRequest.update(updateQuery, request.getProcessTaskId(), request.getId());
+    }
+
+    @Transactional
+    public Integer updateWorkflowRequestForWorkflowStatus(DecisionWorkflowRequest request) {
+        String updateQuery = "workflowStatus=?1 where id=?2";
+        return DecisionWorkflowRequest.update(updateQuery, 3, request.getId());
     }
 
     private DecisionWorkflowRequest getWorkflowRequestModel(Long employeeId, Long managerId) {
