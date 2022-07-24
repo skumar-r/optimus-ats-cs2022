@@ -26,4 +26,9 @@ public interface WorkflowRemoteRestService {
     @Path("/approvals/{instanceId}/tasks")
     @Produces(MediaType.APPLICATION_JSON)
     String getTasks(@PathParam("instanceId") String instanceId);
+
+    @GET
+    @Path("/approvals/{instanceId}/ManagerApproval/{taskId}")
+    @Produces(MediaType.APPLICATION_JSON)
+    String updateTaskStatus(@PathParam("instanceId") String instanceId, @PathParam("taskId") String taskId);
 }

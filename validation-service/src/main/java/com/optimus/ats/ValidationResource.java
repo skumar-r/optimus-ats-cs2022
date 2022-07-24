@@ -4,14 +4,19 @@ import io.smallrye.mutiny.Uni;
 import io.vertx.mutiny.core.Vertx;
 import io.vertx.mutiny.core.eventbus.EventBus;
 
+import java.util.List;
 
 import javax.inject.Inject;
 import javax.json.JsonObject;
 import javax.ws.rs.GET;
+import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.QueryParam;
 
+import com.optimus.ats.dto.ApprovalDto;
+import com.optimus.ats.dto.ResponseDto;
+import com.optimus.ats.model.DecisionWorkflowRequest;
 import com.optimus.ats.service.ValidationService;
 
 @Path("/validation/api")
@@ -37,9 +42,21 @@ public class ValidationResource {
                 .onItem().transform(response -> response.body().toUpperCase());   
     }
 
-    @GET
+    @POST
     @Path("/decision/dummy/{employeeId}/{managerId}")
     public String hello2(@PathParam("employeeId") Long employeeId, @PathParam("managerId") Long managerId) throws Exception {     
         return validationService.invokeDecisionService(employeeId, managerId);
+    }
+
+    @GET
+    @Path("/workflow/all")
+    public List<DecisionWorkflowRequest> getAllWorkflows() throws Exception {     
+        return validationService.getAll();
+    }
+
+    @POST
+    @Path("/workflow/approve")
+    public ResponseDto approve(ApprovalDto dto) throws Exception {     
+        return validationService.approve(dto);
     }
 }
