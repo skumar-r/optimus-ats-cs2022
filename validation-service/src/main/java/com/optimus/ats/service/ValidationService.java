@@ -74,7 +74,7 @@ public class ValidationService {
                 return workflowService.approveWorkflow(workflowRequest);
             } catch(Exception e){
                 log.error("excepion", e);
-                return ResponseDto.createResponse(Status.OK);
+                return ResponseDto.createResponse(Status.INTERNAL_SERVER_ERROR);
             }
         } else {
             return ResponseDto.createResponse(Status.NOT_FOUND);
@@ -82,7 +82,7 @@ public class ValidationService {
     }
 
     public List<DecisionWorkflowRequest> getAll() {
-        List<DecisionWorkflowRequest> list = DecisionWorkflowRequest.listAll();
+        List<DecisionWorkflowRequest> list = DecisionWorkflowRequest.list("approved=?1 and processInstanceId != null and processTaskId != null",false);
         return list;
     }
 

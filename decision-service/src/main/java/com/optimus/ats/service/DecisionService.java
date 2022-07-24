@@ -49,7 +49,7 @@ public class DecisionService {
     public void postProcess(Boolean approved, String remarks, Long incomingId){
         System.out.println("After process");
         log.info("approved:{},remarks:{},incomingId:{}",approved, remarks,incomingId);
-        decisionRepository.update("approved=?1,approvalRemarks=?2 where id=?3", approved, remarks, incomingId);
+        decisionRepository.update("approved=?1,approvalRemarks=?2, workflowStatus=?3 where id=?4", approved, remarks, approved ? 1 : 2, incomingId);
     }
 
     @Transactional

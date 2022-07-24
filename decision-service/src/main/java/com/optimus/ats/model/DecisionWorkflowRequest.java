@@ -44,6 +44,7 @@ public class DecisionWorkflowRequest  {
     @CreationTimestamp
     private Date createdDate;
     private Date approvedDate;
+    private Integer workflowStatus;
 
     public Long getId() {
         return id;
@@ -116,6 +117,14 @@ public class DecisionWorkflowRequest  {
 
     public void setApprovedDate(Date approvedDate) {
         this.approvedDate = approvedDate;
+    }
+
+    public Integer getWorkflowStatus() {
+        return workflowStatus;
+    }
+
+    public void setWorkflowStatus(Integer workflowStatus) {
+        this.workflowStatus = workflowStatus;
     }
 
 }

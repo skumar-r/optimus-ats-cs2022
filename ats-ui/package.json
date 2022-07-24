@@ -12,6 +12,8 @@
     "@smui/button": "^6.0.0-beta.16",
     "@smui/card": "^6.0.0-beta.16",
     "@smui/data-table": "^6.0.0-beta.16",
+    "@smui/dialog": "^6.0.0",
+    "@smui/linear-progress": "^6.0.0",
     "@smui/paper": "^6.0.0-beta.16",
     "@smui/select": "^6.0.0-beta.16",
     "@smui/tab": "^6.0.0-beta.16",
