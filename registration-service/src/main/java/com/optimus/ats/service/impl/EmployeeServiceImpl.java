@@ -104,6 +104,7 @@ public class EmployeeServiceImpl extends CommonResource implements EmployeeServi
 		emp.setHasS3Photo(employee.isHasS3Photo());
 		emp.setDepartment(employee.getDepartment());
 		emp.setDesignation(employee.getDesignation());
+		emp.setCsEmployeeId(employee.getCsEmployeeId());
 		return emp;
 	}
 }
