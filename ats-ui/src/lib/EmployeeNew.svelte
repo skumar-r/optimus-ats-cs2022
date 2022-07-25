@@ -1,7 +1,6 @@
 <script>
   // @ts-nocheck
 
-  import { createForm } from "svelte-forms-lib";
   import Paper, { Title, Subtitle, Content } from "@smui/paper";
   let empPhoto =
     "https://digitalfinger.id/wp-content/uploads/2019/12/no-image-available-icon-6.png";
@@ -9,30 +8,29 @@
     "https://digitalfinger.id/wp-content/uploads/2019/12/no-image-available-icon-6.png";
   let empPhotoInput, idPhotoInput;
 
-  const { form, handleChange, handleSubmit } = createForm({
-    initialValues: {
-      title: "",
-      name: "",
-      email: "",
-      mobile: "",
-      department: "",
-      designation: "",
-      empPhoto: "",
-    },
-    onSubmit: (values) => {
-      const dataArray = new FormData();
-      dataArray.append("title", values.title);
-      dataArray.append("employeeName", values.name);
-      dataArray.append("department", values.department);
-      dataArray.append("designation", values.designation);
-      dataArray.append("email", values.email);
-      dataArray.append("mobile", values.mobile);
+  let  title= "",
+      employeeName= "",
+      email= "",
+      mobile= "",
+      department= "",
+      designation= "";
+
+  let handleChange = (e)=>{
+
+  }
+  let handleSubmit = (e) =>{
+    const dataArray = new FormData();
+      dataArray.append("title", title);
+      dataArray.append("employeeName", employeeName);
+      dataArray.append("department", department);
+      dataArray.append("designation", designation);
+      dataArray.append("email", email);
+      dataArray.append("mobile", mobile);
       dataArray.append("hasS3Photo", false);
-      dataArray.append("photoFrontFile", empPhotoInput);
-      dataArray.append("photoIdCardFile", idPhotoInput);
+      dataArray.append("photoFrontFile", empPhotoInput.files[0]);
+      dataArray.append("photoIdCardFile", idPhotoInput.files[0]);
       fetch("http://localhost:9010/employee", {
         method: "POST",
-        headers: [["Content-Type", "multipart/form-data"]],
         body: dataArray,
       })
         .then((response) => {
@@ -41,8 +39,8 @@
         .catch((error) => {
           // Upload failed
         });
-    },
-  });
+  }
+  
 
   const onFileSelectedEmpPhoto = (e) => {
     let image = e.target.files[0];
@@ -73,14 +71,14 @@
       style="margin-top:25px;">
       <span  class="pageTitle">Add a New Employee</span>
       <Content>
-        <form on:submit={handleSubmit} style="height: 600px;">
+        <form style="height: 600px;">
           <div style="width:33%;float:left;">
             <label for="title">Title</label>
             <select
               id="title"
               name="title"
               on:change={handleChange}
-              bind:value={$form.title}
+              bind:value={title}
             >
               <option />
               <option value="mr">Mr.</option>
@@ -90,10 +88,10 @@
 
             <label for="name">Name</label>
             <input
-              id="name"
-              name="name"
+              id="employeeName"
+              name="employeeName"
               on:change={handleChange}
-              bind:value={$form.name}
+              bind:value={employeeName}
             />
 
             <label for="email">Email Address</label>
@@ -101,7 +99,7 @@
               id="email"
               name="email"
               on:change={handleChange}
-              bind:value={$form.email}
+              bind:value={email}
             />
 
             <label for="mobile">Mobile</label>
@@ -109,7 +107,7 @@
               id="mobile"
               name="mobile"
               on:change={handleChange}
-              bind:value={$form.mobile}
+              bind:value={mobile}
             />
 
             <label for="department">Department</label>
@@ -117,15 +115,15 @@
               id="department"
               name="department"
               on:change={handleChange}
-              bind:value={$form.department}
+              bind:value={department}
             >
               <option />
-              <option value="technology">Technology</option>
+              <option value="tech">Technology</option>
               <option value="research">Research</option>
               <option value="support">IT Support</option>
               <option value="sales">Sales & Support</option>
               <option value="security">Security</option>
-              <option value="facilities">Facilities</option>
+              <option value="admin">Facilities</option>
             </select>
 
             <label for="designation">Designation</label>
@@ -133,11 +131,11 @@
               id="designation"
               name="designation"
               on:change={handleChange}
-              bind:value={$form.designation}
+              bind:value={designation}
             >
               <option />
               <option value="manager">Manager</option>
-              <option value="teamMember">Team Member</option>
+              <option value="teammember">Team Member</option>
               <option value="na">N/A</option>
             </select>
           </div>
@@ -201,7 +199,7 @@
             />
           </div>
           <div style="display: flex;width:100%;justify-content: end;">
-            <button type="submit">Submit</button>
+            <button type="button" on:click={(e)=>handleSubmit(e)}>Submit</button>
           </div>
         </form>
       </Content>
