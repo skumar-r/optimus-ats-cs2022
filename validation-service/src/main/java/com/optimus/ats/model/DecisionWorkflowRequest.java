@@ -10,6 +10,7 @@ import javax.persistence.Table;
 import org.hibernate.annotations.CreationTimestamp;
 
 import io.quarkus.hibernate.orm.panache.PanacheEntity;
+import io.quarkus.hibernate.orm.panache.PanacheEntityBase;
 
 /**
  * Example JPA entity.
@@ -31,7 +32,7 @@ import io.quarkus.hibernate.orm.panache.PanacheEntity;
  */
 @Entity
 @Table(name = "t_decision_request")
-public class DecisionWorkflowRequest  {
+public class DecisionWorkflowRequest  extends PanacheEntityBase{
     @Id
     @GeneratedValue
     private Long id;
@@ -44,7 +45,6 @@ public class DecisionWorkflowRequest  {
     @CreationTimestamp
     private Date createdDate;
     private Date approvedDate;
-    private Integer workflowStatus;
 
     public Long getId() {
         return id;
@@ -117,14 +117,6 @@ public class DecisionWorkflowRequest  {
 
     public void setApprovedDate(Date approvedDate) {
         this.approvedDate = approvedDate;
-    }
-
-    public Integer getWorkflowStatus() {
-        return workflowStatus;
-    }
-
-    public void setWorkflowStatus(Integer workflowStatus) {
-        this.workflowStatus = workflowStatus;
     }
 
 }
