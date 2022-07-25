@@ -125,14 +125,14 @@ small {
   background: #cf3845;
   color: white;
   text-align: center;
-  font-weight: bold;
+  font-family: var(--mdc-typography-headline5-font-family, var(--mdc-typography-font-family, Roboto, sans-serif));
   text-transform: uppercase;
 }
 
 .pageTitle {
-  font-size: 25px;
-  font-weight: bold;
-  font-family: Verdana, Geneva, Tahoma, sans-serif;
+  font-size: var(--mdc-typography-headline5-font-size, 1.5rem);
+  ;
+  font-family: var(--mdc-typography-headline5-font-family, var(--mdc-typography-font-family, Roboto, sans-serif));
   margin-bottom: 10px;
   display: block;
 }

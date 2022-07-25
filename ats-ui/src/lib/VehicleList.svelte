@@ -104,7 +104,7 @@
                   <!-- <IconButton class="material-icons">arrow_upward</IconButton> -->
                 </Cell>
                 <!-- You can turn off sorting for a column. -->
-                <Cell columnId="vehicleDetails" style="width:100%;">
+                <Cell columnId="vehicleDetails">
                   <Label>Details</Label>
                   <!-- <IconButton class="material-icons">arrow_upward</IconButton> -->
                 </Cell>
