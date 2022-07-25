@@ -14,7 +14,9 @@
       title: "",
       name: "",
       email: "",
+      mobile: "",
       department: "",
+      designation: "",
       empPhoto: "",
     },
     onSubmit: (values) => {
@@ -22,9 +24,9 @@
       dataArray.append("title", values.title);
       dataArray.append("employeeName", values.name);
       dataArray.append("department", values.department);
-      dataArray.append("designation", "Manager");
+      dataArray.append("designation", values.designation);
       dataArray.append("email", values.email);
-      dataArray.append("mobile", "9876543210");
+      dataArray.append("mobile", values.mobile);
       dataArray.append("hasS3Photo", false);
       dataArray.append("photoFrontFile", empPhotoInput);
       dataArray.append("photoIdCardFile", idPhotoInput);
@@ -64,10 +66,14 @@
 
 <div>
   <div class="paper-container">
-    <Paper color="primary" variant="outlined" class="mdc-theme--primary" style="margin-top:25px;">
-      <Title>Add a New Employee</Title>
+    <Paper
+      color="primary"
+      variant="outlined"
+      class="mdc-theme--primary no-border"
+      style="margin-top:25px;">
+      <span  class="pageTitle">Add a New Employee</span>
       <Content>
-        <form on:submit={handleSubmit} style="height: 440px;">
+        <form on:submit={handleSubmit} style="height: 600px;">
           <div style="width:33%;float:left;">
             <label for="title">Title</label>
             <select
@@ -77,9 +83,9 @@
               bind:value={$form.title}
             >
               <option />
-              <option>Mr.</option>
-              <option>Mrs.</option>
-              <option>Mx.</option>
+              <option value="mr">Mr.</option>
+              <option value="mrs">Mrs.</option>
+              <option value="mx">Mx.</option>
             </select>
 
             <label for="name">Name</label>
@@ -98,6 +104,14 @@
               bind:value={$form.email}
             />
 
+            <label for="mobile">Mobile</label>
+            <input
+              id="mobile"
+              name="mobile"
+              on:change={handleChange}
+              bind:value={$form.mobile}
+            />
+
             <label for="department">Department</label>
             <select
               id="department"
@@ -106,16 +120,29 @@
               bind:value={$form.department}
             >
               <option />
-              <option>Technology</option>
-              <option>Research</option>
-              <option>IT Support</option>
-              <option>Sales & Support</option>
-              <option>Security</option>
-              <option>Facilities</option>
+              <option value="technology">Technology</option>
+              <option value="research">Research</option>
+              <option value="support">IT Support</option>
+              <option value="sales">Sales & Support</option>
+              <option value="security">Security</option>
+              <option value="facilities">Facilities</option>
+            </select>
+
+            <label for="designation">Designation</label>
+            <select
+              id="designation"
+              name="designation"
+              on:change={handleChange}
+              bind:value={$form.designation}
+            >
+              <option />
+              <option value="manager">Manager</option>
+              <option value="teamMember">Team Member</option>
+              <option value="na">N/A</option>
             </select>
           </div>
 
-          <div style="width:33%;float:left;padding: 0 5px;">
+          <div style="width:33%;float:left;padding: 0 80px;">
             <label for="employeeImage">Employee Photo</label>
             <img class="avatar" src={empPhoto} alt="d" />
             <img
@@ -144,7 +171,7 @@
               bind:this={empPhotoInput}
             />
           </div>
-          <div style="width:33%;float:left;">
+          <div style="width:15%;float:left;">
             <label for="idcardImage">ID Card Photo</label>
             <img class="avatar" src={idPhoto} alt="d" />
             <img
@@ -173,7 +200,7 @@
               bind:this={idPhotoInput}
             />
           </div>
-          <div style="display: flex;width:100%;justify-content: center;">
+          <div style="display: flex;width:100%;justify-content: end;">
             <button type="submit">Submit</button>
           </div>
         </form>

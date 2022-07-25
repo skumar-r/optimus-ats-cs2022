@@ -69,8 +69,13 @@ button:focus:not(:disabled) {
 }
 
 button:hover:not(:disabled) {
-  background-color: var(--primary-dark);
+  background-color: var(--primary-light);
   color: var(--white);
+}
+
+.primaryButton {
+  background-color: var(--primary-dark) !important;
+  color: var(--white) !important;
 }
 
 label {
@@ -114,4 +119,32 @@ small {
 .avatar {
   height: 130px !important;
   width: 200px !important;
+}
+
+.mdc-data-table .mdc-data-table__header-cell {
+  background: #cf3845;
+  color: white;
+  text-align: center;
+  font-weight: bold;
+  text-transform: uppercase;
+}
+
+.pageTitle {
+  font-size: 25px;
+  font-weight: bold;
+  font-family: Verdana, Geneva, Tahoma, sans-serif;
+  margin-bottom: 10px;
+  display: block;
+}
+
+.mdc-data-table__cell.centered {
+  text-align: center;
+}
+
+.buttonContainer.mdc-card__actions {
+  justify-content: end;
+}
+
+.no-border {
+  border: none !important;
 }
