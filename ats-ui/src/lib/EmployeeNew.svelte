@@ -28,7 +28,7 @@
       dataArray.append("mobile", mobile);
       dataArray.append("hasS3Photo", false);
       dataArray.append("photoFrontFile", empPhotoInput.files[0]);
-      dataArray.append("photoIdCardFile", idPhotoInput.files[0]);
+      dataArray.append("photoIDCardFile", idPhotoInput.files[0]);
       fetch("http://localhost:9010/employee", {
         method: "POST",
         body: dataArray,
