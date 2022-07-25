@@ -111,7 +111,7 @@
                 </Cell>
               </Row>
             </Head>
-            <Body>
+            <Body >
               {#each items as item (item.id)}
                 <Row>
                   <Cell numeric class="centered">{item.id}</Cell>
