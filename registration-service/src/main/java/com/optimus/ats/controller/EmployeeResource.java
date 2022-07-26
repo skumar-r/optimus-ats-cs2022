@@ -1,8 +1,11 @@
 package com.optimus.ats.controller;
 
 import com.optimus.ats.dto.EmployeeDto;
+import com.optimus.ats.dto.LogDto;
 import com.optimus.ats.model.Employee;
 import com.optimus.ats.service.EmployeeService;
+import io.vertx.core.json.JsonObject;
+import io.vertx.mutiny.core.eventbus.EventBus;
 import org.jboss.resteasy.reactive.MultipartForm;
 
 import javax.enterprise.context.ApplicationScoped;
@@ -22,11 +25,15 @@ import static javax.ws.rs.core.MediaType.MULTIPART_FORM_DATA;
 public class EmployeeResource {
 
 	@Inject
+	EventBus bus;
+
+	@Inject
 	EmployeeService employeeService;
 
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response getAll() {
+		bus.publish("log", JsonObject.mapFrom(LogDto.builder().serviceName("registration-service").details("getEmployee list").build()));
 		List<Employee> employees = Employee.listAll();
 		return Response.ok(employees).build();
 	}
@@ -47,6 +54,7 @@ public class EmployeeResource {
 	public Response create(@MultipartForm EmployeeDto employee) {
 		System.out.println("email:"+employee.getEmail());
 		try {
+
 			return employeeService.saveEmployee(employee);
 		} catch (IOException e) {
 			return Response.status(Response.Status.NOT_FOUND).build();

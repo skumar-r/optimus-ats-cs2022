@@ -73,7 +73,8 @@ public class EmployeeServiceImpl extends CommonResource implements EmployeeServi
 				System.out.println("local storage exists");
 				String photoFrontFileName = customDir.getAbsolutePath() +
 						File.separator + photoFrontPrefix + "_" + emp.getId() + ".png";
-				System.out.println("photoFrontPrefix=" + photoFrontFileName);
+				System.out.println(">>>>=" + employee.getEmail()+ " >>" +employee.getEmployeeName());
+				System.out.println("photoFrontPrefix=" + photoFrontFileName+ " >>" +employee.getPhotoFrontFile().toPath());
 				Files.write(Paths.get(photoFrontFileName), Files.readAllBytes(employee.getPhotoFrontFile().toPath()),
 						StandardOpenOption.CREATE_NEW);
 				String photoLeftFileName = customDir.getAbsolutePath() +
