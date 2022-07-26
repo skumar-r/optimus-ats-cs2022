@@ -9,8 +9,8 @@
   </dmn:itemDefinition>
   <dmn:itemDefinition id="_46E0EE12-8A32-4DDA-9CB8-B68ED5E64868" name="tdepartment" isCollection="false">
     <dmn:typeRef>string</dmn:typeRef>
-    <dmn:allowedValues kie:constraintType="enumeration" id="_5F195C8A-9AAE-4FCB-B543-02D12E848D60">
-      <dmn:text>"tech", "research", "security", "support", "admin"</dmn:text>
+    <dmn:allowedValues kie:constraintType="enumeration" id="_FF2A4242-BF76-49F8-992E-5D348DC714F0">
+      <dmn:text>"tech", "research", "security", "support", "admin", "sales"</dmn:text>
     </dmn:allowedValues>
   </dmn:itemDefinition>
   <dmn:itemDefinition id="_542747C0-28A3-4DB3-9AA1-C413E817F7A5" name="tallowed" isCollection="false">
@@ -55,7 +55,7 @@
       </dmn:rule>
       <dmn:rule id="_DA15172F-C9DB-4710-AF35-E2D70E854C8D">
         <dmn:inputEntry id="_4A823004-10DC-4AF0-834C-B96B44058BEF">
-          <dmn:text>"tech","research"</dmn:text>
+          <dmn:text>"tech","research","support","sales"</dmn:text>
         </dmn:inputEntry>
         <dmn:inputEntry id="_143CBA20-3B22-402C-9EB5-BC6645CBB478">
           <dmn:text>"manager"</dmn:text>
@@ -69,7 +69,7 @@
       </dmn:rule>
       <dmn:rule id="_3C7A66F0-E0AB-4CA0-8054-3F90CFB41271">
         <dmn:inputEntry id="_A06ACD17-ED21-4CF3-9596-BEC17D0EF6C8">
-          <dmn:text>"tech","research"</dmn:text>
+          <dmn:text>"tech","research","support","sales"</dmn:text>
         </dmn:inputEntry>
         <dmn:inputEntry id="_BC0E7CEB-3806-4EFA-85DF-53193DBA56CE">
           <dmn:text>"teammember"</dmn:text>

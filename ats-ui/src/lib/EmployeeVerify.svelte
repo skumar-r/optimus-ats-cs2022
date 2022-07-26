@@ -1,19 +1,24 @@
 <script>
-  import { createForm } from "svelte-forms-lib";
   import Paper, { Title, Subtitle, Content } from "@smui/paper";
   let empPhoto, idPhoto, empPhotoInput, idPhotoInput;
   let resultAvailable = false;
-  const { form, handleChange, handleSubmit } = createForm({
-    initialValues: {
-      empPhoto: undefined,
-      idPhoto: undefined,
-    },
-    onSubmit: (values) => {
-      resultAvailable = true;
-      alert(JSON.stringify(values));
-    },
-  });
 
+  let handleSubmit = (e) =>{ debugger;
+    const dataArray = new FormData();
+    dataArray.append("type", 'employee');
+    dataArray.append("resourceFile", empPhotoInput.files[0]);
+    dataArray.append("idCardFile", idPhotoInput.files[0]);
+    fetch("http://localhost:9011/recognition", {
+      method: "POST",
+      body: dataArray,
+    })
+            .then((response) => {
+              // Successfully uploaded
+            })
+            .catch((error) => {
+              // Upload failed
+            });
+  }
   const onFileSelectedEmpPhoto = (e) => {
     let image = e.target.files[0];
     let reader = new FileReader();
@@ -38,9 +43,9 @@
     <Paper color="primary" variant="outlined" class="mdc-theme--primary">
       <Title>Verify an Employee</Title>
       <Content>
-        <form on:submit={handleSubmit}>
+        <form>
           <label for="employeeImage">Employee Photo</label>
-          <img class="avatar" src={empPhoto} alt="d" />
+          <img class="avatar" src={empPhoto}  />
           <img
             class="upload"
             src="https://static.thenounproject.com/png/625182-200.png"
@@ -68,7 +73,7 @@
           />
 
           <label for="idcardImage">ID Card Photo</label>
-          <img class="avatar" src={idPhoto} alt="d" />
+          <img class="avatar" src={idPhoto} />
           <img
             class="upload"
             src="https://static.thenounproject.com/png/625182-200.png"
@@ -94,7 +99,9 @@
             on:change={(e) => onFileSelectedIdPhoto(e)}
             bind:this={idPhotoInput}
           />
-          <button type="submit">Verify</button>
+          <div style="display: flex;width:100%;justify-content: end;">
+            <button type="button" on:click={(e)=>handleSubmit(e)}>Verify</button>
+          </div>
         </form>
       </Content>
     </Paper>

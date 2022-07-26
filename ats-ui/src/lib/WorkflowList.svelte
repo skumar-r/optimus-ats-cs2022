@@ -121,7 +121,7 @@
 <div>
   <div style="padding: 0;">
     <div class="paper-container">
-      <Paper color="primary" variant="outlined" class="mdc-theme--primary">
+      <Paper color="primary" variant="outlined" class="mdc-theme--primary no-border">
         <Title>Pending Approval List</Title>        
         <Content>
           <LinearProgress {progress} {closed} {buffer}/>
@@ -139,12 +139,12 @@
                 <Cell numeric columnId="employeeId">
                   <!-- For numeric columns, icon comes first. -->
                   <Label>Employee ID</Label>
-                  <IconButton class="material-icons">arrow_upward</IconButton>
+                  <!-- <IconButton class="material-icons">arrow_upward</IconButton> -->
                 </Cell>
-                <Cell columnId="createdDate" style="width: 100%;">
+                <Cell columnId="createdDate">
                   <Label>Created Date</Label>
                   <!-- For non-numeric columns, icon comes second. -->
-                  <IconButton class="material-icons">arrow_upward</IconButton>
+                  <!-- <IconButton class="material-icons">arrow_upward</IconButton> -->
                   </Cell>
               </Row>
             </Head>

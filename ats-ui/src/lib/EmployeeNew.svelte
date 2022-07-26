@@ -1,7 +1,6 @@
 <script>
   // @ts-nocheck
 
-  import { createForm } from "svelte-forms-lib";
   import Paper, { Title, Subtitle, Content } from "@smui/paper";
   let empPhoto =
     "https://digitalfinger.id/wp-content/uploads/2019/12/no-image-available-icon-6.png";
@@ -9,28 +8,29 @@
     "https://digitalfinger.id/wp-content/uploads/2019/12/no-image-available-icon-6.png";
   let empPhotoInput, idPhotoInput;
 
-  const { form, handleChange, handleSubmit } = createForm({
-    initialValues: {
-      title: "",
-      name: "",
-      email: "",
-      department: "",
-      empPhoto: "",
-    },
-    onSubmit: (values) => {
-      const dataArray = new FormData();
-      dataArray.append("title", values.title);
-      dataArray.append("employeeName", values.name);
-      dataArray.append("department", values.department);
-      dataArray.append("designation", "Manager");
-      dataArray.append("email", values.email);
-      dataArray.append("mobile", "9876543210");
+  let  csEmployeeId= "",
+      employeeName= "",
+      email= "",
+      mobile= "",
+      department= "",
+      designation= "";
+
+  let handleChange = (e)=>{
+
+  }
+  let handleSubmit = (e) =>{
+    const dataArray = new FormData();
+      dataArray.append("csEmployeeId", csEmployeeId);
+      dataArray.append("employeeName", employeeName);
+      dataArray.append("department", department);
+      dataArray.append("designation", designation);
+      dataArray.append("email", email);
+      dataArray.append("mobile", mobile);
       dataArray.append("hasS3Photo", false);
-      dataArray.append("photoFrontFile", empPhotoInput);
-      dataArray.append("photoIdCardFile", idPhotoInput);
+      dataArray.append("photoFrontFile", empPhotoInput.files[0]);
+      dataArray.append("photoIDCardFile", idPhotoInput.files[0]);
       fetch("http://localhost:9010/employee", {
         method: "POST",
-        headers: [["Content-Type", "multipart/form-data"]],
         body: dataArray,
       })
         .then((response) => {
@@ -39,8 +39,8 @@
         .catch((error) => {
           // Upload failed
         });
-    },
-  });
+  }
+  
 
   const onFileSelectedEmpPhoto = (e) => {
     let image = e.target.files[0];
@@ -64,30 +64,29 @@
 
 <div>
   <div class="paper-container">
-    <Paper color="primary" variant="outlined" class="mdc-theme--primary" style="margin-top:25px;">
-      <Title>Add a New Employee</Title>
+    <Paper
+      color="primary"
+      variant="outlined"
+      class="mdc-theme--primary no-border"
+      style="margin-top:25px;">
+      <span  class="pageTitle">Add a New Employee</span>
       <Content>
-        <form on:submit={handleSubmit} style="height: 440px;">
+        <form style="height: 600px;">
           <div style="width:33%;float:left;">
-            <label for="title">Title</label>
-            <select
-              id="title"
-              name="title"
-              on:change={handleChange}
-              bind:value={$form.title}
-            >
-              <option />
-              <option>Mr.</option>
-              <option>Mrs.</option>
-              <option>Mx.</option>
-            </select>
-
-            <label for="name">Name</label>
+            <label for="csEmployeeId">Employee Id</label>
             <input
-              id="name"
-              name="name"
+                    id="csEmployeeId"
+                    name="csEmployeeId"
+                    on:change={handleChange}
+                    bind:value={csEmployeeId}
+            />
+
+            <label for="employeeName">Name</label>
+            <input
+              id="employeeName"
+              name="employeeName"
               on:change={handleChange}
-              bind:value={$form.name}
+              bind:value={employeeName}
             />
 
             <label for="email">Email Address</label>
@@ -95,7 +94,15 @@
               id="email"
               name="email"
               on:change={handleChange}
-              bind:value={$form.email}
+              bind:value={email}
+            />
+
+            <label for="mobile">Mobile</label>
+            <input
+              id="mobile"
+              name="mobile"
+              on:change={handleChange}
+              bind:value={mobile}
             />
 
             <label for="department">Department</label>
@@ -103,19 +110,32 @@
               id="department"
               name="department"
               on:change={handleChange}
-              bind:value={$form.department}
+              bind:value={department}
             >
               <option />
-              <option>Technology</option>
-              <option>Research</option>
-              <option>IT Support</option>
-              <option>Sales & Support</option>
-              <option>Security</option>
-              <option>Facilities</option>
+              <option value="tech">Technology</option>
+              <option value="research">Research</option>
+              <option value="support">IT Support</option>
+              <option value="sales">Sales & Support</option>
+              <option value="security">Security</option>
+              <option value="admin">Facilities</option>
+            </select>
+
+            <label for="designation">Designation</label>
+            <select
+              id="designation"
+              name="designation"
+              on:change={handleChange}
+              bind:value={designation}
+            >
+              <option />
+              <option value="manager">Manager</option>
+              <option value="teammember">Team Member</option>
+              <option value="na">N/A</option>
             </select>
           </div>
 
-          <div style="width:33%;float:left;padding: 0 5px;">
+          <div style="width:33%;float:left;padding: 0 80px;">
             <label for="employeeImage">Employee Photo</label>
             <img class="avatar" src={empPhoto} alt="d" />
             <img
@@ -144,7 +164,7 @@
               bind:this={empPhotoInput}
             />
           </div>
-          <div style="width:33%;float:left;">
+          <div style="width:15%;float:left;">
             <label for="idcardImage">ID Card Photo</label>
             <img class="avatar" src={idPhoto} alt="d" />
             <img
@@ -173,8 +193,8 @@
               bind:this={idPhotoInput}
             />
           </div>
-          <div style="display: flex;width:100%;justify-content: center;">
-            <button type="submit">Submit</button>
+          <div style="display: flex;width:100%;justify-content: end;">
+            <button type="button" on:click={(e)=>handleSubmit(e)}>Submit</button>
           </div>
         </form>
       </Content>
