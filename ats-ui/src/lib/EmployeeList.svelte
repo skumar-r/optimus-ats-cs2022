@@ -1,7 +1,6 @@
 <script lang="js">
   import DataTable, { Head, Body, Row, Cell, Label } from "@smui/data-table";
-  import IconButton from "@smui/icon-button";
-  import Paper, { Title, Content } from "@smui/paper";
+  import Paper, { Content } from "@smui/paper";
   import Card, { Actions } from "@smui/card";
   import { navigate } from "svelte-navigator";
   import Button from "@smui/button";
@@ -10,11 +9,14 @@
   let sortDirection = "ascending";
 
   if (typeof fetch !== "undefined") {
-    fetch(
-      "https://gist.githubusercontent.com/hperrin/e24a4ebd9afdf2a8c283338ae5160a62/raw/dcbf8e6382db49b0dcab70b22f56b1cc444f26d4/users.json"
-    )
+    fetch("http://localhost:9010/employee", {
+      method: "GET",
+    })
       .then((response) => response.json())
-      .then((json) => (items = json));
+      .then((json) => (items = json))
+      .catch((error) => {
+        // Upload failed
+      });
   }
 
   function handleSort() {
@@ -34,14 +36,16 @@
 <div>
   <div class="card-container">
     <Card>
-      <Actions>
+      <Actions class="buttonContainer">
         <Button
+          class="primaryButton"
           variant="outlined"
           on:click={() => navigate("employeeVerify", { replace: true })}
         >
           <Label>Verify an Employee</Label>
         </Button>
         <Button
+          class="primaryButton"
           variant="outlined"
           on:click={() => navigate("employeeNew", { replace: true })}
         >
@@ -52,8 +56,12 @@
   </div>
   <div style="padding: 0;">
     <div class="paper-container">
-      <Paper color="primary" variant="outlined" class="mdc-theme--primary">
-        <Title>Employee List</Title>
+      <Paper
+        color="primary"
+        variant="outlined"
+        class="mdc-theme--primary no-border"
+      >
+        <span class="pageTitle">Employee List</span>
         <Content>
           <DataTable
             sortable
@@ -77,34 +85,41 @@
           -->
                 <Cell numeric columnId="id">
                   <!-- For numeric columns, icon comes first. -->
-                  <IconButton class="material-icons">arrow_upward</IconButton>
                   <Label>ID</Label>
+                  <!-- <IconButton class="material-icons">arrow_upward</IconButton> -->
                 </Cell>
-                <Cell columnId="name" style="width: 100%;">
+                <Cell columnId="employeeName">
                   <Label>Name</Label>
                   <!-- For non-numeric columns, icon comes second. -->
-                  <IconButton class="material-icons">arrow_upward</IconButton>
+                  <!-- <IconButton class="material-icons">arrow_upward</IconButton> -->
                 </Cell>
-                <Cell columnId="username">
+                <Cell columnId="email">
                   <Label>Email Address</Label>
-                  <IconButton class="material-icons">arrow_upward</IconButton>
+                  <!-- <IconButton class="material-icons">arrow_upward</IconButton> -->
                 </Cell>
-                <Cell columnId="email" l>
+                <Cell columnId="mobile">
+                  <Label>Mobile</Label>
+                  <!-- <IconButton class="material-icons">arrow_upward</IconButton> -->
+                </Cell>
+                <Cell columnId="department">
                   <Label>Department</Label>
-                  <IconButton class="material-icons">arrow_upward</IconButton>
+                  <!-- <IconButton class="material-icons">arrow_upward</IconButton> -->
                 </Cell>
-                <!-- You can turn off sorting for a column. -->
-                <Cell sortable={false}>Website</Cell>
+                <Cell columnId="designation">
+                  <Label>Designation</Label>
+                  <!-- <IconButton class="material-icons">arrow_upward</IconButton> -->
+                </Cell>
               </Row>
             </Head>
-            <Body>
+            <Body >
               {#each items as item (item.id)}
                 <Row>
-                  <Cell numeric>{item.id}</Cell>
-                  <Cell>{item.name}</Cell>
-                  <Cell>{item.username}</Cell>
+                  <Cell numeric class="centered">{item.id}</Cell>
+                  <Cell>{item.employeeName}</Cell>
                   <Cell>{item.email}</Cell>
-                  <Cell>{item.website}</Cell>
+                  <Cell class="centered">{item.mobile}</Cell>
+                  <Cell class="centered">{item.department}</Cell>
+                  <Cell class="centered">{item.designation}</Cell>
                 </Row>
               {/each}
             </Body>
@@ -114,4 +129,3 @@
     </div>
   </div>
 </div>
-

@@ -32,6 +32,10 @@ public class EmployeeDto {
 	@PartType(MediaType.TEXT_PLAIN)
 	private String designation;
 
+	@RestForm
+	@PartType(MediaType.TEXT_PLAIN)
+	private String csEmployeeId;
+
 	private String photoFront;
 	private String photoIdCard;
 	@RestForm("photoFrontFile")
@@ -117,5 +121,13 @@ public class EmployeeDto {
 
 	public void setDesignation(String designation) {
 		this.designation = designation;
+	}
+
+	public String getCsEmployeeId() {
+		return csEmployeeId;
+	}
+
+	public void setCsEmployeeId(String csEmployeeId) {
+		this.csEmployeeId = csEmployeeId;
 	}
 }

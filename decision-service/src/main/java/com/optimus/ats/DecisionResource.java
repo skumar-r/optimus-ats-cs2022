@@ -1,19 +1,35 @@
 package com.optimus.ats;
 
+import javax.inject.Inject;
 import javax.ws.rs.GET;
+import javax.ws.rs.POST;
 import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 
 import org.json.JSONObject;
 
-@Path("/decision")
+import com.optimus.ats.service.DecisionService;
+
+@Path("/approval")
 public class DecisionResource {
 
-    @GET
-    @Path("/create")
+    @Inject
+    DecisionService decisionService;
+    
+    @POST
+    @Path("/create/dummy/{id}")
     @Produces(MediaType.APPLICATION_JSON)
-    public JSONObject create() {
+    public JSONObject create1(@PathParam("id") Long employeeId) {
+        decisionService.createDummyRecord(employeeId);
+        return new JSONObject();
+    }
+
+    @GET
+    @Path("/create1")
+    @Produces(MediaType.APPLICATION_JSON)
+    public JSONObject create2() {
         return new JSONObject();
     }
 }

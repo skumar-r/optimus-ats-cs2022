@@ -11,11 +11,14 @@
   let sortDirection = "ascending";
 
   if (typeof fetch !== "undefined") {
-    fetch(
-      "https://gist.githubusercontent.com/hperrin/e24a4ebd9afdf2a8c283338ae5160a62/raw/dcbf8e6382db49b0dcab70b22f56b1cc444f26d4/users.json"
-    )
+    fetch("http://localhost:9010/vehicle", {
+      method: "GET",
+    })
       .then((response) => response.json())
-      .then((json) => (items = json));
+      .then((json) => (items = json))
+      .catch((error) => {
+        // Upload failed
+      });
   }
 
   function handleSort() {
@@ -35,14 +38,16 @@
 <div>
   <div class="card-container">
     <Card>
-      <Actions>
+      <Actions class="buttonContainer">
         <Button
+          class="primaryButton"
           variant="outlined"
           on:click={() => navigate("vehicle/verify", { replace: true })}
         >
           <Label>Verify a Vehicle</Label>
         </Button>
         <Button
+          class="primaryButton"
           variant="outlined"
           on:click={() => navigate("vehicle/new", { replace: true })}
         >
@@ -53,8 +58,12 @@
   </div>
   <div style="padding: 0;">
     <div class="paper-container">
-      <Paper color="primary" variant="outlined" class="mdc-theme--primary">
-        <Title>Employee Vehicle List</Title>
+      <Paper
+        color="primary"
+        variant="outlined"
+        class="mdc-theme--primary no-border"
+      >
+        <span class="pageTitle">Employee Vehicle List</span>
         <Content>
           <DataTable
             sortable
@@ -78,37 +87,37 @@
       -->
                 <Cell numeric columnId="id">
                   <!-- For numeric columns, icon comes first. -->
-                  <IconButton class="material-icons">arrow_upward</IconButton>
+                  <!-- <IconButton class="material-icons">arrow_upward</IconButton> -->
                   <Label>Vehicle ID</Label>
                 </Cell>
-                <Cell columnId="employeeId" style="width: 100%;">
+                <Cell columnId="employeeId">
                   <Label>Employee Id</Label>
                   <!-- For non-numeric columns, icon comes second. -->
-                  <IconButton class="material-icons">arrow_upward</IconButton>
+                  <!-- <IconButton class="material-icons">arrow_upward</IconButton> -->
                 </Cell>
-                <Cell columnId="employeeName">
-                  <Label>Employee Name</Label>
-                  <IconButton class="material-icons">arrow_upward</IconButton>
-                </Cell>
-                <Cell columnId="vehicleBrand" l>
-                  <Label>Vehicle Brand</Label>
-                  <IconButton class="material-icons">arrow_upward</IconButton>
+                <!-- <Cell columnId="employeeName">
+                  <Label>Employee Name</Label> -->
+                <!-- <IconButton class="material-icons">arrow_upward</IconButton> -->
+                <!-- </Cell> -->
+                <Cell columnId="regNo">
+                  <Label>Register No.</Label>
+                  <!-- <IconButton class="material-icons">arrow_upward</IconButton> -->
                 </Cell>
                 <!-- You can turn off sorting for a column. -->
-                <Cell columnId="vehicleModel" l>
-                  <Label>Vehicle Model</Label>
-                  <IconButton class="material-icons">arrow_upward</IconButton>
+                <Cell columnId="vehicleDetails">
+                  <Label>Details</Label>
+                  <!-- <IconButton class="material-icons">arrow_upward</IconButton> -->
                 </Cell>
               </Row>
             </Head>
             <Body>
               {#each items as item (item.id)}
                 <Row>
-                  <Cell numeric>{item.id}</Cell>
-                  <Cell>{item.employeeId}</Cell>
-                  <Cell>{item.employeeName}</Cell>
-                  <Cell>{item.vehicleBrand}</Cell>
-                  <Cell>{item.vehicleModel}</Cell>
+                  <Cell numeric class="centered">{item.id}</Cell>
+                  <Cell class="centered">{item.employeeId}</Cell>
+                  <!-- <Cell>{item.employeeName}</Cell> -->
+                  <Cell class="centered">{item.regNo}</Cell>
+                  <Cell class="centered">{item.vehicleDetails}</Cell>
                 </Row>
               {/each}
             </Body>

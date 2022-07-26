@@ -37,6 +37,9 @@ public class Employee extends PanacheEntityBase {
 	@Column(name = "DESIGNATION")
 	private String designation;
 
+	@Column(name = "CS_EMPLOYEE_ID")
+	private String csEmployeeId;
+
 	public Long getId() {
 		return id;
 	}
@@ -107,5 +110,13 @@ public class Employee extends PanacheEntityBase {
 
 	public void setDesignation(String designation) {
 		this.designation = designation;
+	}
+
+	public String getCsEmployeeId() {
+		return csEmployeeId;
+	}
+
+	public void setCsEmployeeId(String csEmployeeId) {
+		this.csEmployeeId = csEmployeeId;
 	}
 }

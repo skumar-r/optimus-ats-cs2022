@@ -1,9 +1,14 @@
 package com.optimus.ats.controller;
 
 import com.optimus.ats.dto.EmployeeDto;
+import com.optimus.ats.dto.LogDto;
 import com.optimus.ats.model.Employee;
 import com.optimus.ats.service.EmployeeService;
+import io.vertx.core.json.JsonObject;
+import io.vertx.mutiny.core.eventbus.EventBus;
 import org.jboss.resteasy.reactive.MultipartForm;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
@@ -18,8 +23,13 @@ import java.util.List;
 import static javax.ws.rs.core.MediaType.MULTIPART_FORM_DATA;
 
 @ApplicationScoped
-@Path("/employee-registration")
+@Path("/employee")
 public class EmployeeResource {
+
+	static final Logger log = LoggerFactory.getLogger(EmployeeResource.class);
+
+	@Inject
+	EventBus bus;
 
 	@Inject
 	EmployeeService employeeService;
@@ -27,6 +37,7 @@ public class EmployeeResource {
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response getAll() {
+		bus.publish("log", JsonObject.mapFrom(LogDto.builder().serviceName("registration-service").details("getEmployee list").build()));
 		List<Employee> employees = Employee.listAll();
 		return Response.ok(employees).build();
 	}
@@ -46,9 +57,12 @@ public class EmployeeResource {
 	@Consumes(MULTIPART_FORM_DATA)
 	public Response create(@MultipartForm EmployeeDto employee) {
 		System.out.println("email:"+employee.getEmail());
+		System.out.println("name:"+employee.getEmployeeName());
 		try {
+
 			return employeeService.saveEmployee(employee);
 		} catch (IOException e) {
+			log.error("exception", e);
 			return Response.status(Response.Status.NOT_FOUND).build();
 		}
 	}
