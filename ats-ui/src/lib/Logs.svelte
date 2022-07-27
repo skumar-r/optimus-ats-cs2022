@@ -1,10 +1,13 @@
 <script lang="js">
   import DataTable, { Head, Body, Row, Cell, Label } from "@smui/data-table";
+  import Dialog, { Title, Header, Content as DContent, Actions as DActions } from "@smui/Dialog";
+  import IconButton from "@smui/icon-button";
   import Paper, { Content } from "@smui/paper";
-  import Card, { Actions } from "@smui/card";
   import { navigate } from "svelte-navigator";
   import Button from "@smui/button";
   let items = [];
+  let open=false;
+  let actionItem={};
   let sort = "id";
   let sortDirection = "ascending";
   let serviceName ="all"
@@ -90,7 +93,7 @@
             </Head>
             <Body >
               {#each items as item (item.id)}
-                <Row>                 
+                <Row on:click={() => (open = true, actionItem= item)}>                 
                   <Cell>{item.serviceName}</Cell>
                   <Cell>{item?.action ? item.action : "NO_ACTION"}</Cell>
                   <Cell>{item.details}</Cell>
@@ -101,6 +104,41 @@
           </DataTable>
         </Content>
       </Paper>
+      <Dialog
+        bind:open
+        fullscreen
+        aria-labelledby="fullscreen-title"
+        aria-describedby="fullscreen-content"
+      >
+        <Header>
+          <Title id="fullscreen-title">Employee Approval</Title>
+          <IconButton action="close" class="material-icons">close</IconButton>
+        </Header>
+        <DContent id="fullscreen-content">         
+          <form style="height: 440px;">
+            <div style="width:75%;float:left;">
+                Service Name : {actionItem.serviceName}     
+            
+                <label for="email">Action</label>
+                <textarea
+                  id="action"
+                  name="action"
+                  disabled
+                  cols="20" rows="5"
+                  bind:value={actionItem.action}
+                />
+                <label for="email">Details</label>
+                <textarea
+                  id="details"
+                  name="details"
+                  disabled
+                  cols="20" rows="5"
+                  bind:value={actionItem.details}
+                />
+            </div>
+          </form>
+        </DContent>      
+    </Dialog>
     </div>
   </div>
 </div>
