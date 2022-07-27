@@ -96,8 +96,8 @@ public class WorkflowService {
     }
 
     @Transactional
-    public DecisionWorkflowRequest createNewWorkflowRequest(Long employeeId, Long managerId) {
-        DecisionWorkflowRequest request = getWorkflowRequestModel(employeeId, managerId);
+    public DecisionWorkflowRequest createNewWorkflowRequest(Long employeeId, Long managerId, String csId) {
+        DecisionWorkflowRequest request = getWorkflowRequestModel(employeeId, managerId, csId);
         DecisionWorkflowRequest.persist(request);
         return request;
     }
@@ -120,10 +120,11 @@ public class WorkflowService {
         return DecisionWorkflowRequest.update(updateQuery, 3, request.getId());
     }
 
-    private DecisionWorkflowRequest getWorkflowRequestModel(Long employeeId, Long managerId) {
+    private DecisionWorkflowRequest getWorkflowRequestModel(Long employeeId, Long managerId, String csId) {
         DecisionWorkflowRequest request = new DecisionWorkflowRequest();
         request.setEmployeeId(employeeId);
         request.setManagerId(managerId);
+        request.setCsEmpId(csId);
         return request;
     }
 }

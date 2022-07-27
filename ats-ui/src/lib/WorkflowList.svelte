@@ -141,11 +141,17 @@
                   <Label>Employee ID</Label>
                   <!-- <IconButton class="material-icons">arrow_upward</IconButton> -->
                 </Cell>
+                <Cell columnId="csEmpId">
+                  <Label>CS Employee Id</Label>
+                  <!-- For non-numeric columns, icon comes second. -->
+                  <!-- <IconButton class="material-icons">arrow_upward</IconButton> -->
+                  </Cell>
                 <Cell columnId="createdDate">
                   <Label>Created Date</Label>
                   <!-- For non-numeric columns, icon comes second. -->
                   <!-- <IconButton class="material-icons">arrow_upward</IconButton> -->
                   </Cell>
+                <Cell><Label>Action</Label></Cell>
               </Row>
             </Head>
             <Body>
@@ -153,6 +159,7 @@
               {#each items as item (item.id)}
                 <Row>
                   <Cell numeric>{item.employeeId}</Cell>
+                  <Cell>{item.csEmpId}</Cell>
                   <Cell>{item.createdDate}</Cell>
                   <Cell>
                     <Button action="takeAction" on:click={() => (open = true, actionItem= item)}  bind:disabled>

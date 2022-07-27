@@ -35,6 +35,7 @@ public class DecisionWorkflowRequest  {
     @Id
     @GeneratedValue
     private Long id;
+    private String csEmpId;
     private Long employeeId;
     private Long managerId;
     private String processTaskId;
@@ -125,6 +126,14 @@ public class DecisionWorkflowRequest  {
 
     public void setWorkflowStatus(Integer workflowStatus) {
         this.workflowStatus = workflowStatus;
+    }
+
+    public String getCsEmpId() {
+        return csEmpId;
+    }
+
+    public void setCsEmpId(String csEmpId) {
+        this.csEmpId = csEmpId;
     }
 
 }

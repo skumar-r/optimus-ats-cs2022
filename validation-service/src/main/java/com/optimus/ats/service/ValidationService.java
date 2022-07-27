@@ -38,9 +38,9 @@ public class ValidationService {
         return name;
     }
 
-    public String invokeDecisionService(Long employeeId, Long managerId) {
+    public String invokeDecisionService(Long employeeId, Long managerId, String csId) {
         String response = "success";
-        DecisionWorkflowRequest workflow = workflowService.createNewWorkflowRequest(employeeId, managerId);
+        DecisionWorkflowRequest workflow = workflowService.createNewWorkflowRequest(employeeId, managerId, csId);
         log.info("workflowId->" + workflow.getId());
 
         try {
