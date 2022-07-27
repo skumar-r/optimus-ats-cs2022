@@ -17,6 +17,7 @@ import org.slf4j.LoggerFactory;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.optimus.ats.common.EventService;
 import com.optimus.ats.dto.ApprovalDto;
 import com.optimus.ats.dto.ProcessDto;
 import com.optimus.ats.dto.ResponseDto;
@@ -32,13 +33,18 @@ public class WorkflowService {
     @RestClient
     WorkflowRemoteRestService workflowRemoteService;
 
+    @Inject
+    EventService event;
+
     public String invokeDecisionService(Long workflowId) throws Exception {
         ObjectMapper mapper = new ObjectMapper();
         String processInstanceId = "";
         if (Objects.nonNull(workflowId)) {
             ProcessDto dto = new ProcessDto();
             dto.setIncomingId(workflowId);
+            event.eventLog("Approvals Process - Request", dto, "");
             String responseFromRemote = workflowRemoteService.post(dto);
+            event.eventLog("Approvals Process - Response", null, responseFromRemote);
             Map mapObj = mapper.readValue(responseFromRemote, Map.class);
             processInstanceId = (String) mapObj.get("id");
 
@@ -50,7 +56,9 @@ public class WorkflowService {
         ObjectMapper mapper = new ObjectMapper();
         String taskInstanceId = null;
         if (Objects.nonNull(processInstanceId)) {
+            event.eventLog("Approvals Process Task- Request", null, processInstanceId);
             String responseFromRemote = workflowRemoteService.getTasks(processInstanceId);
+            event.eventLog("Approvals Process Task- Response", null, responseFromRemote);
             List<Map> list = mapper.readValue(responseFromRemote, List.class);
             if (Objects.nonNull(list) && list.size() > 0) {
                 taskInstanceId = (String) list.get(0).get("id");
@@ -65,12 +73,15 @@ public class WorkflowService {
         log.info("Request for updateTaskStatus, ProcessInstanceId:{}, ProcessTaskId:{}", workflowRequest.getProcessInstanceId(),workflowRequest.getProcessTaskId() );
         String res="";
         try{
+            event.eventLog("Approvals Process Task Approval- Request", aDto, "");
             res = workflowRemoteService.updateTaskStatus(workflowRequest.getProcessInstanceId(),
             workflowRequest.getProcessTaskId(), aDto);
+            event.eventLog("Approvals Process Task Approval- Response", null, res);
         } catch ( WebApplicationException e){
                 if(e.getResponse().getStatus()==404){
                     updateWorkflowRequestForWorkflowStatus(workflowRequest);
                 }
+                event.eventLog("Approvals Process Task Approval- Exception", null, e.getMessage());
                 throw e;
         }
         

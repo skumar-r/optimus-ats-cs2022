@@ -2,7 +2,11 @@ package com.optimus.ats.model;
 
 import io.quarkus.hibernate.orm.panache.PanacheEntityBase;
 
+import java.util.Date;
+
 import javax.persistence.*;
+
+import org.hibernate.annotations.CreationTimestamp;
 
 @Entity()
 @Cacheable
@@ -16,8 +20,15 @@ public class LogManager extends PanacheEntityBase {
 	@Column(name = "SERVICE_NAME")
 	private String serviceName;
 
+	@Column(name = "ACTION_NAME")
+	private String action;
+
 	@Column(name = "DETAILS")
 	private String details;
+
+	@Column(name = "CREATED_DATE")
+	@CreationTimestamp
+	private Date createdDate;
 
 	public Long getId() {
 		return id;
@@ -35,6 +46,7 @@ public class LogManager extends PanacheEntityBase {
 		this.serviceName = serviceName;
 	}
 
+	
 	public String getDetails() {
 		return details;
 	}
@@ -42,4 +54,21 @@ public class LogManager extends PanacheEntityBase {
 	public void setDetails(String details) {
 		this.details = details;
 	}
+
+	public Date getCreatedDate() {
+		return createdDate;
+	}
+
+	public void setCreatedDate(Date createdDate) {
+		this.createdDate = createdDate;
+	}
+
+	public String getAction() {
+		return action;
+	}
+
+	public void setAction(String action) {
+		this.action = action;
+	}
+	
 }
