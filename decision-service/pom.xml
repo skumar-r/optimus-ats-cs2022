@@ -1,6 +1,5 @@
 <?xml version="1.0"?>
-<project xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd" xmlns="http://maven.apache.org/POM/4.0.0"
-    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+<project xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd" xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
   <modelVersion>4.0.0</modelVersion>
   <groupId>com.optimus.ats</groupId>
   <artifactId>decision-service</artifactId>
@@ -97,6 +96,21 @@
       <artifactId>quarkus-smallrye-openapi</artifactId>
     </dependency>
     <dependency>
+      <groupId>io.quarkus</groupId>
+      <artifactId>quarkus-vertx</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>io.vertx</groupId>
+      <artifactId>vertx-infinispan</artifactId>
+     <!-- <version>3.9.2</version>-->
+      <exclusions>
+          <exclusion>
+              <groupId>io.vertx</groupId>
+              <artifactId>vertx-core</artifactId>
+          </exclusion>
+      </exclusions>
+  </dependency>
+    <dependency>
       <groupId>io.rest-assured</groupId>
       <artifactId>rest-assured</artifactId>
       <scope>test</scope>
@@ -114,6 +128,20 @@
       <artifactId>runtime-tools-quarkus-extension</artifactId>
       <version>1.22.1.Final</version>
     </dependency>
+    <!-- https://mavenlibs.com/maven/dependency/org.kie.kogito/kogito-addons-quarkus-mail 
+    <dependency>
+      <groupId>org.kie.kogito</groupId>
+      <artifactId>kogito-addons-quarkus-mail</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.kie.kogito</groupId>
+      <artifactId>task-notification-quarkus-addon</artifactId>
+      <version>1.7.0.Final</version>
+    </dependency>
+    <dependency>
+      <groupId>io.quarkus</groupId>
+      <artifactId>quarkus-smallrye-reactive-messaging-kafka</artifactId>
+    </dependency>-->
   </dependencies>
   <build>
     <plugins>

@@ -8,6 +8,7 @@
   import VehicleVerify from "./lib/VehicleVerify.svelte";
   import EmployeeVerify from "./lib/EmployeeVerify.svelte";
   import WorkflowList from "./lib/WorkflowList.svelte";
+  import Logs from "./lib/Logs.svelte";
 </script>
 
 <Router>
@@ -22,4 +23,5 @@
   <Route path="vehicle/new"><VehicleNew /></Route>
   <Route path="vehicle/verify"><VehicleVerify /></Route>
   <Route path="workflow/list"><WorkflowList /></Route>
+  <Route path="event/list"><Logs /></Route>
 </Router>
