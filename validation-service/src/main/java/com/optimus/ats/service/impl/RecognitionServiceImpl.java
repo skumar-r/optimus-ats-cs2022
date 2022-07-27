@@ -5,21 +5,16 @@ import com.amazonaws.auth.BasicAWSCredentials;
 import com.amazonaws.services.rekognition.AmazonRekognition;
 import com.amazonaws.services.rekognition.AmazonRekognitionClientBuilder;
 import com.amazonaws.services.rekognition.model.*;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.optimus.ats.common.CommonResource;
 import com.optimus.ats.common.ServiceResponse;
 import com.optimus.ats.common.StatusType;
 import com.optimus.ats.dto.RecognitionDto;
 import com.optimus.ats.model.Employee;
-import com.optimus.ats.model.EmployeeRecognition;
-import com.optimus.ats.model.Vehicle;
-import com.optimus.ats.model.VehicleRecognition;
 import com.optimus.ats.service.RecognitionService;
 import com.optimus.ats.service.ValidationService;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.eclipse.microprofile.config.inject.ConfigProperty;
-import software.amazon.awssdk.core.SdkBytes;
 import software.amazon.awssdk.utils.StringUtils;
 
 import javax.enterprise.context.ApplicationScoped;
@@ -59,12 +54,15 @@ public class RecognitionServiceImpl extends CommonResource implements Recognitio
 				if (StringUtils.equals("employee", dto.getType()) & hasDetectFacesinImage(dto.getFormData()) && hasDetectFacesinImage(dto.getIdCardData())) {
 					return getEmployeeMatchedRecord(dto.getIdCardData(), dto.getFormData());
 				} else{
+					response.setSuccess(false);
 					response.getContentMap().put("message","Uploaded image does not contain face.");
 				}
 			} else {
+				response.setSuccess(false);
 				response.getContentMap().put("message","Employee Photo and ID card required");
 			}
 		} catch (Exception e) {
+			response.setSuccess(false);
 			response.getContentMap().put("message","Employee Photo and ID card required");
 			return response;
 		}
@@ -85,6 +83,7 @@ public class RecognitionServiceImpl extends CommonResource implements Recognitio
 			if(Objects.isNull(employee)){
 				/// not found
 				response.getContentMap().put("StatusType",StatusType.NOT_FOUND.getType());
+				response.setSuccess(false);
 				response.getContentMap().put("message","Employee ID does not exists");
 			} else{
 				System.out.println("employee>>"+employee.getEmployeeName());
@@ -100,6 +99,7 @@ public class RecognitionServiceImpl extends CommonResource implements Recognitio
 				} else {
 					// no match and call decision service
 					validationService.invokeDecisionService(employee.getId(), null);
+					response.setSuccess(false);
 					response.getContentMap().put("StatusType",StatusType.NO_MATCH.getType());
 				}
 			}
