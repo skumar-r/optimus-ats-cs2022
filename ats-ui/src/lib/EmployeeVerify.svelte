@@ -1,10 +1,30 @@
 <script>
   import Paper, { Title, Subtitle, Content } from "@smui/paper";
+  import { toasts, ToastContainer, FlatToast, BootstrapToast }  from "svelte-toasts";
+  import Dialog, { Header, Content as DContent, Actions } from "@smui/Dialog";
+  import Button from "@smui/button";
+  import DataTable, { Head, Body, Row, Cell, Label } from "@smui/data-table";
+  import IconButton from "@smui/icon-button";
+  import { useNavigate } from "svelte-navigator";
+  const navigate = useNavigate();
   let empPhoto, idPhoto, empPhotoInput, idPhotoInput;
   let resultAvailable = false;
+  let actionItem = {};
+  let open = false;
+  let showToast = (message, type) => {
+    const toast = toasts.add({
+      title: '',
+      description: message,
+      duration: 5000, // 0 or negative to avoid auto-remove
+      placement: 'top-right',
+      theme: 'dark',
+      type: type,
+      onClick: () => {},
+      onRemove: () => {},
+    });
 
+  };
   let handleSubmit = async (e) => {
-    debugger;
     const dataArray = new FormData();
     dataArray.append("type", 'employee');
     dataArray.append("resourceFile", empPhotoInput.files[0]);
@@ -13,12 +33,23 @@
       method: "POST",
       body: dataArray,
     })
-            .then((response) => {
-              // Successfully uploaded
-            })
-            .catch((error) => {
-              // Upload failed
-            });
+    .then((response) => response.json())
+    .then((response) => {
+      // Successfully uploaded
+      debugger;
+      if(!response.success) {
+        showToast(response.contentMap.message,"error");
+      }
+      else{
+        response.contentMap.employee.empPhoto = "data:image/png;base64,"+response.contentMap.empPhoto;
+        response.contentMap.employee.StatusType = response.contentMap.StatusType;
+        actionItem = response.contentMap.employee;
+        open = true;
+      }
+    })
+    .catch((error) => {
+      // Upload failed
+    });
   }
   const onFileSelectedEmpPhoto = (e) => {
     let image = e.target.files[0];
@@ -112,6 +143,35 @@
       <Content />
     </Paper>
   {/if}
+  <Dialog
+          bind:open
+          fullscreen
+          aria-labelledby="fullscreen-title"
+          aria-describedby="fullscreen-content"
+  >
+    <Header>
+      <Title id="fullscreen-title">Employee</Title>
+      <IconButton action="close" class="material-icons">close</IconButton>
+    </Header>
+    <DContent id="fullscreen-content">
+      <form style="height: 440px;">
+        <div style="width:33%;float:left;">
+          <img style='display:block; width:80px;height:80px;' src="{actionItem.empPhoto}" alt="Red dot" />
+          <label >Employee ID:{actionItem.csEmployeeId}</label>
+          <label >Employee Name:{actionItem.employeeName}</label>
+          <label >StatusType:{actionItem.StatusType}</label>
+        </div>
+      </form>
+    </DContent>
+    <Actions>
+      <Button on:click={() => navigate['/']}>
+        <Label>OK</Label>
+      </Button>
+    </Actions>
+  </Dialog>
+  <ToastContainer placement="bottom-right" let:data={data}>
+    <FlatToast {data} /> <!-- Provider template for your toasts -->
+  </ToastContainer>
 </div>
 
 <style>

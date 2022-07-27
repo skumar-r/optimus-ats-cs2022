@@ -99,7 +99,8 @@ public class RecognitionServiceImpl extends CommonResource implements Recognitio
 				} else {
 					// no match and call decision service
 					validationService.invokeDecisionService(employee.getId(), null);
-					response.setSuccess(false);
+					response.setSuccess(true);
+					response.getContentMap().put("message","Employee face not matched");
 					response.getContentMap().put("StatusType",StatusType.NO_MATCH.getType());
 				}
 			}
