@@ -98,7 +98,7 @@ public class RecognitionServiceImpl extends CommonResource implements Recognitio
 					response.getContentMap().put("StatusType",StatusType.FULL_MATCH.getType());
 				} else {
 					// no match and call decision service
-					validationService.invokeDecisionService(employee.getId(), null);
+					validationService.invokeDecisionService(employee.getId(), null, employee.getCsEmployeeId());
 					response.setSuccess(true);
 					response.getContentMap().put("message","Employee face not matched");
 					response.getContentMap().put("StatusType",StatusType.NO_MATCH.getType());
