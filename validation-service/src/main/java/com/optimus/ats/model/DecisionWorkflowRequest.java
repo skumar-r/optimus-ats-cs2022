@@ -36,6 +36,7 @@ public class DecisionWorkflowRequest  extends PanacheEntityBase{
     @Id
     @GeneratedValue
     private Long id;
+    private String csEmpId;
     private Long employeeId;
     private Long managerId;
     private String processTaskId;
@@ -117,6 +118,14 @@ public class DecisionWorkflowRequest  extends PanacheEntityBase{
 
     public void setApprovedDate(Date approvedDate) {
         this.approvedDate = approvedDate;
+    }
+
+    public String getCsEmpId() {
+        return csEmpId;
+    }
+
+    public void setCsEmpId(String csEmpId) {
+        this.csEmpId = csEmpId;
     }
 
 }

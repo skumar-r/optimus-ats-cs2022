@@ -43,9 +43,9 @@ public class ValidationResource {
     }
 
     @POST
-    @Path("/decision/dummy/{employeeId}/{managerId}")
-    public String hello2(@PathParam("employeeId") Long employeeId, @PathParam("managerId") Long managerId) throws Exception {     
-        return validationService.invokeDecisionService(employeeId, managerId);
+    @Path("/decision/dummy/{employeeId}/{managerId}/{csId}")
+    public String hello2(@PathParam("employeeId") Long employeeId, @PathParam("managerId") Long managerId, @PathParam("csId") String csId) throws Exception {     
+        return validationService.invokeDecisionService(employeeId, managerId, csId);
     }
 
     @GET
