@@ -1,5 +1,7 @@
 package com.optimus.ats.service;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Objects;
 
 import javax.enterprise.context.ApplicationScoped;
@@ -15,6 +17,9 @@ import com.optimus.ats.model.InternalDataDto;
 import com.optimus.ats.repository.DecisionRepository;
 import com.optimus.ats.repository.EmployeeRepository;
 
+import io.vertx.core.json.JsonObject;
+import io.vertx.mutiny.core.eventbus.EventBus;
+
 @ApplicationScoped
 public class DecisionService {
     
@@ -24,6 +29,9 @@ public class DecisionService {
     DecisionRepository decisionRepository;
     @Inject
     EmployeeRepository employeeRepository;
+
+    @Inject
+    EventBus bus;
 
     public InternalDataDto initProcess(Long incomingId){
         InternalDataDto dto = new InternalDataDto();       
@@ -36,9 +44,19 @@ public class DecisionService {
         } else{
             dto.setValidRequest(false);
         }
+
+        eventLog("Initial Processing-Kogito",dto, "" );
         
         return dto;
     }
+
+    public void eventLog( String action, Object dto, String stringIfDtoIsNull){       
+        JsonObject mapObj = new JsonObject();
+        mapObj.put("serviceName", "decision-service");
+        mapObj.put("action",action);
+        mapObj.put("details",Objects.nonNull(dto)?JsonObject.mapFrom(dto).toString(): stringIfDtoIsNull);
+        bus.publish("log",mapObj);
+    }    
     
 
     public void startProcess(DecisionWorkflowRequest data){
@@ -50,6 +68,7 @@ public class DecisionService {
         System.out.println("After process");
         log.info("approved:{},remarks:{},incomingId:{}",approved, remarks,incomingId);
         decisionRepository.update("approved=?1,approvalRemarks=?2, workflowStatus=?3 where id=?4", Objects.requireNonNullElse(approved, Boolean.TRUE), Objects.requireNonNullElse(remarks, "Auto Approved by Decision Rule"), Objects.requireNonNullElse(approved, Boolean.TRUE).booleanValue() ? 1 : 2, incomingId);
+        eventLog("Post Processing-Kogito",null,  "approved:"+approved+",remarks:"+remarks+",incomingId:"+incomingId);
     }
 
     @Transactional

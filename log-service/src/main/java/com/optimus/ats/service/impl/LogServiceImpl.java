@@ -29,12 +29,14 @@ public class LogServiceImpl {
 		log.info("init with startup event");
 		vertx.eventBus().consumer("log")
 				.handler(h -> {
+					log.info("message body: {}", JsonObject.mapFrom(h.body()).toString());
 					LogManager logManager = JsonObject.mapFrom(h.body()).mapTo(LogManager.class);
-					log.info("sr: {}", logManager.getServiceName());
-					LogManager log = new LogManager();
-					log.setServiceName(logManager.getServiceName());
-					log.setDetails(logManager.getDetails());
-					bus.publish("centrallog",log);
+					log.info("serviceName: {} action:{}", logManager.getServiceName(), logManager.getAction());
+					LogManager logObj = new LogManager();
+					logObj.setServiceName(logManager.getServiceName());
+					logObj.setDetails(logManager.getDetails());
+					logObj.setAction(logManager.getAction());
+					bus.publish("centrallog",logObj);
 				});
 	}
 
