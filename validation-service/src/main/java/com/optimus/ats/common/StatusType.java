@@ -1,9 +1,10 @@
 package com.optimus.ats.common;
 
 public enum StatusType {
-	FULL_MATCH("FULLMATCH"),
-	APPROVAL_REQUIRED("APPROVALREQUIRED"),
-	NO_MATCH("NOMATCH");
+	FULL_MATCH("MATCHED"),
+	APPROVAL_REQUIRED("APPROVAL REQUIRED"),
+	NOT_FOUND("NOT FOUND"),
+	NO_MATCH("NO MATCH");
 
 	final String type;
 

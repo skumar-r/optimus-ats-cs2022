@@ -1,11 +1,20 @@
 package com.optimus.ats.service.impl;
 
+import com.amazonaws.auth.AWSStaticCredentialsProvider;
+import com.amazonaws.auth.BasicAWSCredentials;
+import com.amazonaws.services.rekognition.AmazonRekognition;
+import com.amazonaws.services.rekognition.AmazonRekognitionClientBuilder;
+import com.amazonaws.services.rekognition.model.*;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.optimus.ats.common.CommonResource;
 import com.optimus.ats.common.FormData;
+import com.optimus.ats.common.ServiceResponse;
 import com.optimus.ats.controller.EmployeeResource;
 import com.optimus.ats.dto.EmployeeDto;
 import com.optimus.ats.model.Employee;
 import com.optimus.ats.service.EmployeeService;
+import org.apache.commons.io.FilenameUtils;
+import org.apache.commons.io.IOUtils;
 import org.eclipse.microprofile.config.inject.ConfigProperty;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -18,12 +27,13 @@ import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 import javax.transaction.Transactional;
 import javax.ws.rs.core.Response;
-import java.io.File;
-import java.io.IOException;
+import java.io.*;
+import java.nio.ByteBuffer;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
+import java.util.List;
 
 @ApplicationScoped
 public class EmployeeServiceImpl extends CommonResource implements EmployeeService {
@@ -32,6 +42,15 @@ public class EmployeeServiceImpl extends CommonResource implements EmployeeServi
 
 	@Inject
 	S3Client s3;
+
+	@ConfigProperty(name = "aws.accessKeyId")
+	String ACCESS_KEY;
+
+	@ConfigProperty(name = "aws.secretAccessKey")
+	String SECRET_KEY;
+
+	@ConfigProperty(name = "quarkus.s3.aws.region")
+	String region;
 
 	@ConfigProperty(name = "ats.employee.photo-front-prefix")
 	String photoFrontPrefix;
@@ -44,7 +63,18 @@ public class EmployeeServiceImpl extends CommonResource implements EmployeeServi
 
 	@Transactional
 	@Override
-	public Response saveEmployee(EmployeeDto employee) throws IOException {
+	public ServiceResponse saveEmployee(EmployeeDto employee) throws IOException {
+		ServiceResponse response = ServiceResponse.createSuccessServiceResponse();
+		if(StringUtils.equals(Employee.findByName(employee.getCsEmployeeId()).getCsEmployeeId(),employee.getCsEmployeeId())){
+			response.getContentMap().put("message","Employee Id already exists");
+			response.setSuccess(false);
+			return response;
+		}
+		if(employee.getPhotoFrontFile().exists() && employee.getPhotoIDCardFile().exists() &&  (!hasDetectFacesinImage(employee.getPhotoFrontFile()) || !hasDetectFacesinImage(employee.getPhotoIDCardFile()))){
+			response.getContentMap().put("message","Uploaded image does not contain face.");
+			response.setSuccess(false);
+			return response;
+		}
 		Employee emp = getParseEmployeeDto(employee);
 		Employee.persist(emp);
 		if (employee.isHasS3Photo()) {
@@ -54,7 +84,7 @@ public class EmployeeServiceImpl extends CommonResource implements EmployeeServi
 					.mimetype("image/png")
 					.build();
 			FormData photoLeftObj = FormData.builder()
-					.data(employee.getPhotoFrontFile())
+					.data(employee.getPhotoIDCardFile())
 					.filename(photoIDPrefix + "_" + emp.getId())
 					.mimetype("image/png")
 					.build();
@@ -69,9 +99,11 @@ public class EmployeeServiceImpl extends CommonResource implements EmployeeServi
 				emp.setPhotoFront(photoFrontObj.getFilename());
 				emp.setPhotoIdcard(photoLeftObj.getFilename());
 				Employee.persist(emp);
-				return Response.ok().status(Response.Status.CREATED).build();
+				return response;
 			} else {
-				return Response.serverError().build();
+				Employee.deleteById(emp.getId());
+				response.getContentMap().put("message","Please fill required fields");
+				return response;
 			}
 		} else {
 			File customDir = new File(uploadDir);
@@ -104,15 +136,18 @@ public class EmployeeServiceImpl extends CommonResource implements EmployeeServi
 
 				if (StringUtils.isNotBlank(photoFrontFileName) && StringUtils.isNotBlank(photoLeftFileName)) {
 					System.out.println("isNotBlank");
-					emp.setPhotoFront(photoFrontFileName);
-					emp.setPhotoIdcard(photoLeftFileName);
+					emp.setPhotoFront(FilenameUtils.separatorsToSystem(photoFrontFileName));
+					emp.setPhotoIdcard(FilenameUtils.separatorsToSystem(photoLeftFileName));
 					Employee.persist(emp);
-					return Response.ok().status(Response.Status.CREATED).build();
+					return response;
 				} else {
-					return Response.serverError().build();
+					Employee.deleteById(emp.getId());
+					response.getContentMap().put("message","Please fill required fields");
+					return response;
 				}
 			}
-			return Response.serverError().build();
+			Employee.deleteById(emp.getId());
+			return response;
 		}
 	}
 
@@ -126,5 +161,23 @@ public class EmployeeServiceImpl extends CommonResource implements EmployeeServi
 		emp.setDesignation(employee.getDesignation());
 		emp.setCsEmployeeId(employee.getCsEmployeeId());
 		return emp;
+	}
+
+	private boolean hasDetectFacesinImage(File sourceImage ) throws IOException {
+		try (InputStream targetImgStream = new FileInputStream(sourceImage)) {
+			BasicAWSCredentials credentials = new BasicAWSCredentials(ACCESS_KEY, SECRET_KEY);
+			AmazonRekognition rekognitionClient = AmazonRekognitionClientBuilder.standard()
+					.withCredentials(new AWSStaticCredentialsProvider(credentials)).withRegion(region).build();
+			DetectFacesRequest request = new DetectFacesRequest()
+					.withImage(new Image().withBytes(ByteBuffer.wrap(IOUtils.toByteArray(targetImgStream))))
+					.withAttributes(Attribute.ALL);
+			DetectFacesResult result = rekognitionClient.detectFaces(request);
+			List < FaceDetail > faceDetails = result.getFaceDetails();
+			return faceDetails.size()>0;
+
+		} catch (AmazonRekognitionException |  FileNotFoundException e) {
+			System.out.println(e.getMessage());
+			return false;
+		}
 	}
 }

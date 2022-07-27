@@ -118,4 +118,8 @@ public class Employee extends PanacheEntityBase {
 	public void setCsEmployeeId(String csEmployeeId) {
 		this.csEmployeeId = csEmployeeId;
 	}
+
+	public static Employee findByName(String name){
+		return find("csEmployeeId", name).firstResult();
+	}
 }

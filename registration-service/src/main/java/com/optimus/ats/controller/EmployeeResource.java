@@ -1,5 +1,6 @@
 package com.optimus.ats.controller;
 
+import com.optimus.ats.common.ServiceResponse;
 import com.optimus.ats.dto.EmployeeDto;
 import com.optimus.ats.dto.LogDto;
 import com.optimus.ats.model.Employee;
@@ -55,15 +56,15 @@ public class EmployeeResource {
 	@Transactional
 	@Produces(MediaType.APPLICATION_JSON)
 	@Consumes(MULTIPART_FORM_DATA)
-	public Response create(@MultipartForm EmployeeDto employee) {
+	public ServiceResponse create(@MultipartForm EmployeeDto employee) {
 		System.out.println("email:"+employee.getEmail());
 		System.out.println("name:"+employee.getEmployeeName());
 		try {
 
 			return employeeService.saveEmployee(employee);
-		} catch (IOException e) {
+		} catch (Exception e) {
 			log.error("exception", e);
-			return Response.status(Response.Status.NOT_FOUND).build();
+			return ServiceResponse.createFailureServiceResponse();
 		}
 	}
 

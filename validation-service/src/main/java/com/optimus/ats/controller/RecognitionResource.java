@@ -1,5 +1,7 @@
 package com.optimus.ats.controller;
 
+import com.optimus.ats.common
+		.ServiceResponse;
 import com.optimus.ats.dto.RecognitionDto;
 import com.optimus.ats.model.Employee;
 import com.optimus.ats.service.RecognitionService;
@@ -42,7 +44,7 @@ public class RecognitionResource {
 	@POST
 	@Produces(MediaType.APPLICATION_JSON)
 	@Consumes(MULTIPART_FORM_DATA)
-	public Response create(@MultipartForm RecognitionDto dto) throws IOException {
+	public ServiceResponse create(@MultipartForm RecognitionDto dto) throws IOException {
 		System.out.println("rec:" + dto.getType());
 		return recognitionService.save(dto);
 	}

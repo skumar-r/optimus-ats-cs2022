@@ -18,7 +18,7 @@
   let handleChange = (e)=>{
 
   }
-  let handleSubmit = (e) =>{
+  let handleSubmit = async (e) => {
     const dataArray = new FormData();
       dataArray.append("csEmployeeId", csEmployeeId);
       dataArray.append("employeeName", employeeName);
@@ -29,11 +29,12 @@
       dataArray.append("hasS3Photo", false);
       dataArray.append("photoFrontFile", empPhotoInput.files[0]);
       dataArray.append("photoIDCardFile", idPhotoInput.files[0]);
-      fetch("http://localhost:9010/employee", {
+    await fetch("http://localhost:9010/employee", {
         method: "POST",
         body: dataArray,
       })
         .then((response) => {
+          debugger;
           // Successfully uploaded
         })
         .catch((error) => {

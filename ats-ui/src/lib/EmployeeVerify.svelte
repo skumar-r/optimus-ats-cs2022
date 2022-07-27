@@ -3,12 +3,13 @@
   let empPhoto, idPhoto, empPhotoInput, idPhotoInput;
   let resultAvailable = false;
 
-  let handleSubmit = (e) =>{ debugger;
+  let handleSubmit = async (e) => {
+    debugger;
     const dataArray = new FormData();
     dataArray.append("type", 'employee');
     dataArray.append("resourceFile", empPhotoInput.files[0]);
     dataArray.append("idCardFile", idPhotoInput.files[0]);
-    fetch("http://localhost:9011/recognition", {
+    await fetch("http://localhost:9011/recognition", {
       method: "POST",
       body: dataArray,
     })
