@@ -193,8 +193,15 @@
                 disabled
                 bind:value={actionItem.employeeId}
               />
+              <label for="title">CS Employee Id</label>      
+              <input
+                id="csEmpId"
+                name="csEmpId"
+                disabled
+                bind:value={actionItem.csEmpId}
+              />
   
-              <label for="email">Approval Remarks</label>
+              <label for="email">Remarks</label>
               <input
                 id="approvalRemarks"
                 name="approvalRemarks"
