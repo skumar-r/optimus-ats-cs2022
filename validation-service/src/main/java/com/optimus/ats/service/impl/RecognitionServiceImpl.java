@@ -169,11 +169,7 @@ public class RecognitionServiceImpl extends CommonResource implements Recognitio
 		}
 		return false;
 	}
-	private String convertListToJSONArrayString(List<CompareFacesMatch> list){
-		JsonArray array = new JsonArray();
-		list.forEach(detail -> array.add(JsonObject.mapFrom(detail)));
-		return array.toString();
-	}
+	
 
 	private List<String> getDetectedText(File targetImage) {
 		List<String> detectedText = new ArrayList<>();
@@ -208,12 +204,25 @@ public class RecognitionServiceImpl extends CommonResource implements Recognitio
 					.withAttributes(Attribute.ALL);
 			DetectFacesResult result = rekognitionClient.detectFaces(request);
 			List < FaceDetail > faceDetails = result.getFaceDetails();
+			event.eventLog("AWS Face Detection Response", null, convertFaceDetailListToJSONArrayString(faceDetails));
 			return faceDetails.size()>0;
 
 		} catch (AmazonRekognitionException |  FileNotFoundException e) {
-			System.out.println(e.getMessage());
+			log.error("Exception", e);
 			return false;
 		}
+	}
+
+	private String convertListToJSONArrayString(List<CompareFacesMatch> list){
+		JsonArray array = new JsonArray();
+		list.forEach(detail -> array.add(JsonObject.mapFrom(detail)));
+		return array.toString();
+	}
+
+	private String convertFaceDetailListToJSONArrayString(List<FaceDetail> list){
+		JsonArray array = new JsonArray();
+		list.forEach(detail -> array.add(JsonObject.mapFrom(detail)));
+		return array.toString();
 	}
 	/*private EmployeeRecognition getParseEmployeeObject(Employee employee) {
 		EmployeeRecognition recognition = new EmployeeRecognition();
