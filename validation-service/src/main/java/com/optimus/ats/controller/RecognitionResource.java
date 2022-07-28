@@ -56,6 +56,7 @@ public class RecognitionResource {
 	public ServiceResponse create(@MultipartForm RecognitionDto dto) throws IOException {
 		log.info("RecognitionDto->Type:" + dto.getType());
 		ServiceResponse response= recognitionService.validateEmployee(dto);
+		log.info("Status Type:" + response.getContentMap().get("StatusType"));
 		if(response.getContentMap().get("StatusType").equals(StatusType.APPROVAL_REQUIRED.getType())){			
 			Employee emp = (Employee)response.getContentMap().get("employee");
 			log.info("Invoking Decision Workflow Service for employee Id:{}", emp.getId());

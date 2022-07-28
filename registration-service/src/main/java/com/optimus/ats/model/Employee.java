@@ -1,7 +1,12 @@
 package com.optimus.ats.model;
 
 import io.quarkus.hibernate.orm.panache.PanacheEntityBase;
+import org.apache.commons.io.FileUtils;
+
 import javax.persistence.*;
+import java.io.File;
+import java.io.IOException;
+import java.util.Base64;
 
 @Entity()
 @Cacheable
@@ -38,6 +43,9 @@ public class Employee extends PanacheEntityBase {
 
 	@Column(name = "DESIGNATION")
 	private String designation;
+
+	@Transient
+	private String empPhoto;
 
 	public Long getId() {
 		return id;
@@ -121,5 +129,19 @@ public class Employee extends PanacheEntityBase {
 
 	public static Employee findByName(String name){
 		return find("csEmployeeId", name).firstResult();
+	}
+
+	public String getEmpPhoto() {
+		byte[] fileContent = new byte[0];
+		try {
+			fileContent = FileUtils.readFileToByteArray(new File(this.getPhotoFront()));
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		return "data:image/png;base64,"+Base64.getEncoder().encodeToString(fileContent);
+	}
+
+	public void setEmpPhoto(String empPhoto) {
+		this.empPhoto = empPhoto;
 	}
 }

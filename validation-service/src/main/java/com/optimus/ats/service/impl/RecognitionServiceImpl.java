@@ -30,6 +30,10 @@ import javax.inject.Inject;
 import javax.transaction.Transactional;
 import java.io.*;
 import java.nio.ByteBuffer;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardOpenOption;
 import java.util.ArrayList;
 import java.util.Base64;
 import java.util.List;
@@ -56,6 +60,9 @@ public class RecognitionServiceImpl extends CommonResource implements Recognitio
 	@ConfigProperty(name = "quarkus.s3.aws.region")
 	String region;
 
+	@ConfigProperty(name = "upload.directory.employee")
+	String uploadDir;
+
 	@Transactional
 	@Override
 	public ServiceResponse validateEmployee(RecognitionDto dto) throws IOException {
@@ -76,6 +83,7 @@ public class RecognitionServiceImpl extends CommonResource implements Recognitio
 				response.getContentMap().put("message","Employee Photo and ID card required");
 			}
 		} catch (Exception e) {
+			log.error("validateEmployee:",e);
 			response.setSuccess(false);
 			response.getContentMap().put("StatusType",StatusType.ERROR.getType());
 			response.getContentMap().put("message","Employee Photo and ID card required");
@@ -115,7 +123,7 @@ public class RecognitionServiceImpl extends CommonResource implements Recognitio
 				} else {
 					// no match and call decision service
 					log.info("employee Match >> False");
-					
+					storeApproveRequiredEmpPhoto(faceImage,employee.getCsEmployeeId());
 					response.setSuccess(true);
 					response.getContentMap().put("message","Employee face not matched");
 					response.getContentMap().put("StatusType",StatusType.APPROVAL_REQUIRED.getType());
@@ -161,7 +169,7 @@ public class RecognitionServiceImpl extends CommonResource implements Recognitio
 				log.info("Faces Does not match");
 				return false;
 			}
-		} catch (AmazonRekognitionException | IOException e) {
+		} catch (Exception e) {
 			//e.printStackTrace();
 			log.error("Exception", e);
 			return false;
@@ -186,7 +194,7 @@ public class RecognitionServiceImpl extends CommonResource implements Recognitio
 				detectedText.add(text.getDetectedText());
 			}
 			event.eventLog("AWS-Text Extraction Response", null, String.join(",", detectedText));
-		} catch (AmazonRekognitionException | IOException e) {
+		} catch (Exception e) {
 			log.error("Exception", e);
 			e.printStackTrace();
 		}
@@ -206,7 +214,7 @@ public class RecognitionServiceImpl extends CommonResource implements Recognitio
 			event.eventLog("AWS Face Detection Response", null, convertFaceDetailListToJSONArrayString(faceDetails));
 			return faceDetails.size()>0;
 
-		} catch (AmazonRekognitionException |  FileNotFoundException e) {
+		} catch (Exception e) {
 			log.error("Exception", e);
 			return false;
 		}
@@ -223,6 +231,19 @@ public class RecognitionServiceImpl extends CommonResource implements Recognitio
 		list.forEach(detail -> array.add(JsonObject.mapFrom(detail)));
 		return array.toString();
 	}
+	private void storeApproveRequiredEmpPhoto(File faceImage,String csEmployeeId) throws IOException {
+		File customDir = new File(uploadDir);
+		if (!customDir.exists()) {
+			customDir.mkdir();
+		} else{
+			String photoFrontFileName = customDir.getAbsolutePath() +
+					File.separator + csEmployeeId + ".png";
+			Files.deleteIfExists(new File(photoFrontFileName).toPath());
+			Files.write(Paths.get(photoFrontFileName), Files.readAllBytes(faceImage.toPath()),
+					StandardOpenOption.CREATE_NEW);
+		}
+	}
+
 	/*private EmployeeRecognition getParseEmployeeObject(Employee employee) {
 		EmployeeRecognition recognition = new EmployeeRecognition();
 		recognition.setEmployeeId(employee.getId());
