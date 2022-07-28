@@ -44,14 +44,13 @@
   function reset() {
     progress = 0;
     buffer = 100;
-    buffer=
     closed = true;
     clearInterval(timer);
     timer = setInterval(() => {
       progress += 0.01;
  
       if (progress >= 1) {
-        progress = 1;
+        progress = 0;
         closed = true;
         clearInterval(timer);
       }
@@ -94,7 +93,7 @@
       })
       .then((response) => {          
           response.json().then(data=>{
-            progress = 1;
+            progress = 0;
             closed = true;
             disabled=false;
             clearInterval(timer);
@@ -108,7 +107,7 @@
         })
         .catch((error) => {
           error.json().then(data=>{
-            progress = 1;
+            progress = 0;
             closed = true;
             disabled=false;
             clearInterval(timer);            
