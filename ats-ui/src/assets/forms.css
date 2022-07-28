@@ -114,7 +114,8 @@ small {
 }
 
 .avatar {
-  height: 130px !important;
+  height: auto !important;
+  min-height: 120px !important;
   width: 200px !important;
 }
 

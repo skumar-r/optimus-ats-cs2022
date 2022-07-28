@@ -13,7 +13,11 @@
   import { useNavigate } from "svelte-navigator";
   import CircularProgress from "@smui/circular-progress";
   const navigate = useNavigate();
-  let empPhoto, idPhoto, empPhotoInput, idPhotoInput;
+  let empPhoto =
+    "https://digitalfinger.id/wp-content/uploads/2019/12/no-image-available-icon-6.png";
+  let idPhoto =
+    "https://digitalfinger.id/wp-content/uploads/2019/12/no-image-available-icon-6.png";
+  let empPhotoInput, idPhotoInput;
   let resultAvailable = false;
   let actionItem = {};
   let open = false;
@@ -93,6 +97,7 @@
             <label for="employeeImage">Employee Photo</label>
             <img class="avatar" src={empPhoto} />
             <img
+              style="width: 25px;"
               class="upload"
               src="https://static.thenounproject.com/png/625182-200.png"
               alt=""
@@ -122,6 +127,7 @@
             <label for="idcardImage">ID Card Photo</label>
             <img class="avatar" src={idPhoto} />
             <img
+              style="width: 25px;"
               class="upload"
               src="https://static.thenounproject.com/png/625182-200.png"
               alt=""

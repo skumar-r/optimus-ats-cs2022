@@ -51,7 +51,7 @@ public class RecognitionServiceImpl extends CommonResource implements Recognitio
 		response.getContentMap().put("StatusType",StatusType.NOT_FOUND.getType());
 		try {
 			if (dto != null && dto.getFormData().exists() &&  dto.getIdCardData().exists()) {
-				if (StringUtils.equals("employee", dto.getType()) & hasDetectFacesinImage(dto.getFormData()) && hasDetectFacesinImage(dto.getIdCardData())) {
+				if (StringUtils.equals("employee", dto.getType()) && hasDetectFacesinImage(dto.getFormData()) && hasDetectFacesinImage(dto.getIdCardData())) {
 					return getEmployeeMatchedRecord(dto.getIdCardData(), dto.getFormData());
 				} else{
 					response.setSuccess(false);
