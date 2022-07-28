@@ -34,10 +34,13 @@ public class DecisionService {
     EventBus bus;
 
     public InternalDataDto initProcess(Long incomingId){
-        InternalDataDto dto = new InternalDataDto();       
+        InternalDataDto dto = new InternalDataDto();  
+        log.info("incomingId->{}",incomingId);   
         DecisionWorkflowRequest retrieved = decisionRepository.findById(Long.valueOf(incomingId));
+        log.info("Retrieved DecisionWorkflowRequest-> {}", Objects.nonNull(retrieved)?JsonObject.mapFrom(retrieved).toString():"");  
         if(Objects.nonNull(retrieved)){
             EmployeeData employee = employeeRepository.findById(retrieved.getEmployeeId());
+            log.info("Retrieved EmployeeData-> {}", Objects.nonNull(employee)?JsonObject.mapFrom(employee).toString():"");
             dto.setValidRequest(Objects.isNull(retrieved)? false: true);
             dto.setWorkflowRequest(retrieved);
             dto.setEmployeeData(employee);

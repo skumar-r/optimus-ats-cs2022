@@ -2,10 +2,15 @@ package com.optimus.ats.controller;
 
 import com.optimus.ats.common
 		.ServiceResponse;
+import com.optimus.ats.common.StatusType;
 import com.optimus.ats.dto.RecognitionDto;
 import com.optimus.ats.model.Employee;
 import com.optimus.ats.service.RecognitionService;
+import com.optimus.ats.service.ValidationService;
+
 import org.jboss.resteasy.reactive.MultipartForm;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
@@ -22,8 +27,12 @@ import static javax.ws.rs.core.MediaType.MULTIPART_FORM_DATA;
 @Path("/recognition")
 public class RecognitionResource {
 
+	static final Logger log = LoggerFactory.getLogger(RecognitionResource.class);
+
 	@Inject
 	RecognitionService recognitionService;
+	@Inject
+	ValidationService validationService;
 
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
@@ -45,8 +54,14 @@ public class RecognitionResource {
 	@Produces(MediaType.APPLICATION_JSON)
 	@Consumes(MULTIPART_FORM_DATA)
 	public ServiceResponse create(@MultipartForm RecognitionDto dto) throws IOException {
-		System.out.println("rec:" + dto.getType());
-		return recognitionService.validateEmployee(dto);
+		log.info("RecognitionDto->Type:" + dto.getType());
+		ServiceResponse response= recognitionService.validateEmployee(dto);
+		if(response.getContentMap().get("StatusType").equals(StatusType.APPROVAL_REQUIRED.getType())){			
+			Employee emp = (Employee)response.getContentMap().get("employee");
+			log.info("Invoking Decision Workflow Service for employee Id:{}", emp.getId());
+			validationService.invokeDecisionService(emp.getId(), null, emp.getCsEmployeeId());
+		}
+		return response;		
 	}
 
 	@DELETE
