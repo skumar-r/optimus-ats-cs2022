@@ -158,3 +158,7 @@ tbody tr {
   width: 100%;
   table-layout: fixed;
 }
+
+.mdc-circular-progress__indeterminate-circle-graphic {
+  stroke: white;
+}

@@ -11,11 +11,13 @@
   import DataTable, { Head, Body, Row, Cell, Label } from "@smui/data-table";
   import IconButton from "@smui/icon-button";
   import { useNavigate } from "svelte-navigator";
+  import CircularProgress from "@smui/circular-progress";
   const navigate = useNavigate();
   let empPhoto, idPhoto, empPhotoInput, idPhotoInput;
   let resultAvailable = false;
   let actionItem = {};
-  let open = true;
+  let open = false;
+  let inProgress = false;
   let showToast = (message, type) => {
     const toast = toasts.add({
       title: "",
@@ -33,6 +35,7 @@
     dataArray.append("type", "employee");
     dataArray.append("resourceFile", empPhotoInput.files[0]);
     dataArray.append("idCardFile", idPhotoInput.files[0]);
+    inProgress = true;
     await fetch("http://localhost:9011/recognition", {
       method: "POST",
       body: dataArray,
@@ -40,6 +43,7 @@
       .then((response) => response.json())
       .then((response) => {
         // Successfully uploaded
+        inProgress = false;
         if (!response.success) {
           showToast(response.contentMap.message, "error");
         } else {
@@ -144,8 +148,20 @@
             />
           </div>
           <div style="display: flex;width:100%;justify-content: end;">
-            <button type="button" on:click={(e) => handleSubmit(e)}
-              >Verify</button
+            <button
+              type="button"
+              disabled={inProgress}
+              on:click={(e) => handleSubmit(e)}
+              style="display:flex;align-items:center;"
+            >
+              {#if inProgress}
+                <CircularProgress
+                  class="my-four-colors"
+                  style="height: 32px; width: 32px;"
+                  indeterminate
+                />
+              {/if}
+              <span style="margin-left: 10px;">Verify</span></button
             >
           </div>
         </form>
