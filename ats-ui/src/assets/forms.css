@@ -64,9 +64,6 @@ button:disabled {
   background-color: var(--grey);
 }
 
-button:focus:not(:disabled) {
-  box-shadow: 0 0 0 4px var(--primary-light);
-}
 
 button:hover:not(:disabled) {
   background-color: var(--primary-light);

@@ -35,39 +35,78 @@
 
 <div class="paper-container">
   {#if !resultAvailable}
-    <Paper color="primary" variant="outlined" class="mdc-theme--primary">
-      <Title>Verify a Vehicle</Title>
+    <Paper
+      color="primary"
+      variant="outlined"
+      class="mdc-theme--primary  no-border"
+      style="margin-top:25px;"
+    >
+      <span class="pageTitle">Verify a Vehicle</span>
       <Content>
         <form on:submit={handleSubmit}>
-          <label for="vehicleImage">Vehicle Photo</label>
-          <img class="avatar" src={empPhoto} alt="d" />
-          <img
-            class="upload"
-            src="https://static.thenounproject.com/png/625182-200.png"
-            alt=""
-            on:click={() => {
-              empPhotoInput.click();
-            }}
-          />
-          <div
-            class="chan"
-            on:click={() => {
-              empPhotoInput.click();
-            }}
-          >
-            Choose Employee Photo Image
+          <div style="width:40%;float:left;padding-left:20px;">
+            <label for="employeeImage">Employee Photo</label>
+            <img class="avatar" src={empPhoto} />
+            <img
+              class="upload"
+              src="https://static.thenounproject.com/png/625182-200.png"
+              alt=""
+              on:click={() => {
+                empPhotoInput.click();
+              }}
+            />
+            <div
+              class="chan"
+              on:click={() => {
+                empPhotoInput.click();
+              }}
+            >
+              Choose Employee Photo Image
+            </div>
+            <input
+              name="employeeImage"
+              id="employeeImage"
+              style="display:none"
+              type="file"
+              accept=".jpg, .jpeg, .png"
+              on:change={(e) => onFileSelectedEmpPhoto(e)}
+              bind:this={empPhotoInput}
+            />
           </div>
-          <input
-            name="vehicleImage"
-            id="vehicleImage"
-            style="display:none"
-            type="file"
-            accept=".jpg, .jpeg, .png"
-            on:change={(e) => onFileSelectedEmpPhoto(e)}
-            bind:this={empPhotoInput}
-          />
-          
-          <button type="submit">Verify</button>
+          <div style="width:50%;float:left;padding-left:20px;">
+            <label for="idcardImage">Vehicle Photo</label>
+            <img class="avatar" src={idPhoto} />
+            <img
+              class="upload"
+              src="https://static.thenounproject.com/png/625182-200.png"
+              alt=""
+              on:click={() => {
+                idPhotoInput.click();
+              }}
+            />
+            <div
+              class="chan"
+              on:click={() => {
+                idPhotoInput.click();
+              }}
+            >
+              Choose Vehicle Image
+            </div>
+            <input
+              name="idcardImage"
+              id="idcardImage"
+              style="display:none"
+              type="file"
+              accept=".jpg, .jpeg, .png"
+              on:change={(e) => onFileSelectedIdPhoto(e)}
+              bind:this={idPhotoInput}
+            />
+          </div>
+          <div style="display: flex;width:100%;justify-content: end;">
+            <button type="button" on:click={(e) => handleSubmit(e)}
+              >Verify</button
+            >
+          </div>
         </form>
       </Content>
     </Paper>

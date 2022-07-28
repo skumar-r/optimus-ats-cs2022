@@ -70,7 +70,7 @@
       variant="outlined"
       class="mdc-theme--primary no-border"
       style="margin-top:25px;">
-      <span  class="pageTitle">Add a New Employee</span>
+      <span class="pageTitle">Add a New Employee</span>
       <Content>
         <form style="height: 600px;">
           <div style="width:33%;float:left;">

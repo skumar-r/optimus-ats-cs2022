@@ -1,14 +1,18 @@
 <script>
   import { createForm } from "svelte-forms-lib";
   import Paper, { Title, Subtitle, Content } from "@smui/paper";
-  let empPhoto, idPhoto, empPhotoInput, idPhotoInput;
+  let empPhoto =
+    "https://digitalfinger.id/wp-content/uploads/2019/12/no-image-available-icon-6.png";
+  let idPhoto =
+    "https://digitalfinger.id/wp-content/uploads/2019/12/no-image-available-icon-6.png";
+  let empPhotoInput, idPhotoInput;
   const { form, handleChange, handleSubmit } = createForm({
     initialValues: {
       title: "",
       name: "",
       email: "",
       department: "",
-      empPhoto: undefined
+      empPhoto: undefined,
     },
     onSubmit: (values) => {
       debugger;
@@ -21,6 +25,7 @@
     let reader = new FileReader();
     reader.readAsDataURL(image);
     reader.onload = (e) => {
+      // @ts-ignore
       empPhoto = e.target.result;
     };
   };
@@ -30,117 +35,129 @@
     let reader = new FileReader();
     reader.readAsDataURL(image);
     reader.onload = (e) => {
+      // @ts-ignore
       idPhoto = e.target.result;
     };
   };
 </script>
 
 <div class="paper-container">
-  <Paper color="primary" variant="outlined" class="mdc-theme--primary">
-    <Title>Add a New Vehicle</Title>
+  <Paper
+    color="primary"
+    variant="outlined"
+    class="mdc-theme--primary no-border"
+    style="margin-top:25px;"
+  >
+    <span class="pageTitle">Add a New Vehicle</span>
     <Content>
-      <form on:submit={handleSubmit}>
-        <label for="title">Title</label>
-        <select
-          id="title"
-          name="title"
-          on:change={handleChange}
-          bind:value={$form.title}
-        >
-          <option />
-          <option>Mr.</option>
-          <option>Mrs.</option>
-          <option>Mx.</option>
-        </select>
+      <form on:submit={handleSubmit} style="height: 600px;">
+        <div style="width:33%;float:left;">
+          <label for="title">Title</label>
+          <select
+            id="title"
+            name="title"
+            on:change={handleChange}
+            bind:value={$form.title}
+          >
+            <option />
+            <option>Mr.</option>
+            <option>Mrs.</option>
+            <option>Mx.</option>
+          </select>
 
-        <label for="name">Name</label>
-        <input
-          id="name"
-          name="name"
-          on:change={handleChange}
-          bind:value={$form.name}
-        />
+          <label for="name">Name</label>
+          <input
+            id="name"
+            name="name"
+            on:change={handleChange}
+            bind:value={$form.name}
+          />
 
-        <label for="email">Email Address</label>
-        <input
-          id="email"
-          name="email"
-          on:change={handleChange}
-          bind:value={$form.email}
-        />
+          <label for="email">Email Address</label>
+          <input
+            id="email"
+            name="email"
+            on:change={handleChange}
+            bind:value={$form.email}
+          />
 
-        <label for="department">Department</label>
-        <select
-          id="department"
-          name="department"
-          on:change={handleChange}
-          bind:value={$form.department}
-        >
-          <option />
-          <option>Technology</option>
-          <option>Research</option>
-          <option>IT Support</option>
-          <option>Sales & Support</option>
-          <option>Security</option>
-          <option>Facilities</option>
-        </select>
-
-        <label for="employeeImage">Employee Photo</label>
-        <img class="avatar" src={empPhoto} alt="d" />
-        <img
-          class="upload"
-          src="https://static.thenounproject.com/png/625182-200.png"
-          alt=""
-          on:click={() => {
-            empPhotoInput.click();
-          }}
-        />
-        <div
-          class="chan"
-          on:click={() => {
-            empPhotoInput.click();
-          }}
-        >
-          Choose Image
+          <label for="department">Department</label>
+          <select
+            id="department"
+            name="department"
+            on:change={handleChange}
+            bind:value={$form.department}
+          >
+            <option />
+            <option>Technology</option>
+            <option>Research</option>
+            <option>IT Support</option>
+            <option>Sales & Support</option>
+            <option>Security</option>
+            <option>Facilities</option>
+          </select>
         </div>
-        <input
-          name="employeeImage"
-          id="employeeImage"
-          style="display:none"
-          type="file"
-          accept=".jpg, .jpeg, .png"
-          on:change={(e) => onFileSelectedEmpPhoto(e)}
-          bind:this={empPhotoInput}
-        />
-
-        <label for="idcardImage">ID Card Photo</label>
-        <img class="avatar" src={idPhoto} alt="d" />
-        <img
-          class="upload"
-          src="https://static.thenounproject.com/png/625182-200.png"
-          alt=""
-          on:click={() => {
-            idPhotoInput.click();
-          }}
-        />
-        <div
-          class="chan"
-          on:click={() => {
-            idPhotoInput.click();
-          }}
-        >
-          Choose Image
+        <div style="width:30%;float:left;padding-left:30px;">
+          <label for="employeeImage">Employee Photo</label>
+          <img class="avatar" src={empPhoto} alt="d" />
+          <img
+            class="upload"
+            src="https://static.thenounproject.com/png/625182-200.png"
+            alt=""
+            on:click={() => {
+              empPhotoInput.click();
+            }}
+          />
+          <div
+            class="chan"
+            on:click={() => {
+              empPhotoInput.click();
+            }}
+          >
+            Choose Image
+          </div>
+          <input
+            name="employeeImage"
+            id="employeeImage"
+            style="display:none"
+            type="file"
+            accept=".jpg, .jpeg, .png"
+            on:change={(e) => onFileSelectedEmpPhoto(e)}
+            bind:this={empPhotoInput}
+          />
         </div>
-        <input
-          name="idcardImage"
-          id="idcardImage"
-          style="display:none"
-          type="file"
-          accept=".jpg, .jpeg, .png"
-          on:change={(e) => onFileSelectedIdPhoto(e)}
-          bind:this={idPhotoInput}
-        />
-        <button type="submit">Submit</button>
+        <div style="width:30%;float:left;padding-left:30px;">
+          <label for="idcardImage">ID Card Photo</label>
+          <img class="avatar" src={idPhoto} alt="d" />
+          <img
+            class="upload"
+            src="https://static.thenounproject.com/png/625182-200.png"
+            alt=""
+            on:click={() => {
+              idPhotoInput.click();
+            }}
+          />
+          <div
+            class="chan"
+            on:click={() => {
+              idPhotoInput.click();
+            }}
+          >
+            Choose Image
+          </div>
+          <input
+            name="idcardImage"
+            id="idcardImage"
+            style="display:none"
+            type="file"
+            accept=".jpg, .jpeg, .png"
+            on:change={(e) => onFileSelectedIdPhoto(e)}
+            bind:this={idPhotoInput}
+          />
+        </div>
+        <div style="display: flex;width:100%;justify-content: end;">
+          <button type="submit">Submit</button>
+        </div>
       </form>
     </Content>
   </Paper>
