@@ -7,12 +7,17 @@ import com.amazonaws.services.rekognition.AmazonRekognitionClientBuilder;
 import com.amazonaws.services.rekognition.model.*;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.optimus.ats.common.CommonResource;
+import com.optimus.ats.common.EventService;
 import com.optimus.ats.common.FormData;
 import com.optimus.ats.common.ServiceResponse;
 import com.optimus.ats.controller.EmployeeResource;
 import com.optimus.ats.dto.EmployeeDto;
 import com.optimus.ats.model.Employee;
 import com.optimus.ats.service.EmployeeService;
+
+import io.vertx.core.json.JsonArray;
+import io.vertx.core.json.JsonObject;
+
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
 import org.eclipse.microprofile.config.inject.ConfigProperty;
@@ -43,6 +48,8 @@ public class EmployeeServiceImpl extends CommonResource implements EmployeeServi
 
 	@Inject
 	S3Client s3;
+	@Inject
+	EventService event;
 
 	@ConfigProperty(name = "aws.accessKeyId")
 	String ACCESS_KEY;
@@ -59,7 +66,7 @@ public class EmployeeServiceImpl extends CommonResource implements EmployeeServi
 	@ConfigProperty(name = "ats.employee.photo-id-prefix")
 	String photoIDPrefix;
 
-	@ConfigProperty(name = "upload.directory")
+	@ConfigProperty(name = "upload.directory.employee")
 	String uploadDir;
 
 	@Transactional
@@ -71,16 +78,18 @@ public class EmployeeServiceImpl extends CommonResource implements EmployeeServi
 			response.setSuccess(false);
 			return response;
 		}
-		if(!Objects.isNull(employee.getPhotoFrontFile()) && !Objects.isNull(employee.getPhotoIDCardFile()) &&  (!hasDetectFacesinImage(employee.getPhotoFrontFile()) || !hasDetectFacesinImage(employee.getPhotoIDCardFile()))){
-			response.getContentMap().put("message","Uploaded image does not contain face.");
-			response.setSuccess(false);
-			return response;
-		}
 		if(Objects.isNull(employee.getPhotoFrontFile()) && Objects.isNull(employee.getPhotoIDCardFile())){
-			response.getContentMap().put("message","Please upload image");
+			response.getContentMap().put("message","Both employee Image with Face and ID Card Front Photo are mandatory.Please upload them");
 			response.setSuccess(false);
 			return response;
 		}
+
+		if(!Objects.isNull(employee.getPhotoFrontFile()) && !Objects.isNull(employee.getPhotoIDCardFile()) &&  (!hasDetectFacesinImage(employee.getPhotoFrontFile()) || !hasDetectFacesinImage(employee.getPhotoIDCardFile()))){
+			response.getContentMap().put("message","Uploaded Photo images(s) don't contain face.");
+			response.setSuccess(false);
+			return response;
+		}
+		
 		Employee emp = getParseEmployeeDto(employee);
 		Employee.persist(emp);
 		if (employee.isHasS3Photo()) {
@@ -128,8 +137,8 @@ public class EmployeeServiceImpl extends CommonResource implements EmployeeServi
 				log.info("local storage exists");
 				String photoFrontFileName = customDir.getAbsolutePath() +
 						File.separator + photoFrontPrefix + "_" + emp.getId() + ".png";
-				System.out.println(">>>>=" + employee.getEmail()+ " >>" +employee.getEmployeeName());
-				System.out.println("photoFrontPrefix=" + photoFrontFileName+ " >>" +employee.getPhotoFrontFile().toPath());
+				log.info(">>>>=" + employee.getEmail()+ " >>" +employee.getEmployeeName());
+				log.info("photoFrontPrefix=" + photoFrontFileName+ " >>" +employee.getPhotoFrontFile().toPath());
 
 				log.info("photoFrontPrefix=" + photoFrontFileName);
 
@@ -137,17 +146,18 @@ public class EmployeeServiceImpl extends CommonResource implements EmployeeServi
 						StandardOpenOption.CREATE_NEW);
 				String photoLeftFileName = customDir.getAbsolutePath() +
 						File.separator + photoIDPrefix + "_" + emp.getId() + ".png";
-				System.out.println("photoLeftPrefix=" + photoLeftFileName);
+						log.info("photoLeftPrefix=" + photoLeftFileName);
 				Files.write(Paths.get(photoLeftFileName), Files.readAllBytes(employee.getPhotoIDCardFile().toPath()),
 						StandardOpenOption.CREATE_NEW);
 
 				if (StringUtils.isNotBlank(photoFrontFileName) && StringUtils.isNotBlank(photoLeftFileName)) {
-					System.out.println("isNotBlank");
+					log.info("Photo fileNames are not blank");
 					emp.setPhotoFront(FilenameUtils.separatorsToSystem(photoFrontFileName));
 					emp.setPhotoIdcard(FilenameUtils.separatorsToSystem(photoLeftFileName));
 					Employee.persist(emp);
 					return response;
 				} else {
+					log.info("Photo fileNames are  blank");
 					Employee.deleteById(emp.getId());
 					response.setSuccess(false);
 					response.getContentMap().put("message","Please fill required fields");
@@ -181,11 +191,18 @@ public class EmployeeServiceImpl extends CommonResource implements EmployeeServi
 					.withAttributes(Attribute.ALL);
 			DetectFacesResult result = rekognitionClient.detectFaces(request);
 			List < FaceDetail > faceDetails = result.getFaceDetails();
+			event.eventLog("Detect Face in Image", null, convertListToJSONArray(faceDetails));
 			return faceDetails.size()>0;
 
 		} catch (AmazonRekognitionException |  FileNotFoundException e) {
-			System.out.println(e.getMessage());
+			log.error("Exception", e);
 			return false;
 		}
+	}
+
+	private String convertListToJSONArray(List < FaceDetail > list){
+		JsonArray array = new JsonArray();
+		list.forEach(detail -> array.add(JsonObject.mapFrom(detail)));
+		return array.toString();
 	}
 }

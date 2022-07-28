@@ -1,5 +1,6 @@
 package com.optimus.ats.controller;
 
+import com.optimus.ats.common.EventService;
 import com.optimus.ats.common.ServiceResponse;
 import com.optimus.ats.dto.EmployeeDto;
 import com.optimus.ats.dto.LogDto;
@@ -29,16 +30,16 @@ public class EmployeeResource {
 
 	static final Logger log = LoggerFactory.getLogger(EmployeeResource.class);
 
+
 	@Inject
-	EventBus bus;
+	EventService event;
 
 	@Inject
 	EmployeeService employeeService;
 
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response getAll() {
-		bus.publish("log", JsonObject.mapFrom(LogDto.builder().serviceName("registration-service").details("getEmployee list").build()));
+	public Response getAll() {		
 		List<Employee> employees = Employee.listAll();
 		return Response.ok(employees).build();
 	}
@@ -59,13 +60,16 @@ public class EmployeeResource {
 	public ServiceResponse create(@MultipartForm EmployeeDto employee) {
 		System.out.println("email:"+employee.getEmail());
 		System.out.println("name:"+employee.getEmployeeName());
+		ServiceResponse response = null;
+		event.eventLog("Save Employee - Request", employee, "");
 		try {
-
-			return employeeService.saveEmployee(employee);
+			response = employeeService.saveEmployee(employee);
 		} catch (Exception e) {
 			log.error("exception", e);
-			return ServiceResponse.createFailureServiceResponse();
+			response = ServiceResponse.createFailureServiceResponse();
 		}
+		event.eventLog("Save Employee - Response", response, "");
+		return response;
 	}
 
 	@DELETE

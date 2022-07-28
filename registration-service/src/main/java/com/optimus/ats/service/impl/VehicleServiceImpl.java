@@ -6,6 +6,9 @@ import com.optimus.ats.dto.VehicleDto;
 import com.optimus.ats.model.Vehicle;
 import com.optimus.ats.service.VehicleService;
 import org.eclipse.microprofile.config.inject.ConfigProperty;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import software.amazon.awssdk.core.sync.RequestBody;
 import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.services.s3.model.PutObjectResponse;
@@ -18,11 +21,15 @@ import javax.ws.rs.core.Response;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 
 @ApplicationScoped
 public class VehicleServiceImpl extends CommonResource implements VehicleService {
+
+	static final Logger log = LoggerFactory.getLogger(VehicleServiceImpl.class);
+
 	@Inject
 	S3Client s3;
 
@@ -32,7 +39,7 @@ public class VehicleServiceImpl extends CommonResource implements VehicleService
 	@ConfigProperty(name = "ats.vehicle.photo-rear-prefix")
 	String photoRearPrefix;
 
-	@ConfigProperty(name = "upload.directory")
+	@ConfigProperty(name = "upload.directory.vehicle")
 	String uploadDir;
 
 	@Transactional
@@ -68,22 +75,30 @@ public class VehicleServiceImpl extends CommonResource implements VehicleService
 			}
 		} else {
 			File customDir = new File(uploadDir);
-			System.out.println("local storage:" + uploadDir + "  " + customDir.getAbsolutePath());
+			log.info("local storage:" + uploadDir + "  " + customDir.getAbsolutePath());
+			if (!customDir.exists()) {
+				Path path = Paths.get(uploadDir);
+				try{
+					Files.createDirectories(path);
+				} catch(Exception e){
+					log.error("error", e);
+				}
+			}
 			if (customDir.exists()) {
-				System.out.println("local storage exists");
+				log.info("local storage exists");
 				String photoFrontFileName = customDir.getAbsolutePath() +
 						File.separator + photoFrontPrefix + "_" + veh.getId() + ".png";
-				System.out.println("photoFrontPrefix=" + photoFrontFileName);
+						log.info("photoFrontPrefix=" + photoFrontFileName);
 				Files.write(Paths.get(photoFrontFileName), Files.readAllBytes(vehicleDto.getPhotoFrontFile().toPath()),
 						StandardOpenOption.CREATE_NEW);
 				String photoRearFileName = customDir.getAbsolutePath() +
 						File.separator + photoRearPrefix + "_" + veh.getId() + ".png";
-				System.out.println("photoRearPrefix=" + photoRearFileName);
+						log.info("photoRearPrefix=" + photoRearFileName);
 				Files.write(Paths.get(photoRearFileName), Files.readAllBytes(vehicleDto.getPhotoRearFile().toPath()),
 						StandardOpenOption.CREATE_NEW);
 
 				if (StringUtils.isNotBlank(photoFrontFileName) && StringUtils.isNotBlank(photoRearFileName)) {
-					System.out.println("isNotBlank=");
+					log.info("isNotBlank=");
 					veh.setPhotoFront(photoFrontFileName);
 					veh.setPhotoRear(photoRearFileName);
 					Vehicle.persist(veh);
