@@ -34,6 +34,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 import java.util.List;
+import java.util.Objects;
 
 @ApplicationScoped
 public class EmployeeServiceImpl extends CommonResource implements EmployeeService {
@@ -65,13 +66,18 @@ public class EmployeeServiceImpl extends CommonResource implements EmployeeServi
 	@Override
 	public ServiceResponse saveEmployee(EmployeeDto employee) throws IOException {
 		ServiceResponse response = ServiceResponse.createSuccessServiceResponse();
-		if(StringUtils.equals(Employee.findByName(employee.getCsEmployeeId()).getCsEmployeeId(),employee.getCsEmployeeId())){
+		if(!Objects.isNull(Employee.findByName(employee.getCsEmployeeId())) && StringUtils.equals(Employee.findByName(employee.getCsEmployeeId()).getCsEmployeeId(),employee.getCsEmployeeId())){
 			response.getContentMap().put("message","Employee Id already exists");
 			response.setSuccess(false);
 			return response;
 		}
-		if(employee.getPhotoFrontFile().exists() && employee.getPhotoIDCardFile().exists() &&  (!hasDetectFacesinImage(employee.getPhotoFrontFile()) || !hasDetectFacesinImage(employee.getPhotoIDCardFile()))){
+		if(!Objects.isNull(employee.getPhotoFrontFile()) && !Objects.isNull(employee.getPhotoIDCardFile()) &&  (!hasDetectFacesinImage(employee.getPhotoFrontFile()) || !hasDetectFacesinImage(employee.getPhotoIDCardFile()))){
 			response.getContentMap().put("message","Uploaded image does not contain face.");
+			response.setSuccess(false);
+			return response;
+		}
+		if(Objects.isNull(employee.getPhotoFrontFile()) && Objects.isNull(employee.getPhotoIDCardFile())){
+			response.getContentMap().put("message","Please upload image");
 			response.setSuccess(false);
 			return response;
 		}
@@ -102,6 +108,7 @@ public class EmployeeServiceImpl extends CommonResource implements EmployeeServi
 				return response;
 			} else {
 				Employee.deleteById(emp.getId());
+				response.setSuccess(false);
 				response.getContentMap().put("message","Please fill required fields");
 				return response;
 			}
@@ -142,6 +149,7 @@ public class EmployeeServiceImpl extends CommonResource implements EmployeeServi
 					return response;
 				} else {
 					Employee.deleteById(emp.getId());
+					response.setSuccess(false);
 					response.getContentMap().put("message","Please fill required fields");
 					return response;
 				}

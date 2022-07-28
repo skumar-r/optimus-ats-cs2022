@@ -2,6 +2,9 @@
   // @ts-nocheck
 
   import Paper, { Title, Subtitle, Content } from "@smui/paper";
+  import { toasts, ToastContainer, FlatToast, BootstrapToast }  from "svelte-toasts";
+  import { useNavigate } from "svelte-navigator";
+  const navigate = useNavigate();
   let empPhoto =
     "https://digitalfinger.id/wp-content/uploads/2019/12/no-image-available-icon-6.png";
   let idPhoto =
@@ -14,7 +17,20 @@
       mobile= "",
       department= "",
       designation= "";
-
+  let showToast = (message, type) => {
+    const toast = toasts.add({
+      title: '',
+      description: message,
+      duration: 5000, // 0 or negative to avoid auto-remove
+      placement: 'top-right',
+      theme: 'dark',
+      type: type,
+      onClick: () => {
+      },
+      onRemove: () => {
+      },
+    });
+  }
   let handleChange = (e)=>{
 
   }
@@ -33,13 +49,18 @@
         method: "POST",
         body: dataArray,
       })
-        .then((response) => {
-          debugger;
-          // Successfully uploaded
-        })
-        .catch((error) => {
-          // Upload failed
-        });
+            .then((response) => response.json())
+            .then((response) => {
+              if(!response.success) {
+                showToast(response.contentMap.message,"error");
+              }
+              else{
+                navigate("/");
+              }
+            })
+            .catch((error) => {
+              // Upload failed
+            });
   }
   
 
@@ -201,6 +222,9 @@
       </Content>
     </Paper>
   </div>
+  <ToastContainer placement="bottom-right" let:data={data}>
+    <FlatToast {data} /> <!-- Provider template for your toasts -->
+  </ToastContainer>
 </div>
 
 <style>

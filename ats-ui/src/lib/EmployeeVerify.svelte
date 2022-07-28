@@ -206,7 +206,7 @@
       </form>
     </DContent>
     <Actions>
-      <Button on:click={() => navigate["/"]}>
+      <Button on:click={() => navigate("/")}>
         <Label>OK</Label>
       </Button>
     </Actions>
