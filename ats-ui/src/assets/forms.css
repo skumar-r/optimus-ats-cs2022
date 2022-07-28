@@ -163,3 +163,7 @@ tbody tr {
 .mdc-circular-progress__indeterminate-circle-graphic {
   stroke: white;
 }
+
+.emp-dialog .mdc-dialog__surface{
+  width:100px !important;
+}

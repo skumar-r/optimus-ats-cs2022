@@ -9,9 +9,13 @@
   import LinearProgress from '@smui/linear-progress';
   import { onMount, onDestroy } from 'svelte';
   import { toasts, ToastContainer, FlatToast, BootstrapToast }  from "svelte-toasts";
-
+let empPhoto =
+        "https://digitalfinger.id/wp-content/uploads/2019/12/no-image-available-icon-6.png";
   let items = [];
-  let actionItem = {};
+  let actionItem = {
+    empPhoto:"",
+    comparePhoto:""
+  };
   let sort = "id";
   let sortDirection = "ascending";
   let open = false;
@@ -184,7 +188,7 @@
         </Header>
         <DContent id="fullscreen-content">         
           <form style="height: 440px;">
-            <div style="width:33%;float:left;">
+            <div style="width:50%;float:left;">
               <label for="title">Employee Id</label>      
               <input
                 id="employeeId"
@@ -199,12 +203,21 @@
                 disabled
                 bind:value={actionItem.csEmpId}
               />
-  
-              <label for="email">Remarks</label>
+              <label >Employee Photo</label>
+              <img
+                      style="display:block; width:200px;"
+                      src={actionItem.empPhoto.length>50?actionItem.empPhoto:empPhoto}
+              />
+              <label >Verification Photo</label>
+              <img
+                      style="display:block; width:200px;"
+                      src={actionItem.comparePhoto.length>50?actionItem.comparePhoto:empPhoto}
+              />
+              <label>Remarks</label>
               <input
-                id="approvalRemarks"
-                name="approvalRemarks"
-                bind:value={actionItem.approvalRemarks}
+                      id="approvalRemarks"
+                      name="approvalRemarks"
+                      bind:value={actionItem.approvalRemarks}
               />
             </div>
           </form>

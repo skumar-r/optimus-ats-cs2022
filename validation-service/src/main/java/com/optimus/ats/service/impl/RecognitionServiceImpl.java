@@ -83,6 +83,7 @@ public class RecognitionServiceImpl extends CommonResource implements Recognitio
 				response.getContentMap().put("message","Employee Photo and ID card required");
 			}
 		} catch (Exception e) {
+			log.error("validateEmployee:",e);
 			response.setSuccess(false);
 			response.getContentMap().put("StatusType",StatusType.ERROR.getType());
 			response.getContentMap().put("message","Employee Photo and ID card required");
@@ -168,7 +169,7 @@ public class RecognitionServiceImpl extends CommonResource implements Recognitio
 				log.info("Faces Does not match");
 				return false;
 			}
-		} catch (AmazonRekognitionException | IOException e) {
+		} catch (Exception e) {
 			//e.printStackTrace();
 			log.error("Exception", e);
 			return false;
@@ -193,7 +194,7 @@ public class RecognitionServiceImpl extends CommonResource implements Recognitio
 				detectedText.add(text.getDetectedText());
 			}
 			event.eventLog("AWS-Text Extraction Response", null, String.join(",", detectedText));
-		} catch (AmazonRekognitionException | IOException e) {
+		} catch (Exception e) {
 			log.error("Exception", e);
 			e.printStackTrace();
 		}
@@ -213,7 +214,7 @@ public class RecognitionServiceImpl extends CommonResource implements Recognitio
 			event.eventLog("AWS Face Detection Response", null, convertFaceDetailListToJSONArrayString(faceDetails));
 			return faceDetails.size()>0;
 
-		} catch (AmazonRekognitionException |  FileNotFoundException e) {
+		} catch (Exception e) {
 			log.error("Exception", e);
 			return false;
 		}
@@ -237,7 +238,7 @@ public class RecognitionServiceImpl extends CommonResource implements Recognitio
 		} else{
 			String photoFrontFileName = customDir.getAbsolutePath() +
 					File.separator + csEmployeeId + ".png";
-
+			Files.deleteIfExists(new File(photoFrontFileName).toPath());
 			Files.write(Paths.get(photoFrontFileName), Files.readAllBytes(faceImage.toPath()),
 					StandardOpenOption.CREATE_NEW);
 		}

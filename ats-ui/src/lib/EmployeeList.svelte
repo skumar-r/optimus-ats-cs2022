@@ -7,7 +7,9 @@
   import Dialog, { Header, Content as DContent } from "@smui/Dialog";
   import IconButton from "@smui/icon-button";
   let items = [];
-  let actionItem = {};
+  let actionItem = {
+    empPhoto:""
+  };
   let sort = "id";
   let sortDirection = "ascending";
   let open = false;
@@ -146,7 +148,7 @@
       </Paper>
     </div>
   </div>
-  <Dialog
+  <Dialog class="emp-dialog"
           bind:open
           fullscreen
           aria-labelledby="fullscreen-title"
@@ -167,12 +169,12 @@
       >
     </Header>
     <DContent id="fullscreen-content">
-      <div  style="height: 150px; width: 25px">
+      <form>
         <img
-                style="display:block; width:100px;height:100px;"
-                src={actionItem.empPhoto}
+                style="display:block; width:100%;"
+                src={actionItem.empPhoto.length>50?actionItem.empPhoto:empPhoto}
         />
-      </div>
+      </form>
     </DContent>
   </Dialog>
 </div>
