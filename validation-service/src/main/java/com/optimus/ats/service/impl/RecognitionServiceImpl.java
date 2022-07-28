@@ -6,15 +6,23 @@ import com.amazonaws.services.rekognition.AmazonRekognition;
 import com.amazonaws.services.rekognition.AmazonRekognitionClientBuilder;
 import com.amazonaws.services.rekognition.model.*;
 import com.optimus.ats.common.CommonResource;
+import com.optimus.ats.common.EventService;
 import com.optimus.ats.common.ServiceResponse;
 import com.optimus.ats.common.StatusType;
 import com.optimus.ats.dto.RecognitionDto;
 import com.optimus.ats.model.Employee;
 import com.optimus.ats.service.RecognitionService;
 import com.optimus.ats.service.ValidationService;
+
+import io.vertx.core.json.JsonArray;
+import io.vertx.core.json.JsonObject;
+
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.eclipse.microprofile.config.inject.ConfigProperty;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import software.amazon.awssdk.utils.StringUtils;
 
 import javax.enterprise.context.ApplicationScoped;
@@ -30,6 +38,10 @@ import java.util.Objects;
 @ApplicationScoped
 public class RecognitionServiceImpl extends CommonResource implements RecognitionService {
 
+	static final Logger log = LoggerFactory.getLogger(RecognitionServiceImpl.class);
+
+	@Inject
+	EventService event;
 	@Inject
 	ValidationService validationService;
 	
@@ -46,35 +58,38 @@ public class RecognitionServiceImpl extends CommonResource implements Recognitio
 
 	@Transactional
 	@Override
-	public ServiceResponse save(RecognitionDto dto) throws IOException {
+	public ServiceResponse validateEmployee(RecognitionDto dto) throws IOException {
 		ServiceResponse response = ServiceResponse.createSuccessServiceResponse();
-		response.getContentMap().put("StatusType",StatusType.NOT_FOUND.getType());
+		event.eventLog("Validate Employee - Request", dto, "");	
 		try {
 			if (dto != null && dto.getFormData().exists() &&  dto.getIdCardData().exists()) {
 				if (StringUtils.equals("employee", dto.getType()) && hasDetectFacesinImage(dto.getFormData()) && hasDetectFacesinImage(dto.getIdCardData())) {
 					return getEmployeeMatchedRecord(dto.getIdCardData(), dto.getFormData());
 				} else{
 					response.setSuccess(false);
+					response.getContentMap().put("StatusType",StatusType.NO_FACE.getType());
 					response.getContentMap().put("message","Uploaded image does not contain face.");
 				}
 			} else {
 				response.setSuccess(false);
+				response.getContentMap().put("StatusType",StatusType.NOT_FOUND.getType());
 				response.getContentMap().put("message","Employee Photo and ID card required");
 			}
 		} catch (Exception e) {
 			response.setSuccess(false);
+			response.getContentMap().put("StatusType",StatusType.ERROR.getType());
 			response.getContentMap().put("message","Employee Photo and ID card required");
-			return response;
 		}
+		event.eventLog("Validate Employee - Response", response, "");	
 		return response;
 	}
 
 	private ServiceResponse getEmployeeMatchedRecord(File idCardImage, File faceImage) throws IOException {
 		ServiceResponse response = ServiceResponse.createSuccessServiceResponse();
 		List<String> extractedText = getDetectedText(idCardImage);
-		System.out.println("dd>>"+extractedText.size());
+		log.info("Extracted Text: {}",extractedText.size());
 		String csId = extractedText.stream().filter(item -> item.contains("CS")).findFirst().orElse(null);
-		System.out.println("csId>>"+csId);
+		log.info("Extracted csEmployeeId>>:{}", csId);
 		Employee employee = null;
 		if (StringUtils.isNotBlank(csId)) {
 			List<Employee> employees = Employee.listAll();
@@ -82,12 +97,12 @@ public class RecognitionServiceImpl extends CommonResource implements Recognitio
 
 			if(Objects.isNull(employee)){
 				/// not found
-				response.getContentMap().put("StatusType",StatusType.NOT_FOUND.getType());
+				response.getContentMap().put("StatusType",StatusType.NO_MATCH.getType());
 				response.setSuccess(false);
-				response.getContentMap().put("message","Employee ID does not exists");
+				response.getContentMap().put("message","No Employee found with the Employee ID :"+csId);
 			} else{
-				System.out.println("employee>>"+employee.getEmployeeName());
-				System.out.println("employee photo>>"+employee.getPhotoFront());
+				log.info("employee Name>>"+employee.getEmployeeName());
+				log.info("employee Image>>"+employee.getPhotoFront());
 
 				byte[] fileContent = FileUtils.readFileToByteArray(new File(employee.getPhotoFront()));
 				String encodedString = Base64.getEncoder().encodeToString(fileContent);
@@ -95,15 +110,22 @@ public class RecognitionServiceImpl extends CommonResource implements Recognitio
 				response.getContentMap().put("empPhoto",encodedString);
 				if(hasFaceMatched(employee.isHasS3Photo(), employee.getPhotoFront(), faceImage)){
 					// matched
+					log.info("employee Match >> True");
 					response.getContentMap().put("StatusType",StatusType.FULL_MATCH.getType());
 				} else {
 					// no match and call decision service
+					log.info("employee Match >> False");
+					log.info("Invoking Decision Workflow Service");
 					validationService.invokeDecisionService(employee.getId(), null, employee.getCsEmployeeId());
 					response.setSuccess(true);
 					response.getContentMap().put("message","Employee face not matched");
-					response.getContentMap().put("StatusType",StatusType.NO_MATCH.getType());
+					response.getContentMap().put("StatusType",StatusType.APPROVAL_REQUIRED.getType());
 				}
 			}
+		} else {
+			response.setSuccess(false);
+			response.getContentMap().put("message","Unable to get CS Employee Id from the uploaded ID Card Photo Image. Please upload a valid ID card image");
+			response.getContentMap().put("StatusType",StatusType.ERROR.getType());
 		}
 		return response;
 	}
@@ -130,21 +152,27 @@ public class RecognitionServiceImpl extends CommonResource implements Recognitio
 
 			CompareFacesResult result = rekognitionClient.compareFaces(compareFacesRequest);
 			List<CompareFacesMatch> lists = result.getFaceMatches();
-
+			event.eventLog("AWS Face Match - Response", null, convertListToJSONArrayString(lists));
 			if (!lists.isEmpty()) {
 				for (CompareFacesMatch label : lists) {
-					System.out.println(label.getFace() + ": Similarity is " + label.getSimilarity().toString());
+					log.info(label.getFace() + ": Similarity is " + label.getSimilarity().toString());
 					return true;
 				}
 			} else {
-				System.out.println("Faces Does not match");
+				log.info("Faces Does not match");
 				return false;
 			}
 		} catch (AmazonRekognitionException | IOException e) {
 			//e.printStackTrace();
+			log.error("Exception", e);
 			return false;
 		}
 		return false;
+	}
+	private String convertListToJSONArrayString(List<CompareFacesMatch> list){
+		JsonArray array = new JsonArray();
+		list.forEach(detail -> array.add(JsonObject.mapFrom(detail)));
+		return array.toString();
 	}
 
 	private List<String> getDetectedText(File targetImage) {
@@ -159,10 +187,12 @@ public class RecognitionServiceImpl extends CommonResource implements Recognitio
 			DetectTextResult result = rekognitionClient.detectText(request);
 			List<TextDetection> textDetections = result.getTextDetections();
 			for (TextDetection text : textDetections) {
-				System.out.println("Detected: " + text.getDetectedText());
+				log.info("Detected: " + text.getDetectedText());
 				detectedText.add(text.getDetectedText());
 			}
+			event.eventLog("AWS-Text Extraction Response", null, String.join(",", detectedText));
 		} catch (AmazonRekognitionException | IOException e) {
+			log.error("Exception", e);
 			e.printStackTrace();
 		}
 		return detectedText;

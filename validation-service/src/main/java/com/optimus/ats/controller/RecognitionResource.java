@@ -46,7 +46,7 @@ public class RecognitionResource {
 	@Consumes(MULTIPART_FORM_DATA)
 	public ServiceResponse create(@MultipartForm RecognitionDto dto) throws IOException {
 		System.out.println("rec:" + dto.getType());
-		return recognitionService.save(dto);
+		return recognitionService.validateEmployee(dto);
 	}
 
 	@DELETE

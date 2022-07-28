@@ -7,5 +7,5 @@ import javax.ws.rs.core.Response;
 import java.io.IOException;
 
 public interface RecognitionService {
-	ServiceResponse save(RecognitionDto dto) throws IOException;
+	ServiceResponse validateEmployee(RecognitionDto dto) throws IOException;
 }
