@@ -4,10 +4,16 @@
   import Card, { Actions } from "@smui/card";
   import { navigate } from "svelte-navigator";
   import Button from "@smui/button";
+  import Dialog, { Header, Content as DContent } from "@smui/Dialog";
+  import IconButton from "@smui/icon-button";
   let items = [];
+  let actionItem = {};
   let sort = "id";
   let sortDirection = "ascending";
-
+  let open = false;
+  let disabled = false;
+  let empPhoto =
+          "https://digitalfinger.id/wp-content/uploads/2019/12/no-image-available-icon-6.png";
   if (typeof fetch !== "undefined") {
     fetch("http://localhost:9010/employee", {
       method: "GET",
@@ -88,6 +94,11 @@
                   <Label>ID</Label>
                   <!-- <IconButton class="material-icons">arrow_upward</IconButton> -->
                 </Cell>
+                <Cell numeric columnId="csEmployeeId">
+                <!-- For numeric columns, icon comes first. -->
+                <Label>Employee ID</Label>
+                <!-- <IconButton class="material-icons">arrow_upward</IconButton> -->
+                </Cell>
                 <Cell columnId="employeeName">
                   <Label>Name</Label>
                   <!-- For non-numeric columns, icon comes second. -->
@@ -109,17 +120,24 @@
                   <Label>Designation</Label>
                   <!-- <IconButton class="material-icons">arrow_upward</IconButton> -->
                 </Cell>
+                <Cell><Label>Photo</Label></Cell>
               </Row>
             </Head>
             <Body >
               {#each items as item (item.id)}
                 <Row>
                   <Cell numeric class="centered">{item.id}</Cell>
+                  <Cell numeric class="centered">{item.csEmployeeId}</Cell>
                   <Cell>{item.employeeName}</Cell>
                   <Cell>{item.email}</Cell>
                   <Cell class="centered">{item.mobile}</Cell>
                   <Cell class="centered">{item.department}</Cell>
                   <Cell class="centered">{item.designation}</Cell>
+                  <Cell>
+                    <Button action="takeAction" on:click={() => (open = true, actionItem= item)}  bind:disabled>
+                      <Label>Photo</Label>
+                    </Button>
+                  </Cell>
                 </Row>
               {/each}
             </Body>
@@ -128,4 +146,33 @@
       </Paper>
     </div>
   </div>
+  <Dialog
+          bind:open
+          fullscreen
+          aria-labelledby="fullscreen-title"
+          aria-describedby="fullscreen-content"
+  >
+    <Header>
+      <span class="pageTitle" style="padding-top: 20px;">Employee</span>
+      <IconButton
+              action="close"
+              class="material-icons"
+              style="margin: 0;
+      top: -10px;
+      min-width: 20px;
+      padding: 15px;
+      border-radius:50%;
+      width: 20px;
+      height: 20px;">close</IconButton
+      >
+    </Header>
+    <DContent id="fullscreen-content">
+      <div  style="height: 150px; width: 25px">
+        <img
+                style="display:block; width:100px;height:100px;"
+                src={actionItem.empPhoto}
+        />
+      </div>
+    </DContent>
+  </Dialog>
 </div>

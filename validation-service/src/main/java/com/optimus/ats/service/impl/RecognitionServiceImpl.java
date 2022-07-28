@@ -30,6 +30,10 @@ import javax.inject.Inject;
 import javax.transaction.Transactional;
 import java.io.*;
 import java.nio.ByteBuffer;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardOpenOption;
 import java.util.ArrayList;
 import java.util.Base64;
 import java.util.List;
@@ -55,6 +59,9 @@ public class RecognitionServiceImpl extends CommonResource implements Recognitio
 
 	@ConfigProperty(name = "quarkus.s3.aws.region")
 	String region;
+
+	@ConfigProperty(name = "upload.directory.employee")
+	String uploadDir;
 
 	@Transactional
 	@Override
@@ -115,7 +122,7 @@ public class RecognitionServiceImpl extends CommonResource implements Recognitio
 				} else {
 					// no match and call decision service
 					log.info("employee Match >> False");
-					
+					storeApproveRequiredEmpPhoto(faceImage,employee.getCsEmployeeId());
 					response.setSuccess(true);
 					response.getContentMap().put("message","Employee face not matched");
 					response.getContentMap().put("StatusType",StatusType.APPROVAL_REQUIRED.getType());
@@ -223,6 +230,19 @@ public class RecognitionServiceImpl extends CommonResource implements Recognitio
 		list.forEach(detail -> array.add(JsonObject.mapFrom(detail)));
 		return array.toString();
 	}
+	private void storeApproveRequiredEmpPhoto(File faceImage,String csEmployeeId) throws IOException {
+		File customDir = new File(uploadDir);
+		if (!customDir.exists()) {
+			customDir.mkdir();
+		} else{
+			String photoFrontFileName = customDir.getAbsolutePath() +
+					File.separator + csEmployeeId + ".png";
+
+			Files.write(Paths.get(photoFrontFileName), Files.readAllBytes(faceImage.toPath()),
+					StandardOpenOption.CREATE_NEW);
+		}
+	}
+
 	/*private EmployeeRecognition getParseEmployeeObject(Employee employee) {
 		EmployeeRecognition recognition = new EmployeeRecognition();
 		recognition.setEmployeeId(employee.getId());
