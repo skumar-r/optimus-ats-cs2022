@@ -164,6 +164,14 @@ tbody tr {
   stroke: white;
 }
 
-.emp-dialog .mdc-dialog__surface{
-  width:100px !important;
+.emp-dialog .mdc-dialog__surface {
+  width: 100px !important;
+}
+
+.mdc-card__action--button {
+  margin-top: 0 !important;
+}
+
+.smui-paper {
+  padding: 10px 16px;
 }

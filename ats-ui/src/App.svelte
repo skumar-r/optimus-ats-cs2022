@@ -12,9 +12,9 @@
 </script>
 
 <Router>
-  <nav class="dashboardButton">
+  <!-- <nav class="dashboardButton">
     <Link class="dashboardButtonLink" to="/">Dashboard</Link>
-  </nav>
+  </nav> -->
   <Route path="/"><Dashboard /></Route>
   <Route path="employeeList"><EmployeeList /></Route>
   <Route path="employeeNew"><EmployeeNew /></Route>
