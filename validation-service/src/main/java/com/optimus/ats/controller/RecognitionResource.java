@@ -8,6 +8,7 @@ import com.optimus.ats.model.Employee;
 import com.optimus.ats.service.RecognitionService;
 import com.optimus.ats.service.ValidationService;
 
+import com.optimus.ats.service.impl.RecognitionServiceImpl;
 import org.jboss.resteasy.reactive.MultipartForm;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -30,7 +31,7 @@ public class RecognitionResource {
 	static final Logger log = LoggerFactory.getLogger(RecognitionResource.class);
 
 	@Inject
-	RecognitionService recognitionService;
+	RecognitionServiceImpl recognitionService;
 	@Inject
 	ValidationService validationService;
 
@@ -60,6 +61,7 @@ public class RecognitionResource {
 		if(response.getContentMap().get("StatusType").equals(StatusType.APPROVAL_REQUIRED.getType())){			
 			Employee emp = (Employee)response.getContentMap().get("employee");
 			log.info("Invoking Decision Workflow Service for employee Id:{}", emp.getId());
+			recognitionService.storeApproveRequiredEmpPhoto(dto.getFormData(),emp.getCsEmployeeId(),emp.isHasS3Photo());
 			validationService.invokeDecisionService(emp.getId(), null, emp.getCsEmployeeId());
 		}
 		return response;		

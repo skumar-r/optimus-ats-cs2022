@@ -42,7 +42,7 @@
       dataArray.append("designation", designation);
       dataArray.append("email", email);
       dataArray.append("mobile", mobile);
-      dataArray.append("hasS3Photo", false);
+      dataArray.append("hasS3Photo", true);
       dataArray.append("photoFrontFile", empPhotoInput.files[0]);
       dataArray.append("photoIDCardFile", idPhotoInput.files[0]);
     await fetch("http://localhost:9010/employee", {

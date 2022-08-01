@@ -5,10 +5,7 @@ import com.amazonaws.auth.BasicAWSCredentials;
 import com.amazonaws.services.rekognition.AmazonRekognition;
 import com.amazonaws.services.rekognition.AmazonRekognitionClientBuilder;
 import com.amazonaws.services.rekognition.model.*;
-import com.optimus.ats.common.CommonResource;
-import com.optimus.ats.common.EventService;
-import com.optimus.ats.common.ServiceResponse;
-import com.optimus.ats.common.StatusType;
+import com.optimus.ats.common.*;
 import com.optimus.ats.dto.RecognitionDto;
 import com.optimus.ats.model.Employee;
 import com.optimus.ats.service.RecognitionService;
@@ -23,6 +20,8 @@ import org.eclipse.microprofile.config.inject.ConfigProperty;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import software.amazon.awssdk.core.sync.RequestBody;
+import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.utils.StringUtils;
 
 import javax.enterprise.context.ApplicationScoped;
@@ -43,7 +42,8 @@ import java.util.Objects;
 public class RecognitionServiceImpl extends CommonResource implements RecognitionService {
 
 	static final Logger log = LoggerFactory.getLogger(RecognitionServiceImpl.class);
-
+	@Inject
+	S3Client s3;
 	@Inject
 	EventService event;
 	@Inject
@@ -52,10 +52,10 @@ public class RecognitionServiceImpl extends CommonResource implements Recognitio
 	@ConfigProperty(name = "bucket.name")
 	String bucketName;
 
-	@ConfigProperty(name = "aws.accessKeyId")
+	/*@ConfigProperty(name = "aws.accessKeyId")
 	String ACCESS_KEY;
 	@ConfigProperty(name = "aws.secretAccessKey")
-	String SECRET_KEY;
+	String SECRET_KEY;*/
 
 	@ConfigProperty(name = "quarkus.s3.aws.region")
 	String region;
@@ -111,11 +111,8 @@ public class RecognitionServiceImpl extends CommonResource implements Recognitio
 			} else{
 				log.info("employee Name>>"+employee.getEmployeeName());
 				log.info("employee Image>>"+employee.getPhotoFront());
-
-				byte[] fileContent = FileUtils.readFileToByteArray(new File(employee.getPhotoFront()));
-				String encodedString = Base64.getEncoder().encodeToString(fileContent);
 				response.getContentMap().put("employee",employee);
-				response.getContentMap().put("empPhoto",encodedString);
+				response.getContentMap().put("empPhoto",employee.isHasS3Photo()?getS3Photo(employee.getPhotoFront()):getLocalPhoto(employee.getPhotoFront()));
 				if(hasFaceMatched(employee.isHasS3Photo(), employee.getPhotoFront(), faceImage)){
 					// matched
 					log.info("employee Match >> True");
@@ -123,7 +120,7 @@ public class RecognitionServiceImpl extends CommonResource implements Recognitio
 				} else {
 					// no match and call decision service
 					log.info("employee Match >> False");
-					storeApproveRequiredEmpPhoto(faceImage,employee.getCsEmployeeId());
+
 					response.setSuccess(true);
 					response.getContentMap().put("message","Employee face not matched");
 					response.getContentMap().put("StatusType",StatusType.APPROVAL_REQUIRED.getType());
@@ -140,9 +137,9 @@ public class RecognitionServiceImpl extends CommonResource implements Recognitio
 
 
 	private boolean hasFaceMatched(boolean hasS3Photo, String sourceImage, File targetImage) {
-		BasicAWSCredentials credentials = new BasicAWSCredentials(ACCESS_KEY, SECRET_KEY);
-		AmazonRekognition rekognitionClient = AmazonRekognitionClientBuilder.standard().withCredentials(new AWSStaticCredentialsProvider(credentials)).withRegion(region).build();
-
+		//BasicAWSCredentials credentials = new BasicAWSCredentials(ACCESS_KEY, SECRET_KEY);
+		//AmazonRekognition rekognitionClient = AmazonRekognitionClientBuilder.standard().withCredentials(new AWSStaticCredentialsProvider(credentials)).withRegion(region).build();
+		AmazonRekognition rekognitionClient = AmazonRekognitionClientBuilder.standard().withRegion(region).build();
 		CompareFacesRequest compareFacesRequest = null;
 		try (InputStream targetImgStream = new FileInputStream(targetImage)) {
 			if (hasS3Photo) {
@@ -181,9 +178,9 @@ public class RecognitionServiceImpl extends CommonResource implements Recognitio
 	private List<String> getDetectedText(File targetImage) {
 		List<String> detectedText = new ArrayList<>();
 		try (InputStream targetImgStream = new FileInputStream(targetImage)) {
-			BasicAWSCredentials credentials = new BasicAWSCredentials(ACCESS_KEY, SECRET_KEY);
-			AmazonRekognition rekognitionClient = AmazonRekognitionClientBuilder.standard()
-					.withCredentials(new AWSStaticCredentialsProvider(credentials)).withRegion(region).build();
+			//BasicAWSCredentials credentials = new BasicAWSCredentials(ACCESS_KEY, SECRET_KEY);
+			AmazonRekognition rekognitionClient = AmazonRekognitionClientBuilder.standard().withRegion(region).build();
+					//.withCredentials(new AWSStaticCredentialsProvider(credentials)).withRegion(region).build();
 
 			DetectTextRequest request = new DetectTextRequest()
 					.withImage(new Image().withBytes(ByteBuffer.wrap(IOUtils.toByteArray(targetImgStream))));
@@ -203,9 +200,9 @@ public class RecognitionServiceImpl extends CommonResource implements Recognitio
 
 	private boolean hasDetectFacesinImage(File sourceImage ) throws IOException {
 		try (InputStream targetImgStream = new FileInputStream(sourceImage)) {
-			BasicAWSCredentials credentials = new BasicAWSCredentials(ACCESS_KEY, SECRET_KEY);
-			AmazonRekognition rekognitionClient = AmazonRekognitionClientBuilder.standard()
-					.withCredentials(new AWSStaticCredentialsProvider(credentials)).withRegion(region).build();
+			//BasicAWSCredentials credentials = new BasicAWSCredentials(ACCESS_KEY, SECRET_KEY);
+			AmazonRekognition rekognitionClient = AmazonRekognitionClientBuilder.standard().withRegion(region).build();
+					//.withCredentials(new AWSStaticCredentialsProvider(credentials)).withRegion(region).build();
 			DetectFacesRequest request = new DetectFacesRequest()
 					.withImage(new Image().withBytes(ByteBuffer.wrap(IOUtils.toByteArray(targetImgStream))))
 					.withAttributes(Attribute.ALL);
@@ -231,17 +228,46 @@ public class RecognitionServiceImpl extends CommonResource implements Recognitio
 		list.forEach(detail -> array.add(JsonObject.mapFrom(detail)));
 		return array.toString();
 	}
-	private void storeApproveRequiredEmpPhoto(File faceImage,String csEmployeeId) throws IOException {
-		File customDir = new File(uploadDir);
-		if (!customDir.exists()) {
-			customDir.mkdir();
-		} else{
-			String photoFrontFileName = customDir.getAbsolutePath() +
-					File.separator + csEmployeeId + ".png";
-			Files.deleteIfExists(new File(photoFrontFileName).toPath());
-			Files.write(Paths.get(photoFrontFileName), Files.readAllBytes(faceImage.toPath()),
-					StandardOpenOption.CREATE_NEW);
+	public void storeApproveRequiredEmpPhoto(File faceImage,String csEmployeeId,boolean isHasS3Photo) throws IOException {
+		if(isHasS3Photo){
+			FormData photoFrontObj = FormData.builder()
+					.data(faceImage)
+					.filename(csEmployeeId)
+					.mimetype("image/png")
+					.build();
+			s3.putObject(buildPutRequest(photoFrontObj), RequestBody.fromFile(faceImage));
+		} else {
+			File customDir = new File(uploadDir);
+			if (!customDir.exists()) {
+				customDir.mkdir();
+			} else {
+				String photoFrontFileName = customDir.getAbsolutePath() +
+						File.separator + csEmployeeId + ".png";
+				Files.deleteIfExists(new File(photoFrontFileName).toPath());
+				Files.write(Paths.get(photoFrontFileName), Files.readAllBytes(faceImage.toPath()),
+						StandardOpenOption.CREATE_NEW);
+			}
 		}
+	}
+
+	public String getLocalPhoto(String photoUrl) {
+		byte[] fileContent = new byte[0];
+		try {
+			fileContent = FileUtils.readFileToByteArray(new File(photoUrl));
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		return "data:image/png;base64,"+ Base64.getEncoder().encodeToString(fileContent);
+	}
+	public String getS3Photo(String photoUrl) {
+		byte[] fileContent = new byte[0];
+		try {
+			fileContent = s3.getObject(buildGetRequest(photoUrl)).readAllBytes();
+			System.out.println(">>>>"+fileContent);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		return "data:image/png;base64,"+ Base64.getEncoder().encodeToString(fileContent);
 	}
 
 	/*private EmployeeRecognition getParseEmployeeObject(Employee employee) {

@@ -45,14 +45,13 @@
       body: dataArray,
     })
       .then((response) => response.json())
-      .then((response) => {
+      .then((response) => { debugger;
         // Successfully uploaded
         inProgress = false;
         if (!response.success) {
           showToast(response.contentMap.message, "error");
         } else {
-          response.contentMap.employee.empPhoto =
-            "data:image/png;base64," + response.contentMap.empPhoto;
+          response.contentMap.employee.empPhoto =response.contentMap.empPhoto
           response.contentMap.employee.StatusType =
             response.contentMap.StatusType;
           actionItem = response.contentMap.employee;

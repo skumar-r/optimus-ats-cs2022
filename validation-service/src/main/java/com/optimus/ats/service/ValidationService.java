@@ -1,6 +1,7 @@
 package com.optimus.ats.service;
 
 import com.optimus.ats.model.Employee;
+import com.optimus.ats.service.impl.RecognitionServiceImpl;
 import io.quarkus.runtime.StartupEvent;
 import io.quarkus.vertx.ConsumeEvent;
 import io.vertx.mutiny.core.eventbus.EventBus;
@@ -42,6 +43,9 @@ public class ValidationService {
 
     @Inject
     WorkflowService workflowService;
+
+    @Inject
+    RecognitionServiceImpl recognitionService;
 
     @ConsumeEvent("echo")
     public String echo(String name) {
@@ -95,19 +99,16 @@ public class ValidationService {
         List<DecisionWorkflowRequest> list = DecisionWorkflowRequest.list("approved=?1 and processInstanceId != null and processTaskId != null and (workflowStatus != 3 or workflowStatus is null)",false);
        return list.stream().map(req->{
            if(!Objects.isNull(Employee.findByName(req.getCsEmpId()))) {
-               req.setEmpPhoto(getPhoto(Employee.findByName(req.getCsEmpId()).getPhotoFront()));
-               req.setComparePhoto(getPhoto(uploadDir + File.separator + req.getCsEmpId() + ".png"));
+               Employee emp = Employee.findByName(req.getCsEmpId());
+               if(emp.isHasS3Photo()){
+                   req.setEmpPhoto(recognitionService.getS3Photo(Employee.findByName(req.getCsEmpId()).getPhotoFront()));
+                   req.setComparePhoto(recognitionService.getS3Photo(req.getCsEmpId()));
+               }else {
+                   req.setEmpPhoto(recognitionService.getLocalPhoto(Employee.findByName(req.getCsEmpId()).getPhotoFront()));
+                   req.setComparePhoto(recognitionService.getLocalPhoto(uploadDir + File.separator + req.getCsEmpId() + ".png"));
+               }
            }
            return req;
         }).collect(Collectors.toList());
-    }
-    private String getPhoto(String photo) {
-        byte[] fileContent = new byte[0];
-        try {
-            fileContent = FileUtils.readFileToByteArray(new File(photo));
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return "data:image/png;base64,"+ Base64.getEncoder().encodeToString(fileContent);
     }
 }

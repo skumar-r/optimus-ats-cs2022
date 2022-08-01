@@ -11,7 +11,7 @@ import java.util.Base64;
 @Entity()
 @Cacheable
 @Table(name = "T_EMPLOYEE")
-public class Employee extends PanacheEntityBase {
+public class Employee extends PanacheEntityBase{
 	@Id
 	@GeneratedValue(strategy =GenerationType.AUTO)
 	@Column(name = "EMPLOYEE_ID", unique = true)
@@ -132,13 +132,7 @@ public class Employee extends PanacheEntityBase {
 	}
 
 	public String getEmpPhoto() {
-		byte[] fileContent = new byte[0];
-		try {
-			fileContent = FileUtils.readFileToByteArray(new File(this.getPhotoFront()));
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		return "data:image/png;base64,"+Base64.getEncoder().encodeToString(fileContent);
+		return empPhoto;
 	}
 
 	public void setEmpPhoto(String empPhoto) {

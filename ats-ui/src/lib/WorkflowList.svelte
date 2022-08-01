@@ -13,8 +13,8 @@ let empPhoto =
         "https://digitalfinger.id/wp-content/uploads/2019/12/no-image-available-icon-6.png";
   let items = [];
   let actionItem = {
-    empPhoto:"",
-    comparePhoto:""
+    empPhoto:"image",
+    comparePhoto:"image"
   };
   let sort = "id";
   let sortDirection = "ascending";
