@@ -1,34 +1,71 @@
 <script>
-  import { createForm } from "svelte-forms-lib";
-  import Paper, { Title, Subtitle, Content } from "@smui/paper";
-  let empPhoto =
+  import Paper, { Content } from "@smui/paper";
+  import { useNavigate } from "svelte-navigator";
+  import {
+    toasts,
+    ToastContainer,
+    FlatToast,
+    BootstrapToast,
+  } from "svelte-toasts";
+  const navigate = useNavigate();
+  let vehiclePhotoInput;
+  let regNo = "";
+  let vehicleDetails = "";
+  let employeeId = "";
+  let vehiclePhoto =
     "https://digitalfinger.id/wp-content/uploads/2019/12/no-image-available-icon-6.png";
-  let idPhoto =
-    "https://digitalfinger.id/wp-content/uploads/2019/12/no-image-available-icon-6.png";
-  let empPhotoInput, idPhotoInput;
-  const { form, handleChange, handleSubmit } = createForm({
-    initialValues: {
-      title: "",
-      name: "",
-      email: "",
-      department: "",
-      empPhoto: undefined,
-    },
-    onSubmit: (values) => {
-      debugger;
-      alert(JSON.stringify(values));
-    },
-  });
+  let employees = [];
+  if (typeof fetch !== "undefined") {
+    fetch("http://localhost:9010/employee", {
+      method: "GET",
+    })
+      .then((response) => response.json())
+      .then((json) => (employees = json))
+      .catch((error) => {
+        // Upload failed
+      });
+  }
 
-  const onFileSelectedEmpPhoto = (e) => {
-    let image = e.target.files[0];
-    let reader = new FileReader();
-    reader.readAsDataURL(image);
-    reader.onload = (e) => {
-      // @ts-ignore
-      empPhoto = e.target.result;
-    };
+  let handleSubmit = async (e) => {
+    const dataArray = new FormData();
+    dataArray.append("regNo", regNo);
+    dataArray.append("vehicleDetails", vehicleDetails);
+    dataArray.append("employeeId", employeeId);
+    // @ts-ignore
+    dataArray.append("hasS3Photo", true);
+    dataArray.append("photoFrontFile", vehiclePhotoInput.files[0]);
+
+    await fetch("http://localhost:9010/vehicle", {
+      method: "POST",
+      body: dataArray,
+    })
+      .then((response) => response.json())
+      .then((response) => {
+        if (!response.success) {
+          showToast(response.contentMap.message, "error");
+        } else {
+          navigate("/");
+        }
+      })
+      .catch((error) => {
+        // Upload failed
+      });
   };
+
+  let showToast = (message, type) => {
+    const toast = toasts.add({
+      title: "",
+      description: message,
+      duration: 5000, // 0 or negative to avoid auto-remove
+      placement: "top-right",
+      theme: "dark",
+      type: type,
+      onClick: () => {},
+      onRemove: () => {},
+    });
+  };
+
+  let handleChange = (e) => {};
 
   const onFileSelectedIdPhoto = (e) => {
     let image = e.target.files[0];
@@ -36,7 +73,7 @@
     reader.readAsDataURL(image);
     reader.onload = (e) => {
       // @ts-ignore
-      idPhoto = e.target.result;
+      vehiclePhoto = e.target.result;
     };
   };
 </script>
@@ -52,107 +89,56 @@
     <Content>
       <form on:submit={handleSubmit} style="height: 600px;">
         <div style="width:33%;float:left;">
-          <label for="title">Title</label>
-          <select
-            id="title"
-            name="title"
-            on:change={handleChange}
-            bind:value={$form.title}
-          >
-            <option />
-            <option>Mr.</option>
-            <option>Mrs.</option>
-            <option>Mx.</option>
-          </select>
-
-          <label for="name">Name</label>
+          <label for="regNo">Registration No.</label>
           <input
-            id="name"
-            name="name"
+            id="regNo"
+            name="regNo"
             on:change={handleChange}
-            bind:value={$form.name}
+            bind:value={regNo}
           />
 
-          <label for="email">Email Address</label>
-          <input
-            id="email"
-            name="email"
-            on:change={handleChange}
-            bind:value={$form.email}
-          />
-
-          <label for="department">Department</label>
-          <select
-            id="department"
-            name="department"
-            on:change={handleChange}
-            bind:value={$form.department}
-          >
-            <option />
-            <option>Technology</option>
-            <option>Research</option>
-            <option>IT Support</option>
-            <option>Sales & Support</option>
-            <option>Security</option>
-            <option>Facilities</option>
+          <label for="vehicleDetails">Employee Id</label>
+          <select bind:value={employeeId}>
+            {#each employees as value}<option value={value.id}
+                >{value.name}</option
+              >{/each}
           </select>
+
+          <label for="vehicleDetails">Vehicle Details</label>
+          <textarea
+            id="vehicleDetails"
+            name="vehicleDetails"
+            on:change={handleChange}
+            bind:value={vehicleDetails}
+          />
         </div>
         <div style="width:30%;float:left;padding-left:30px;">
-          <label for="employeeImage">Employee Photo</label>
-          <img class="avatar" src={empPhoto} alt="d" />
+          <label for="vehiclePhoto">Vehicle Photo</label>
+          <img class="avatar" src={vehiclePhoto} alt="d" />
           <img
             class="upload"
             src="https://static.thenounproject.com/png/625182-200.png"
             alt=""
             on:click={() => {
-              empPhotoInput.click();
+              vehiclePhotoInput.click();
             }}
           />
           <div
             class="chan"
             on:click={() => {
-              empPhotoInput.click();
+              vehiclePhotoInput.click();
             }}
           >
             Choose Image
           </div>
           <input
-            name="employeeImage"
-            id="employeeImage"
-            style="display:none"
-            type="file"
-            accept=".jpg, .jpeg, .png"
-            on:change={(e) => onFileSelectedEmpPhoto(e)}
-            bind:this={empPhotoInput}
-          />
-        </div>
-        <div style="width:30%;float:left;padding-left:30px;">
-          <label for="idcardImage">ID Card Photo</label>
-          <img class="avatar" src={idPhoto} alt="d" />
-          <img
-            class="upload"
-            src="https://static.thenounproject.com/png/625182-200.png"
-            alt=""
-            on:click={() => {
-              idPhotoInput.click();
-            }}
-          />
-          <div
-            class="chan"
-            on:click={() => {
-              idPhotoInput.click();
-            }}
-          >
-            Choose Image
-          </div>
-          <input
-            name="idcardImage"
-            id="idcardImage"
+            name="vehiclePhoto"
+            id="vehiclePhoto"
             style="display:none"
             type="file"
             accept=".jpg, .jpeg, .png"
             on:change={(e) => onFileSelectedIdPhoto(e)}
-            bind:this={idPhotoInput}
+            bind:this={vehiclePhotoInput}
           />
         </div>
         <div style="display: flex;width:100%;justify-content: end;">

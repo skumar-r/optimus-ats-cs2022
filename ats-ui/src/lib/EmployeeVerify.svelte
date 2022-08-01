@@ -67,6 +67,7 @@
     let reader = new FileReader();
     reader.readAsDataURL(image);
     reader.onload = (e) => {
+      // @ts-ignore
       empPhoto = e.target.result;
     };
   };
@@ -76,6 +77,7 @@
     let reader = new FileReader();
     reader.readAsDataURL(image);
     reader.onload = (e) => {
+      // @ts-ignore
       idPhoto = e.target.result;
     };
   };
