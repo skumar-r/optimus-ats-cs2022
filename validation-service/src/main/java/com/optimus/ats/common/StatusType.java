@@ -6,7 +6,9 @@ public enum StatusType {
 	NOT_FOUND("NOT FOUND"),
 	NO_MATCH("NO MATCH"),
 	ERROR("ERROR"),
+	NO_VEHICLE("NO VEHICLE"),
 	NO_FACE("NO FACE");
+
 	
 	final String type;
 

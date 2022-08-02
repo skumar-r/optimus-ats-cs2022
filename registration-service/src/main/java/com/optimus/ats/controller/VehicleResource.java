@@ -1,9 +1,14 @@
 package com.optimus.ats.controller;
 
+import com.optimus.ats.common.EventService;
+import com.optimus.ats.common.ServiceResponse;
 import com.optimus.ats.dto.VehicleDto;
+import com.optimus.ats.model.Employee;
 import com.optimus.ats.model.Vehicle;
-import com.optimus.ats.service.VehicleService;
+import com.optimus.ats.service.impl.VehicleServiceImpl;
 import org.jboss.resteasy.reactive.MultipartForm;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
@@ -11,23 +16,37 @@ import javax.transaction.Transactional;
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import java.io.IOException;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static javax.ws.rs.core.MediaType.MULTIPART_FORM_DATA;
 
 @ApplicationScoped
 @Path("/vehicle")
 public class VehicleResource {
+	static final Logger log = LoggerFactory.getLogger(VehicleResource.class);
+	@Inject
+	EventService event;
 
 	@Inject
-	VehicleService vehicleService;
+	VehicleServiceImpl vehicleService;
 
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response getAll() {
-		List<Vehicle> employees = Vehicle.listAll();
-		return Response.ok(employees).build();
+		List<Vehicle> vehicles = Vehicle.listAll();
+		vehicles = vehicles.stream().map(vehicle -> {
+			Employee emp = Employee.findById(vehicle.getEmployeeId());
+			if (vehicle.isHasS3Photo()) {
+				vehicle.setVehiclePhoto(vehicleService.getS3Photo(vehicle.getPhotoFront()));
+			} else {
+				vehicle.setVehiclePhoto(vehicleService.getLocalPhoto(vehicle.getPhotoFront()));
+			}
+			vehicle.setEmplyeeName(emp.getEmployeeName());
+			vehicle.setCsEmployeeId(emp.getCsEmployeeId());
+			return vehicle;
+		}).collect(Collectors.toList());
+		return Response.ok(vehicles).build();
 	}
 
 	@GET
@@ -40,16 +59,20 @@ public class VehicleResource {
 	}
 
 	@POST
-	@Transactional
 	@Produces(MediaType.APPLICATION_JSON)
 	@Consumes(MULTIPART_FORM_DATA)
-	public Response create(@MultipartForm VehicleDto vehicleDto) {
+	public ServiceResponse create(@MultipartForm VehicleDto vehicleDto) {
 		System.out.println("Reg No:" + vehicleDto.getRegNo());
+		ServiceResponse response = null;
+		event.eventLog("Save Employee - Request", vehicleDto, "");
 		try {
 			return vehicleService.saveVehicle(vehicleDto);
-		} catch (IOException e) {
-			return Response.status(Response.Status.NOT_FOUND).build();
+		} catch (Exception e) {
+			log.error("exception", e);
+			response = ServiceResponse.createFailureServiceResponse();
 		}
+		event.eventLog("Save Employee - Response", response, "");
+		return response;
 	}
 
 	@DELETE

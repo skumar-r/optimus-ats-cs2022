@@ -22,6 +22,7 @@
   let actionItem = {};
   let open = false;
   let inProgress = false;
+  export let isVerify =  true;
   let showToast = (message, type) => {
     const toast = toasts.add({
       title: "",
@@ -213,7 +214,7 @@
       </form>
     </DContent>
     <Actions>
-      <Button on:click={() => navigate("/")}>
+      <Button on:click={() => isVerify=false}>
         <Label>OK</Label>
       </Button>
     </Actions>

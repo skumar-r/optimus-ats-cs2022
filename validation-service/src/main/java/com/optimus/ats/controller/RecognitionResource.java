@@ -5,6 +5,7 @@ import com.optimus.ats.common
 import com.optimus.ats.common.StatusType;
 import com.optimus.ats.dto.RecognitionDto;
 import com.optimus.ats.model.Employee;
+import com.optimus.ats.model.Vehicle;
 import com.optimus.ats.service.RecognitionService;
 import com.optimus.ats.service.ValidationService;
 
@@ -54,7 +55,7 @@ public class RecognitionResource {
 	@POST
 	@Produces(MediaType.APPLICATION_JSON)
 	@Consumes(MULTIPART_FORM_DATA)
-	public ServiceResponse create(@MultipartForm RecognitionDto dto) throws IOException {
+	public ServiceResponse validateEmployee(@MultipartForm RecognitionDto dto) throws IOException {
 		log.info("RecognitionDto->Type:" + dto.getType());
 		ServiceResponse response= recognitionService.validateEmployee(dto);
 		log.info("Status Type:" + response.getContentMap().get("StatusType"));
@@ -65,6 +66,24 @@ public class RecognitionResource {
 			validationService.invokeDecisionService(emp.getId(), null, emp.getCsEmployeeId());
 		}
 		return response;		
+	}
+
+	@POST
+	@Path("/vehicle")
+	@Produces(MediaType.APPLICATION_JSON)
+	@Consumes(MULTIPART_FORM_DATA)
+	public ServiceResponse validateVehicle(@MultipartForm RecognitionDto dto) throws IOException {
+		log.info("RecognitionDto->Type:" + dto.getType());
+		ServiceResponse response= recognitionService.validateVehicle(dto);
+		log.info("Status Type:" + response.getContentMap().get("StatusType"));
+		/*if(response.getContentMap().get("StatusType").equals(StatusType.APPROVAL_REQUIRED.getType())){
+			Vehicle vehicle = (Vehicle)response.getContentMap().get("vehicle");
+			Employee emp = (Employee)response.getContentMap().get("employee");
+			log.info("Invoking Decision Workflow Service for employee Id:{}", vehicle.getId());
+			recognitionService.storeApproveRequiredEmpPhoto(dto.getFormData(),vehicle.getRegNo(),emp.isHasS3Photo());
+			validationService.invokeDecisionService(emp.getId(), null, emp.getCsEmployeeId());
+		}*/
+		return response;
 	}
 
 	@DELETE

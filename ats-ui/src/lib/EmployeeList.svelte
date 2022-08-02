@@ -8,6 +8,7 @@
   import IconButton from "@smui/icon-button";
   import EmployeeNew from "./EmployeeNew.svelte";
   import EmployeeVerify from "./EmployeeVerify.svelte";
+  import { onMount, onDestroy } from 'svelte';
 
   let items = [];
   let actionItem = {
@@ -22,7 +23,7 @@
   let loading = false;
   let empPhoto ="https://digitalfinger.id/wp-content/uploads/2019/12/no-image-available-icon-6.png";
 
-  loadData();
+  onMount(() => {loadData()});
 
   function loadData(){
     loading = true;
@@ -217,7 +218,7 @@
           </Actions>
         </Card>
       </div>
-      <EmployeeNew />
+      <EmployeeNew bind:isRegister={isRegister} on:message={loadData()}/>
     </div>
   {/if}
   {#if isVerify}
@@ -237,7 +238,7 @@
           </Actions>
         </Card>
       </div>
-      <EmployeeVerify />
+      <EmployeeVerify bind:isVerify={isVerify}/>
     </div>
   {/if}
 </div>

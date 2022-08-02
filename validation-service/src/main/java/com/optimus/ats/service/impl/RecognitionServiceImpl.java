@@ -8,6 +8,7 @@ import com.amazonaws.services.rekognition.model.*;
 import com.optimus.ats.common.*;
 import com.optimus.ats.dto.RecognitionDto;
 import com.optimus.ats.model.Employee;
+import com.optimus.ats.model.Vehicle;
 import com.optimus.ats.service.RecognitionService;
 import com.optimus.ats.service.ValidationService;
 
@@ -134,8 +135,99 @@ public class RecognitionServiceImpl extends CommonResource implements Recognitio
 		return response;
 	}
 
+	@Transactional
+	@Override
+	public ServiceResponse validateVehicle(RecognitionDto dto) throws IOException {
+		ServiceResponse response = ServiceResponse.createSuccessServiceResponse();
+		event.eventLog("Validate Vehicle - Request", dto, "");
+		try {
+			if (dto != null && dto.getFormData().exists() &&  dto.getIdCardData().exists()) {
+				String detectedVehNo = getVehicleDetectedText(dto.getFormData());
+				if (StringUtils.equals("vehicle", dto.getType()) && (detectedVehNo.contains("TN") || detectedVehNo.contains("KL"))) {
+					return getVehicleMatchedRecord(dto.getIdCardData(), dto.getFormData());
+				} else{
+					response.setSuccess(false);
+					response.getContentMap().put("StatusType",StatusType.NO_VEHICLE.getType());
+					response.getContentMap().put("message","Uploaded image does not contain vehicle.");
+				}
+			} else {
+				response.setSuccess(false);
+				response.getContentMap().put("StatusType",StatusType.NOT_FOUND.getType());
+				response.getContentMap().put("message","Vehicle Photo and ID card required");
+			}
+		} catch (Exception e) {
+			log.error("validate Vehicle:",e);
+			response.setSuccess(false);
+			response.getContentMap().put("StatusType",StatusType.ERROR.getType());
+			response.getContentMap().put("message","Vehicle Photo and ID card required");
+		}
+		event.eventLog("Validate Vehicle - Response", response, "");
+		return response;
+	}
 
+	private ServiceResponse getVehicleMatchedRecord(File idCardImage, File vehicleImage) throws IOException {
+		ServiceResponse response = ServiceResponse.createSuccessServiceResponse();
+		List<String> extractedText = getDetectedText(idCardImage);
+		log.info("Extracted Text: {}", extractedText.size());
+		String csId = extractedText.stream().filter(item -> item.contains("CS")).findFirst().orElse(null);
+		log.info("Extracted csEmployeeId>>:{}", csId);
+		Employee employee = null;
+		if (StringUtils.isNotBlank(csId)) {
+			List<Employee> employees = Employee.listAll();
+			employee = employees.stream().filter(empl -> StringUtils.equals(empl.getCsEmployeeId(), csId)).findFirst().orElse(null);
+			Vehicle vehicle = Objects.isNull(employee)? null: Vehicle.findByEmployeeId(employee.getId());
+			if (Objects.isNull(employee)) {
+				/// not found
+				response.getContentMap().put("StatusType", StatusType.NO_MATCH.getType());
+				response.setSuccess(false);
+				response.getContentMap().put("message", "No Employee found with the Employee ID :" + csId);
+			} else {
+				log.info("employee Name>>" + employee.getEmployeeName());
+				log.info("employee Image>>" + employee.getPhotoFront());
+				response.getContentMap().put("employee", employee);
+				response.getContentMap().put("vehicle", vehicle);
+				response.getContentMap().put("empPhoto", employee.isHasS3Photo() ? getS3Photo(vehicle.getPhotoFront()) : getLocalPhoto(vehicle.getPhotoFront()));
+				if (getVehicleDetectedText(vehicleImage).contains(vehicle.getRegNo())) {
+					// matched
+					log.info("employee Match >> True");
+					response.getContentMap().put("StatusType", StatusType.FULL_MATCH.getType());
+				} else {
+					// no match and call decision service
+					log.info("employee Match >> False");
 
+					response.setSuccess(true);
+					response.getContentMap().put("message", "Employee face not matched");
+					response.getContentMap().put("StatusType", StatusType.APPROVAL_REQUIRED.getType());
+				}
+			}
+		} else {
+			response.setSuccess(false);
+			response.getContentMap().put("message", "Unable to get CS Employee Id from the uploaded ID Card Photo Image. Please upload a valid ID card image");
+			response.getContentMap().put("StatusType", StatusType.ERROR.getType());
+		}
+		return response;
+	}
+	private String getVehicleDetectedText(File targetImage) {
+		StringBuilder stringBuilder = new StringBuilder();
+		TextDetection detectedText = null;
+		try (InputStream targetImgStream = new FileInputStream(targetImage)) {
+			AmazonRekognition rekognitionClient = AmazonRekognitionClientBuilder.standard().withRegion(region).build();
+			DetectTextRequest request = new DetectTextRequest()
+					.withImage(new Image().withBytes(ByteBuffer.wrap(IOUtils.toByteArray(targetImgStream))));
+			DetectTextResult result = rekognitionClient.detectText(request);
+			List<TextDetection> textDetections = result.getTextDetections();
+			for (TextDetection text : textDetections) {
+				log.info("Detected: " + text.getDetectedText());
+				stringBuilder.append(text.getDetectedText());
+			}
+			log.info("detexted text==", stringBuilder.toString());
+			event.eventLog("AWS-Text Extraction Response", null, stringBuilder.toString());
+		} catch (Exception e) {
+			log.error("Exception", e);
+			e.printStackTrace();
+		}
+		return stringBuilder.toString();
+	}
 	private boolean hasFaceMatched(boolean hasS3Photo, String sourceImage, File targetImage) {
 		//BasicAWSCredentials credentials = new BasicAWSCredentials(ACCESS_KEY, SECRET_KEY);
 		//AmazonRekognition rekognitionClient = AmazonRekognitionClientBuilder.standard().withCredentials(new AWSStaticCredentialsProvider(credentials)).withRegion(region).build();

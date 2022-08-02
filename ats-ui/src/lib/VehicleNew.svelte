@@ -1,20 +1,23 @@
 <script>
-  import Paper, { Content } from "@smui/paper";
+  import { createEventDispatcher } from 'svelte';
+  import Paper, { Title, Subtitle, Content } from "@smui/paper";
+  import { toasts, ToastContainer, FlatToast, BootstrapToast }  from "svelte-toasts";
   import { useNavigate } from "svelte-navigator";
-  import {
-    toasts,
-    ToastContainer,
-    FlatToast,
-    BootstrapToast,
-  } from "svelte-toasts";
   const navigate = useNavigate();
+  const dispatch = createEventDispatcher();
   let vehiclePhotoInput;
   let regNo = "";
   let vehicleDetails = "";
   let employeeId = "";
+  export let isRegister =true;
   let vehiclePhoto =
     "https://digitalfinger.id/wp-content/uploads/2019/12/no-image-available-icon-6.png";
   let employees = [];
+  function refreshData() {
+    isRegister = false;
+    dispatch('message', {});
+  }
+
   if (typeof fetch !== "undefined") {
     fetch("http://localhost:9010/employee", {
       method: "GET",
@@ -31,26 +34,26 @@
     dataArray.append("regNo", regNo);
     dataArray.append("vehicleDetails", vehicleDetails);
     dataArray.append("employeeId", employeeId);
-    // @ts-ignore
     dataArray.append("hasS3Photo", true);
     dataArray.append("photoFrontFile", vehiclePhotoInput.files[0]);
-
+debugger;
     await fetch("http://localhost:9010/vehicle", {
       method: "POST",
       body: dataArray,
     })
       .then((response) => response.json())
       .then((response) => {
+        debugger;
         if (!response.success) {
           showToast(response.contentMap.message, "error");
         } else {
-          navigate("/");
+          refreshData();
         }
       })
       .catch((error) => {
         // Upload failed
       });
-  };
+  }
 
   let showToast = (message, type) => {
     const toast = toasts.add({
@@ -87,7 +90,7 @@
   >
     <span class="pageTitle">Add a New Vehicle</span>
     <Content>
-      <form on:submit={handleSubmit} style="height: 600px;">
+      <form  style="height: 600px;">
         <div style="width:33%;float:left;">
           <label for="regNo">Registration No.</label>
           <input
@@ -100,7 +103,7 @@
           <label for="vehicleDetails">Employee Id</label>
           <select bind:value={employeeId}>
             {#each employees as value}<option value={value.id}
-                >{value.name}</option
+                >{value.employeeName}</option
               >{/each}
           </select>
 
@@ -142,11 +145,14 @@
           />
         </div>
         <div style="display: flex;width:100%;justify-content: end;">
-          <button type="submit">Submit</button>
+          <button type="button" on:click={(e)=>handleSubmit(e)}>Submit</button>
         </div>
       </form>
     </Content>
   </Paper>
+  <ToastContainer placement="bottom-right" let:data={data}>
+    <FlatToast {data} /> <!-- Provider template for your toasts -->
+  </ToastContainer>
 </div>
 
 <style>

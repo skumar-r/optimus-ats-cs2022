@@ -25,9 +25,6 @@ public class Vehicle extends PanacheEntityBase {
 	@Column(name = "VEHICLE_PHOTO_FRONT")
 	private String photoFront;
 
-	@Column(name = "VEHICLE_PHOTO_REAR")
-	private String photoRear;
-
 	@Column(name = "IS_S3PHOTO")
 	private boolean hasS3Photo;
 
@@ -72,14 +69,6 @@ public class Vehicle extends PanacheEntityBase {
 		this.photoFront = photoFront;
 	}
 
-	public String getPhotoRear() {
-		return photoRear;
-	}
-
-	public void setPhotoRear(String photoRear) {
-		this.photoRear = photoRear;
-	}
-
 	public boolean isHasS3Photo() {
 		return hasS3Photo;
 	}
@@ -88,4 +77,10 @@ public class Vehicle extends PanacheEntityBase {
 		this.hasS3Photo = hasS3Photo;
 	}
 
+	public static Vehicle findByName(String name){
+		return find("regNo", name).firstResult();
+	}
+	public static Vehicle findByEmployeeId(Long employeeId){
+		return find("employeeId", employeeId).firstResult();
+	}
 }

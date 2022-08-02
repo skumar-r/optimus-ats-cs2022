@@ -10,7 +10,7 @@
   let idPhoto =
     "https://digitalfinger.id/wp-content/uploads/2019/12/no-image-available-icon-6.png";
   let empPhotoInput, idPhotoInput;
-
+  export let isRegister = true;
   let  csEmployeeId= "",
       employeeName= "",
       email= "",
@@ -55,7 +55,7 @@
                 showToast(response.contentMap.message,"error");
               }
               else{
-                navigate("/");
+                isRegister = false;
               }
             })
             .catch((error) => {

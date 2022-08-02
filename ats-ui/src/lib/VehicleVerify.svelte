@@ -22,6 +22,7 @@
   let actionItem = {};
   let open = false;
   let inProgress = false;
+  export let isVerify = true;
   let showToast = (message, type) => {
     const toast = toasts.add({
       title: "",
@@ -40,7 +41,7 @@
     dataArray.append("resourceFile", empPhotoInput.files[0]);
     dataArray.append("idCardFile", idPhotoInput.files[0]);
     inProgress = true;
-    await fetch("http://localhost:9011/recognition", {
+    await fetch("http://localhost:9011/recognition/vehicle", {
       method: "POST",
       body: dataArray,
     })
@@ -188,7 +189,7 @@
     aria-describedby="fullscreen-content"
   >
     <Header>
-      <span class="pageTitle" style="padding-top: 20px;">Employee</span>
+      <span class="pageTitle" style="padding-top: 20px;">Vehicle</span>
       <IconButton
         action="close"
         class="material-icons"
@@ -214,7 +215,7 @@
       </form>
     </DContent>
     <Actions>
-      <Button on:click={() => navigate("/")}>
+      <Button on:click={() => isVerify=false}>
         <Label>OK</Label>
       </Button>
     </Actions>
