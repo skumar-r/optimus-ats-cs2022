@@ -4,6 +4,7 @@
   import Card, { Actions } from "@smui/card";
   import Button from "@smui/button";
   import Dialog, { Header, Content as DContent } from "@smui/Dialog";
+  import { Pulse } from 'svelte-loading-spinners'
   import IconButton from "@smui/icon-button";
   import EmployeeNew from "./EmployeeNew.svelte";
   import EmployeeVerify from "./EmployeeVerify.svelte";
@@ -18,17 +19,28 @@
   let sortDirection = "ascending";
   let open = false;
   let disabled = false;
-  let empPhoto =
-    "https://digitalfinger.id/wp-content/uploads/2019/12/no-image-available-icon-6.png";
-  if (typeof fetch !== "undefined") {
+  let loading = false;
+  let empPhoto ="https://digitalfinger.id/wp-content/uploads/2019/12/no-image-available-icon-6.png";
+
+  loadData();
+
+  function loadData(){
+    loading = true;
+    if (typeof fetch !== "undefined") {
     fetch("http://localhost:9010/employee", {
       method: "GET",
     })
-      .then((response) => response.json())
-      .then((json) => (items = json))
+      .then((response) =>{        
+        response.json().then(data=> {
+          loading= false;
+          items=data
+        })
+      })      
       .catch((error) => {
         // Upload failed
+        loading= false;
       });
+  }
   }
 
   function handleSort() {
@@ -79,8 +91,10 @@
             variant="outlined"
             class="mdc-theme--primary no-border"
           >
-            <span class="pageTitle">Employee List</span>
-            <Content>
+            <span class="pageTitle">Employee List{#if loading==true}
+              <Pulse size="60" color="rgb(187,64,74)" unit="px" duration="1s"></Pulse>
+              {/if}</span>
+            <Content>              
               <DataTable
                 sortable
                 bind:sort
@@ -91,16 +105,6 @@
               >
                 <Head>
                   <Row>
-                    <!--
-              Note: whatever you supply to "columnId" is
-              appended with "-status-label" and used as an ID
-              for the hidden label that describes the sort
-              status to screen readers.
-      
-              You can localize those labels with the
-              "sortAscendingAriaLabel" and
-              "sortDescendingAriaLabel" props on the DataTable.
-            -->
                     <Cell numeric columnId="id">
                       <!-- For numeric columns, icon comes first. -->
                       <Label>ID</Label>

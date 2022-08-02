@@ -45,7 +45,7 @@
       body: dataArray,
     })
       .then((response) => response.json())
-      .then((response) => { debugger;
+      .then((response) => {
         // Successfully uploaded
         inProgress = false;
         if (!response.success) {
