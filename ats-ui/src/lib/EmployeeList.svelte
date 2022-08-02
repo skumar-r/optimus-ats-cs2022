@@ -4,11 +4,11 @@
   import Card, { Actions } from "@smui/card";
   import Button from "@smui/button";
   import Dialog, { Header, Content as DContent } from "@smui/Dialog";
-  import { Pulse } from 'svelte-loading-spinners'
+  import { Pulse } from "svelte-loading-spinners";
   import IconButton from "@smui/icon-button";
   import EmployeeNew from "./EmployeeNew.svelte";
   import EmployeeVerify from "./EmployeeVerify.svelte";
-  import { onMount, onDestroy } from 'svelte';
+  import { onMount, onDestroy } from "svelte";
 
   let items = [];
   let actionItem = {
@@ -21,27 +21,30 @@
   let open = false;
   let disabled = false;
   let loading = false;
-  let empPhoto ="https://digitalfinger.id/wp-content/uploads/2019/12/no-image-available-icon-6.png";
+  let empPhoto =
+    "https://digitalfinger.id/wp-content/uploads/2019/12/no-image-available-icon-6.png";
 
-  onMount(() => {loadData()});
+  onMount(() => {
+    loadData();
+  });
 
-  function loadData(){
+  function loadData() {
     loading = true;
     if (typeof fetch !== "undefined") {
-    fetch("http://localhost:9010/employee", {
-      method: "GET",
-    })
-      .then((response) =>{        
-        response.json().then(data=> {
-          loading= false;
-          items=data
+      fetch("http://localhost:9010/employee", {
+        method: "GET",
+      })
+        .then((response) => {
+          response.json().then((data) => {
+            loading = false;
+            items = data;
+          });
         })
-      })      
-      .catch((error) => {
-        // Upload failed
-        loading= false;
-      });
-  }
+        .catch((error) => {
+          // Upload failed
+          loading = false;
+        });
+    }
   }
 
   function handleSort() {
@@ -92,10 +95,17 @@
             variant="outlined"
             class="mdc-theme--primary no-border"
           >
-            <span class="pageTitle">Employee List{#if loading==true}
-              <Pulse size="60" color="rgb(187,64,74)" unit="px" duration="1s"></Pulse>
-              {/if}</span>
-            <Content>              
+            <span class="pageTitle"
+              >Employee List{#if loading == true}
+                <Pulse
+                  size="60"
+                  color="rgb(187,64,74)"
+                  unit="px"
+                  duration="1s"
+                />
+              {/if}</span
+            >
+            <Content>
               <DataTable
                 sortable
                 bind:sort
@@ -161,6 +171,9 @@
                       </Cell>
                     </Row>
                   {/each}
+                  {#if items.length == 0}
+                    <div style="width: 88%;text-align:center;padding:50px;color:#cf3845;font-size: 20px;">No employee found</div>
+                  {/if}
                 </Body>
               </DataTable>
             </Content>
@@ -218,7 +231,7 @@
           </Actions>
         </Card>
       </div>
-      <EmployeeNew bind:isRegister={isRegister} on:message={loadData()}/>
+      <EmployeeNew bind:isRegister on:message={loadData()} />
     </div>
   {/if}
   {#if isVerify}
@@ -238,7 +251,7 @@
           </Actions>
         </Card>
       </div>
-      <EmployeeVerify bind:isVerify={isVerify}/>
+      <EmployeeVerify bind:isVerify />
     </div>
   {/if}
 </div>

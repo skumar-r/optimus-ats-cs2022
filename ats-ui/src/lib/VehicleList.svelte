@@ -159,6 +159,9 @@
                       </Cell>
                     </Row>
                   {/each}
+                  {#if items.length == 0}
+                  <div style="width: 88%;text-align:center;padding:50px;color:#cf3845;font-size: 20px;">No employee vehicle found</div>
+                {/if}
                 </Body>
               </DataTable>
             </Content>
