@@ -195,7 +195,7 @@ let empPhoto =
                 name="employeeId"
                 disabled
                 bind:value={actionItem.employeeId}
-              />
+              /><br/>
               <label for="title">CS Employee Id</label>      
               <input
                 id="csEmpId"
@@ -206,12 +206,12 @@ let empPhoto =
               <label >Employee Photo</label>
               <img
                       style="display:block; width:200px;"
-                      src={actionItem.empPhoto.length>50?actionItem.empPhoto:empPhoto}
+                      src={ actionItem.empPhoto && actionItem.empPhoto.length>50?actionItem.empPhoto:empPhoto}
               />
               <label >Verification Photo</label>
               <img
                       style="display:block; width:200px;"
-                      src={actionItem.comparePhoto.length>50?actionItem.comparePhoto:empPhoto}
+                      src={actionItem.comparePhoto && actionItem.comparePhoto.length>50?actionItem.comparePhoto:empPhoto}
               />
               <label>Remarks</label>
               <input

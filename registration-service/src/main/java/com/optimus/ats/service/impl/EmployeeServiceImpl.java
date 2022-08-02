@@ -174,6 +174,7 @@ public class EmployeeServiceImpl extends CommonResource implements EmployeeServi
 	}
 	public String getS3Photo(String photoUrl) {
 		byte[] fileContent = new byte[0];
+		log.info("Try to get the photo from S3"+photoUrl);
 		try {
 			fileContent = s3.getObject(buildGetRequest(photoUrl)).readAllBytes();
 		} catch (IOException e) {

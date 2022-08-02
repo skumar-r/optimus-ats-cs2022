@@ -48,6 +48,7 @@ public class EmployeeResource {
 			}
 			return employee;
 		}).collect(Collectors.toList());
+		log.info("Number of employees->{}", employees.size());
 		return Response.ok(employees).build();
 	}
 
