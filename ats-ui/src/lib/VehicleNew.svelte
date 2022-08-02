@@ -1,9 +1,7 @@
 <script>
   import { createEventDispatcher } from 'svelte';
-  import Paper, { Title, Subtitle, Content } from "@smui/paper";
-  import { toasts, ToastContainer, FlatToast, BootstrapToast }  from "svelte-toasts";
-  import { useNavigate } from "svelte-navigator";
-  const navigate = useNavigate();
+  import Paper, { Content } from "@smui/paper";
+  import { toasts, ToastContainer, FlatToast }  from "svelte-toasts";
   const dispatch = createEventDispatcher();
   let vehiclePhotoInput;
   let regNo = "";
@@ -34,6 +32,7 @@
     dataArray.append("regNo", regNo);
     dataArray.append("vehicleDetails", vehicleDetails);
     dataArray.append("employeeId", employeeId);
+    // @ts-ignore
     dataArray.append("hasS3Photo", true);
     dataArray.append("photoFrontFile", vehiclePhotoInput.files[0]);
 debugger;

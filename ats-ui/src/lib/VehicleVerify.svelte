@@ -1,18 +1,11 @@
 <script>
-  import Paper, { Title, Subtitle, Content } from "@smui/paper";
-  import {
-    toasts,
-    ToastContainer,
-    FlatToast,
-    BootstrapToast,
-  } from "svelte-toasts";
+  import Paper, { Title, Content } from "@smui/paper";
+  import { toasts, ToastContainer, FlatToast } from "svelte-toasts";
   import Dialog, { Header, Content as DContent, Actions } from "@smui/Dialog";
   import Button from "@smui/button";
-  import DataTable, { Head, Body, Row, Cell, Label } from "@smui/data-table";
+  import { Label } from "@smui/data-table";
   import IconButton from "@smui/icon-button";
-  import { useNavigate } from "svelte-navigator";
   import CircularProgress from "@smui/circular-progress";
-  const navigate = useNavigate();
   let empPhoto =
     "https://digitalfinger.id/wp-content/uploads/2019/12/no-image-available-icon-6.png";
   let idPhoto =
@@ -98,7 +91,7 @@
         <form>
           <div style="width:40%;float:left;padding-left:20px;">
             <label for="idcardImage">ID Card Photo</label>
-            <img class="avatar" src={idPhoto} />
+            <img class="avatar" src={idPhoto} alt="avatar" />
             <img
               style="width: 25px;"
               class="upload"
@@ -128,7 +121,7 @@
           </div>
           <div style="width:40%;float:left;padding-left:20px;">
             <label for="employeeImage">Vehicle Photo</label>
-            <img class="avatar" src={empPhoto} />
+            <img class="avatar" src={empPhoto} alt="avatar" />
             <img
               style="width: 25px;"
               class="upload"
@@ -209,13 +202,13 @@
           src={actionItem.empPhoto}
           alt="Red dot"
         />
-        <label>Employee ID:{actionItem.csEmployeeId}</label>
-        <label>Employee Name:{actionItem.employeeName}</label>
-        <label>StatusType:{actionItem.StatusType}</label>
+        <span>Employee ID:{actionItem.csEmployeeId}</span>
+        <span>Employee Name:{actionItem.employeeName}</span>
+        <span>StatusType:{actionItem.StatusType}</span>
       </form>
     </DContent>
     <Actions>
-      <Button on:click={() => isVerify=false}>
+      <Button on:click={() => (isVerify = false)}>
         <Label>OK</Label>
       </Button>
     </Actions>

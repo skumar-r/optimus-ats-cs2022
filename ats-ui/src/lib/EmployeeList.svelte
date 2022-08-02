@@ -1,4 +1,5 @@
 <script lang="js">
+// @ts-nocheck
   import DataTable, { Head, Body, Row, Cell, Label } from "@smui/data-table";
   import Paper, { Content } from "@smui/paper";
   import Card, { Actions } from "@smui/card";
@@ -8,7 +9,7 @@
   import IconButton from "@smui/icon-button";
   import EmployeeNew from "./EmployeeNew.svelte";
   import EmployeeVerify from "./EmployeeVerify.svelte";
-  import { onMount, onDestroy } from "svelte";
+  import { onMount } from "svelte";
 
   let items = [];
   let actionItem = {
@@ -203,12 +204,8 @@
         </Header>
         <DContent id="fullscreen-content">
           <form>
-            <img
-              style="display:block; width:100%;"
-              src={actionItem.empPhoto.length > 50
-                ? actionItem.empPhoto
-                : empPhoto}
-            />
+            <!-- svelte-ignore a11y-missing-attribute -->
+            <img style="display:block; width:100%;" src={actionItem.empPhoto.length > 50? actionItem.empPhoto : empPhoto} />
           </form>
         </DContent>
       </Dialog>
@@ -231,7 +228,7 @@
           </Actions>
         </Card>
       </div>
-      <EmployeeNew bind:isRegister on:message={loadData()} />
+      <EmployeeNew bind:isRegister on:message={loadData} />
     </div>
   {/if}
   {#if isVerify}

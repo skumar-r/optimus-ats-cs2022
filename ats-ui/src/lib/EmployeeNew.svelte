@@ -1,10 +1,8 @@
 <script>
   // @ts-nocheck
 
-  import Paper, { Title, Subtitle, Content } from "@smui/paper";
-  import { toasts, ToastContainer, FlatToast, BootstrapToast }  from "svelte-toasts";
-  import { useNavigate } from "svelte-navigator";
-  const navigate = useNavigate();
+  import Paper, { Content } from "@smui/paper";
+  import { toasts, ToastContainer, FlatToast }  from "svelte-toasts";
   let empPhoto =
     "https://digitalfinger.id/wp-content/uploads/2019/12/no-image-available-icon-6.png";
   let idPhoto =

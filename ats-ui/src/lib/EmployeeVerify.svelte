@@ -1,18 +1,11 @@
 <script>
-  import Paper, { Title, Subtitle, Content } from "@smui/paper";
-  import {
-    toasts,
-    ToastContainer,
-    FlatToast,
-    BootstrapToast,
-  } from "svelte-toasts";
+  import Paper, { Title, Content } from "@smui/paper";
+  import { toasts, ToastContainer, FlatToast } from "svelte-toasts";
   import Dialog, { Header, Content as DContent, Actions } from "@smui/Dialog";
   import Button from "@smui/button";
-  import DataTable, { Head, Body, Row, Cell, Label } from "@smui/data-table";
+  import { Label } from "@smui/data-table";
   import IconButton from "@smui/icon-button";
-  import { useNavigate } from "svelte-navigator";
   import CircularProgress from "@smui/circular-progress";
-  const navigate = useNavigate();
   let empPhoto =
     "https://digitalfinger.id/wp-content/uploads/2019/12/no-image-available-icon-6.png";
   let idPhoto =
@@ -22,7 +15,7 @@
   let actionItem = {};
   let open = false;
   let inProgress = false;
-  export let isVerify =  true;
+  export let isVerify = true;
   let showToast = (message, type) => {
     const toast = toasts.add({
       title: "",
@@ -52,7 +45,7 @@
         if (!response.success) {
           showToast(response.contentMap.message, "error");
         } else {
-          response.contentMap.employee.empPhoto =response.contentMap.empPhoto
+          response.contentMap.employee.empPhoto = response.contentMap.empPhoto;
           response.contentMap.employee.StatusType =
             response.contentMap.StatusType;
           actionItem = response.contentMap.employee;
@@ -97,7 +90,7 @@
         <form>
           <div style="width:40%;float:left;padding-left:20px;">
             <label for="employeeImage">Employee Photo</label>
-            <img class="avatar" src={empPhoto} />
+            <img class="avatar" src={empPhoto} alt="avatar" />
             <img
               style="width: 25px;"
               class="upload"
@@ -127,7 +120,7 @@
           </div>
           <div style="width:50%;float:left;padding-left:20px;">
             <label for="idcardImage">ID Card Photo</label>
-            <img class="avatar" src={idPhoto} />
+            <img class="avatar" src={idPhoto} alt="avatar" />
             <img
               style="width: 25px;"
               class="upload"
@@ -208,13 +201,13 @@
           src={actionItem.empPhoto}
           alt="Red dot"
         />
-        <label>Employee ID:{actionItem.csEmployeeId}</label>
-        <label>Employee Name:{actionItem.employeeName}</label>
-        <label>StatusType:{actionItem.StatusType}</label>
+        <span>Employee ID:{actionItem.csEmployeeId}</span>
+        <span>Employee Name:{actionItem.employeeName}</span>
+        <span>StatusType:{actionItem.StatusType}</span>
       </form>
     </DContent>
     <Actions>
-      <Button on:click={() => isVerify=false}>
+      <Button on:click={() => (isVerify = false)}>
         <Label>OK</Label>
       </Button>
     </Actions>

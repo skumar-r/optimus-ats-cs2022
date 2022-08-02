@@ -1,4 +1,5 @@
 <script lang="js">
+  // @ts-nocheck
   import DataTable, { Head, Body, Row, Cell, Label } from "@smui/data-table";
   import Paper, { Content } from "@smui/paper";
   import Card, { Actions } from "@smui/card";
@@ -7,12 +8,12 @@
   import IconButton from "@smui/icon-button";
   import VehicleNew from "./VehicleNew.svelte";
   import VehicleVerify from "./VehicleVerify.svelte";
-  import { Pulse } from 'svelte-loading-spinners'
-  import {onMount} from "svelte";
+  import { Pulse } from "svelte-loading-spinners";
+  import { onMount } from "svelte";
   let isRegister = false;
   let isVerify = false;
   let empPhoto =
-          "https://digitalfinger.id/wp-content/uploads/2019/12/no-image-available-icon-6.png";
+    "https://digitalfinger.id/wp-content/uploads/2019/12/no-image-available-icon-6.png";
   let actionItem = {
     vehiclePhoto: "",
   };
@@ -22,7 +23,9 @@
   let sort = "id";
   let sortDirection = "ascending";
   let loading = false;
-  onMount(() => {loadData()});
+  onMount(() => {
+    loadData();
+  });
 
   function loadData() {
     loading = true;
@@ -30,15 +33,15 @@
       fetch("http://localhost:9010/vehicle", {
         method: "GET",
       })
-      .then((response) =>{
-        response.json().then(data=> {
-          loading= false;
-          items=data
+        .then((response) => {
+          response.json().then((data) => {
+            loading = false;
+            items = data;
+          });
         })
-      })
-      .catch((error) => {
-        loading= false;
-      });
+        .catch((error) => {
+          loading = false;
+        });
     }
   }
 
@@ -90,9 +93,16 @@
             variant="outlined"
             class="mdc-theme--primary no-border"
           >
-            <span class="pageTitle">Employee Vehicle List{#if loading==true}
-              <Pulse size="60" color="rgb(187,64,74)" unit="px" duration="1s"></Pulse>
-              {/if}</span>
+            <span class="pageTitle"
+              >Employee Vehicle List{#if loading == true}
+                <Pulse
+                  size="60"
+                  color="rgb(187,64,74)"
+                  unit="px"
+                  duration="1s"
+                />
+              {/if}</span
+            >
             <Content>
               <DataTable
                 sortable
@@ -149,10 +159,11 @@
                       <Cell class="centered">{item.regNo}</Cell>
                       <Cell class="centered">{item.vehicleDetails}</Cell>
                       <Cell class="centered">
-                        <Button style="margin-top: 0;"
-                                action="takeAction"
-                                on:click={() => ((open = true), (actionItem = item))}
-                                bind:disabled
+                        <Button
+                          style="margin-top: 0;"
+                          action="takeAction"
+                          on:click={() => ((open = true), (actionItem = item))}
+                          bind:disabled
                         >
                           <Label>Photo</Label>
                         </Button>
@@ -160,8 +171,12 @@
                     </Row>
                   {/each}
                   {#if items.length == 0}
-                  <div style="width: 88%;text-align:center;padding:50px;color:#cf3845;font-size: 20px;">No employee vehicle found</div>
-                {/if}
+                    <div
+                      style="width: 88%;text-align:center;padding:50px;color:#cf3845;font-size: 20px;"
+                    >
+                      No employee vehicle found
+                    </div>
+                  {/if}
                 </Body>
               </DataTable>
             </Content>
@@ -169,18 +184,18 @@
         </div>
       </div>
       <Dialog
-              class="emp-dialog"
-              bind:open
-              fullscreen
-              aria-labelledby="fullscreen-title"
-              aria-describedby="fullscreen-content"
+        class="emp-dialog"
+        bind:open
+        fullscreen
+        aria-labelledby="fullscreen-title"
+        aria-describedby="fullscreen-content"
       >
         <Header>
           <span class="pageTitle" style="padding-top: 20px;">Employee</span>
           <IconButton
-                  action="close"
-                  class="material-icons"
-                  style="margin: 0;
+            action="close"
+            class="material-icons"
+            style="margin: 0;
         top: -10px;
         min-width: 20px;
         padding: 15px;
@@ -192,8 +207,9 @@
         <DContent id="fullscreen-content">
           <form>
             <img
-                    style="display:block; width:100%;"
-                    src={actionItem.vehiclePhoto.length > 50
+              style="display:block; width:100%;"
+              alt="vehiclePhoto"
+              src={actionItem.vehiclePhoto.length > 50
                 ? actionItem.vehiclePhoto
                 : empPhoto}
             />
@@ -219,7 +235,7 @@
           </Actions>
         </Card>
       </div>
-      <VehicleNew bind:isRegister={isRegister} />
+      <VehicleNew bind:isRegister on:message={loadData} />
     </div>
   {/if}
   {#if isVerify}
@@ -239,7 +255,7 @@
           </Actions>
         </Card>
       </div>
-      <VehicleVerify bind:isVerify={isVerify}/>
+      <VehicleVerify bind:isVerify />
     </div>
   {/if}
 </div>

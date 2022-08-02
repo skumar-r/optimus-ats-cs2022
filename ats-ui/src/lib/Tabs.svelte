@@ -48,7 +48,10 @@
     padding: 0.5rem 1rem;
     cursor: pointer;
     text-transform: capitalize;
-    font-family: var(--mdc-typography-headline5-font-family, var(--mdc-typography-font-family, Roboto, sans-serif));
+    font-family: var(
+      --mdc-typography-headline5-font-family,
+      var(--mdc-typography-font-family, Roboto, sans-serif)
+    );
   }
 
   li > span {
