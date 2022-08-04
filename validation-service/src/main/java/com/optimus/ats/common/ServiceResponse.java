@@ -2,7 +2,6 @@ package com.optimus.ats.common;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import org.jboss.resteasy.reactive.common.jaxrs.ResponseImpl;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -14,11 +13,10 @@ import java.util.Map;
  */
 
 @JsonAutoDetect(fieldVisibility = JsonAutoDetect.Visibility.NONE, getterVisibility = JsonAutoDetect.Visibility.NONE)
-public class ServiceResponse extends ResponseImpl {
+public class ServiceResponse {
 
 	private ServiceResponse() {
 	}
-
 	private boolean success = false;
 	private Map<String, Object> contentMap = new HashMap<>();
 

@@ -1,11 +1,11 @@
 package com.optimus.ats.controller;
 
+import com.optimus.ats.common.EventService;
+import com.optimus.ats.common.ServiceResponse;
 import com.optimus.ats.dto.EmployeeDto;
-import com.optimus.ats.dto.LogDto;
 import com.optimus.ats.model.Employee;
 import com.optimus.ats.service.EmployeeService;
-import io.vertx.core.json.JsonObject;
-import io.vertx.mutiny.core.eventbus.EventBus;
+import com.optimus.ats.service.impl.EmployeeServiceImpl;
 import org.jboss.resteasy.reactive.MultipartForm;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -16,9 +16,8 @@ import javax.transaction.Transactional;
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-
-import java.io.IOException;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static javax.ws.rs.core.MediaType.MULTIPART_FORM_DATA;
 
@@ -29,16 +28,27 @@ public class EmployeeResource {
 	static final Logger log = LoggerFactory.getLogger(EmployeeResource.class);
 
 	@Inject
-	EventBus bus;
+	EventService event;
 
 	@Inject
 	EmployeeService employeeService;
 
+	@Inject
+	EmployeeServiceImpl employeeServiceImpl;
+
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response getAll() {
-		bus.publish("log", JsonObject.mapFrom(LogDto.builder().serviceName("registration-service").details("getEmployee list").build()));
 		List<Employee> employees = Employee.listAll();
+		employees = employees.stream().map(employee -> {
+			if (employee.isHasS3Photo()) {
+				employee.setEmpPhoto(employeeServiceImpl.getS3Photo(employee.getPhotoFront()));
+			} else {
+				employee.setEmpPhoto(employeeServiceImpl.getLocalPhoto(employee.getPhotoFront()));
+			}
+			return employee;
+		}).collect(Collectors.toList());
+		log.info("Number of employees->{}", employees.size());
 		return Response.ok(employees).build();
 	}
 
@@ -55,16 +65,19 @@ public class EmployeeResource {
 	@Transactional
 	@Produces(MediaType.APPLICATION_JSON)
 	@Consumes(MULTIPART_FORM_DATA)
-	public Response create(@MultipartForm EmployeeDto employee) {
-		System.out.println("email:"+employee.getEmail());
-		System.out.println("name:"+employee.getEmployeeName());
+	public ServiceResponse create(@MultipartForm EmployeeDto employee) {
+		System.out.println("email:" + employee.getEmail());
+		System.out.println("name:" + employee.getEmployeeName());
+		ServiceResponse response = null;
+		event.eventLog("Save Employee - Request", employee, "");
 		try {
-
-			return employeeService.saveEmployee(employee);
-		} catch (IOException e) {
+			response = employeeService.saveEmployee(employee);
+		} catch (Exception e) {
 			log.error("exception", e);
-			return Response.status(Response.Status.NOT_FOUND).build();
+			response = ServiceResponse.createFailureServiceResponse();
 		}
+		event.eventLog("Save Employee - Response", response, "");
+		return response;
 	}
 
 	@DELETE
@@ -73,7 +86,7 @@ public class EmployeeResource {
 	@Transactional
 	public Response deleteById(@PathParam("id") Long id) {
 		boolean deleted = Employee.deleteById(id);
-		if(deleted) {
+		if (deleted) {
 			return Response.noContent().build();
 		}
 		return Response.status(Response.Status.BAD_REQUEST).build();

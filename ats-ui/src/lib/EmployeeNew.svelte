@@ -1,24 +1,38 @@
 <script>
   // @ts-nocheck
 
-  import Paper, { Title, Subtitle, Content } from "@smui/paper";
+  import Paper, { Content } from "@smui/paper";
+  import { toasts, ToastContainer, FlatToast }  from "svelte-toasts";
   let empPhoto =
     "https://digitalfinger.id/wp-content/uploads/2019/12/no-image-available-icon-6.png";
   let idPhoto =
     "https://digitalfinger.id/wp-content/uploads/2019/12/no-image-available-icon-6.png";
   let empPhotoInput, idPhotoInput;
-
+  export let isRegister = true;
   let  csEmployeeId= "",
       employeeName= "",
       email= "",
       mobile= "",
       department= "",
       designation= "";
-
+  let showToast = (message, type) => {
+    const toast = toasts.add({
+      title: '',
+      description: message,
+      duration: 5000, // 0 or negative to avoid auto-remove
+      placement: 'top-right',
+      theme: 'dark',
+      type: type,
+      onClick: () => {
+      },
+      onRemove: () => {
+      },
+    });
+  }
   let handleChange = (e)=>{
 
   }
-  let handleSubmit = (e) =>{
+  let handleSubmit = async (e) => {
     const dataArray = new FormData();
       dataArray.append("csEmployeeId", csEmployeeId);
       dataArray.append("employeeName", employeeName);
@@ -26,19 +40,25 @@
       dataArray.append("designation", designation);
       dataArray.append("email", email);
       dataArray.append("mobile", mobile);
-      dataArray.append("hasS3Photo", false);
+      dataArray.append("hasS3Photo", true);
       dataArray.append("photoFrontFile", empPhotoInput.files[0]);
       dataArray.append("photoIDCardFile", idPhotoInput.files[0]);
-      fetch("http://localhost:9010/employee", {
+    await fetch("http://localhost:9010/employee", {
         method: "POST",
         body: dataArray,
       })
-        .then((response) => {
-          // Successfully uploaded
-        })
-        .catch((error) => {
-          // Upload failed
-        });
+            .then((response) => response.json())
+            .then((response) => {
+              if(!response.success) {
+                showToast(response.contentMap.message,"error");
+              }
+              else{
+                isRegister = false;
+              }
+            })
+            .catch((error) => {
+              // Upload failed
+            });
   }
   
 
@@ -69,7 +89,7 @@
       variant="outlined"
       class="mdc-theme--primary no-border"
       style="margin-top:25px;">
-      <span  class="pageTitle">Add a New Employee</span>
+      <span class="pageTitle">Add a New Employee</span>
       <Content>
         <form style="height: 600px;">
           <div style="width:33%;float:left;">
@@ -200,6 +220,9 @@
       </Content>
     </Paper>
   </div>
+  <ToastContainer placement="bottom-right" let:data={data}>
+    <FlatToast {data} /> <!-- Provider template for your toasts -->
+  </ToastContainer>
 </div>
 
 <style>

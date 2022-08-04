@@ -64,9 +64,6 @@ button:disabled {
   background-color: var(--grey);
 }
 
-button:focus:not(:disabled) {
-  box-shadow: 0 0 0 4px var(--primary-light);
-}
 
 button:hover:not(:disabled) {
   background-color: var(--primary-light);
@@ -117,7 +114,8 @@ small {
 }
 
 .avatar {
-  height: 130px !important;
+  height: auto !important;
+  min-height: 120px !important;
   width: 200px !important;
 }
 
@@ -160,4 +158,20 @@ tbody tr {
   display: table;
   width: 100%;
   table-layout: fixed;
+}
+
+.mdc-circular-progress__indeterminate-circle-graphic {
+  stroke: white;
+}
+
+.emp-dialog .mdc-dialog__surface {
+  width: 100px !important;
+}
+
+.mdc-card__action--button {
+  margin-top: 0 !important;
+}
+
+.smui-paper {
+  padding: 10px 16px;
 }

@@ -14,6 +14,9 @@ public class RecognitionDto {
 	@RestForm("resourceFile")
 	private File formData;
 
+	@RestForm("idCardFile")
+	private File idCardData;
+
 	public String getType() {
 		return type;
 	}
@@ -28,5 +31,13 @@ public class RecognitionDto {
 
 	public void setFormData(File formData) {
 		this.formData = formData;
+	}
+
+	public File getIdCardData() {
+		return idCardData;
+	}
+
+	public void setIdCardData(File idCardData) {
+		this.idCardData = idCardData;
 	}
 }

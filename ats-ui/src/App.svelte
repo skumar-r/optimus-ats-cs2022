@@ -1,5 +1,5 @@
 <script lang="js">
-  import { Router, Route, Link } from "svelte-navigator";
+  import { Router, Route } from "svelte-navigator";
   import EmployeeList from "./lib/EmployeeList.svelte";
   import Dashboard from "./lib/Dashboard.svelte";
   import EmployeeNew from "./lib/EmployeeNew.svelte";
@@ -12,9 +12,6 @@
 </script>
 
 <Router>
-  <nav class="dashboardButton">
-    <Link class="dashboardButtonLink" to="/">Dashboard</Link>
-  </nav>
   <Route path="/"><Dashboard /></Route>
   <Route path="employeeList"><EmployeeList /></Route>
   <Route path="employeeNew"><EmployeeNew /></Route>

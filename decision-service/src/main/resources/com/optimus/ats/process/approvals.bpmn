@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<bpmn2:definitions xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:bpmn2="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:bpsim="http://www.bpsim.org/schemas/1.0" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:drools="http://www.jboss.org/drools" id="_0inJQOwKEDqpBcmIiK2AjQ" xsi:schemaLocation="http://www.omg.org/spec/BPMN/20100524/MODEL BPMN20.xsd http://www.jboss.org/drools drools.xsd http://www.bpsim.org/schemas/1.0 bpsim.xsd http://www.omg.org/spec/DD/20100524/DC DC.xsd http://www.omg.org/spec/DD/20100524/DI DI.xsd " exporter="jBPM Process Modeler" exporterVersion="2.0" targetNamespace="http://www.omg.org/bpmn20">
+<bpmn2:definitions xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:bpmn2="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:bpsim="http://www.bpsim.org/schemas/1.0" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:drools="http://www.jboss.org/drools" id="_I67kUPCMEDqqvoHTg2t73Q" xsi:schemaLocation="http://www.omg.org/spec/BPMN/20100524/MODEL BPMN20.xsd http://www.jboss.org/drools drools.xsd http://www.bpsim.org/schemas/1.0 bpsim.xsd http://www.omg.org/spec/DD/20100524/DC DC.xsd http://www.omg.org/spec/DD/20100524/DI DI.xsd " exporter="jBPM Process Modeler" exporterVersion="2.0" targetNamespace="http://www.omg.org/bpmn20">
   <bpmn2:itemDefinition id="_dataItem" structureRef="com.optimus.ats.model.InternalDataDto"/>
   <bpmn2:itemDefinition id="_validRequestItem" structureRef="Boolean"/>
   <bpmn2:itemDefinition id="_incomingIdItem" structureRef="java.lang.Long"/>
@@ -46,8 +46,8 @@
   <bpmn2:interface id="_9829F369-D1C0-4E7B-9F9B-A189F9ABD127_ServiceInterface" name="com.optimus.ats.service.DecisionService" implementationRef="com.optimus.ats.service.DecisionService">
     <bpmn2:operation id="_9829F369-D1C0-4E7B-9F9B-A189F9ABD127_ServiceOperation" name="postProcess" implementationRef="postProcess"/>
   </bpmn2:interface>
-  <bpmn2:collaboration id="_73FB3D75-536C-480A-93D5-485C9E50BB59" name="Default Collaboration">
-    <bpmn2:participant id="_DB967692-BDC8-4963-82C7-8AD05583FB7B" name="Pool Participant" processRef="approvals"/>
+  <bpmn2:collaboration id="_B0617E6C-0A86-4DBE-89F4-EF6FBE5CBD72" name="Default Collaboration">
+    <bpmn2:participant id="_161A12D2-BF9E-45D6-84D0-0D0182209B09" name="Pool Participant" processRef="approvals"/>
   </bpmn2:collaboration>
   <bpmn2:process id="approvals" drools:packageName="com.optimus.ats.process" drools:version="1.0" drools:adHoc="false" name="approvals" isExecutable="true" processType="Public">
     <bpmn2:property id="data" itemSubjectRef="_dataItem" name="data"/>
@@ -123,8 +123,11 @@
       <bpmn2:outgoing>_A07ECFD9-56CB-4539-B5B7-C1BEC68F0B4C</bpmn2:outgoing>
       <bpmn2:script>kcontext.setVariable("validRequest", data.isValidRequest());
 kcontext.setVariable("decisionRequest", data.getWorkflowRequest());
-kcontext.setVariable("department", data.getEmployeeData().getDepartment());
-kcontext.setVariable("designation", data.getEmployeeData().getDesignation());</bpmn2:script>
+if(data.getEmployeeData() != null){
+    kcontext.setVariable("department", data.getEmployeeData().getDepartment());
+    kcontext.setVariable("designation", data.getEmployeeData().getDesignation());
+}
+</bpmn2:script>
     </bpmn2:scriptTask>
     <bpmn2:serviceTask id="_9829F369-D1C0-4E7B-9F9B-A189F9ABD127" drools:serviceimplementation="Java" drools:serviceinterface="com.optimus.ats.service.DecisionService" drools:serviceoperation="postProcess" name="Process Approval Update" implementation="Java" operationRef="_9829F369-D1C0-4E7B-9F9B-A189F9ABD127_ServiceOperation">
       <bpmn2:extensionElements>
@@ -574,7 +577,7 @@ kcontext.setVariable("designation", data.getEmployeeData().getDesignation());</b
         </bpsim:Scenario>
       </bpsim:BPSimData>
     </bpmn2:extensionElements>
-    <bpmn2:source>_0inJQOwKEDqpBcmIiK2AjQ</bpmn2:source>
-    <bpmn2:target>_0inJQOwKEDqpBcmIiK2AjQ</bpmn2:target>
+    <bpmn2:source>_I67kUPCMEDqqvoHTg2t73Q</bpmn2:source>
+    <bpmn2:target>_I67kUPCMEDqqvoHTg2t73Q</bpmn2:target>
   </bpmn2:relationship>
 </bpmn2:definitions>

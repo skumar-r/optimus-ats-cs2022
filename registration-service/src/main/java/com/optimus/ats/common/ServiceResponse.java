@@ -13,7 +13,7 @@ import java.util.Map;
  */
 
 @JsonAutoDetect(fieldVisibility = JsonAutoDetect.Visibility.NONE, getterVisibility = JsonAutoDetect.Visibility.NONE)
-public class ServiceResponse extends ResponseImpl {
+public class ServiceResponse{
 
 	private ServiceResponse() {
 	}
@@ -38,6 +38,11 @@ public class ServiceResponse extends ResponseImpl {
 	public static ServiceResponse createSuccessServiceResponse() {
 		ServiceResponse newServiceResponse = new ServiceResponse();
 		newServiceResponse.setSuccess(true);
+		return newServiceResponse;
+	}
+	public static ServiceResponse createFailureServiceResponse() {
+		ServiceResponse newServiceResponse = new ServiceResponse();
+		newServiceResponse.setSuccess(false);
 		return newServiceResponse;
 	}
 }

@@ -1,12 +1,17 @@
 package com.optimus.ats.model;
 
 import io.quarkus.hibernate.orm.panache.PanacheEntityBase;
+import org.apache.commons.io.FileUtils;
+
 import javax.persistence.*;
+import java.io.File;
+import java.io.IOException;
+import java.util.Base64;
 
 @Entity()
 @Cacheable
 @Table(name = "T_EMPLOYEE")
-public class Employee extends PanacheEntityBase {
+public class Employee extends PanacheEntityBase{
 	@Id
 	@GeneratedValue(strategy =GenerationType.AUTO)
 	@Column(name = "EMPLOYEE_ID", unique = true)
@@ -38,6 +43,9 @@ public class Employee extends PanacheEntityBase {
 
 	@Column(name = "DESIGNATION")
 	private String designation;
+
+	@Transient
+	private String empPhoto;
 
 	public Long getId() {
 		return id;
@@ -117,5 +125,17 @@ public class Employee extends PanacheEntityBase {
 
 	public void setCsEmployeeId(String csEmployeeId) {
 		this.csEmployeeId = csEmployeeId;
+	}
+
+	public static Employee findByName(String name){
+		return find("csEmployeeId", name).firstResult();
+	}
+
+	public String getEmpPhoto() {
+		return empPhoto;
+	}
+
+	public void setEmpPhoto(String empPhoto) {
+		this.empPhoto = empPhoto;
 	}
 }

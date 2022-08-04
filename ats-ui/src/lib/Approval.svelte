@@ -39,7 +39,5 @@
       </Actions>
     </Card>
   </div>
-  <div style="padding: 0;" >
-      
-  </div>
+  <div style="padding: 0;" />
 </div>

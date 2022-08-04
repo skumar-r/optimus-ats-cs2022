@@ -24,17 +24,8 @@ public class VehicleDto {
 	@PartType(MediaType.TEXT_PLAIN)
 	private boolean hasS3Photo;
 
-	@RestForm
-	@PartType(MediaType.TEXT_PLAIN)
-	private int modifiedId;
-
-	private String photoFront;
-	private String photoLeft;
-
 	@RestForm("photoFrontFile")
 	private File photoFrontFile;
-	@RestForm("photoRearFile")
-	private File photoRearFile;
 
 	public String getRegNo() {
 		return regNo;
@@ -68,43 +59,11 @@ public class VehicleDto {
 		this.hasS3Photo = hasS3Photo;
 	}
 
-	public int getModifiedId() {
-		return modifiedId;
-	}
-
-	public void setModifiedId(int modifiedId) {
-		this.modifiedId = modifiedId;
-	}
-
-	public String getPhotoFront() {
-		return photoFront;
-	}
-
-	public void setPhotoFront(String photoFront) {
-		this.photoFront = photoFront;
-	}
-
-	public String getPhotoLeft() {
-		return photoLeft;
-	}
-
-	public void setPhotoLeft(String photoLeft) {
-		this.photoLeft = photoLeft;
-	}
-
 	public File getPhotoFrontFile() {
 		return photoFrontFile;
 	}
 
 	public void setPhotoFrontFile(File photoFrontFile) {
 		this.photoFrontFile = photoFrontFile;
-	}
-
-	public File getPhotoRearFile() {
-		return photoRearFile;
-	}
-
-	public void setPhotoRearFile(File photoRearFile) {
-		this.photoRearFile = photoRearFile;
 	}
 }

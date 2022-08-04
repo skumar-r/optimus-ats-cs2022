@@ -2,10 +2,7 @@ package com.optimus.ats.model;
 
 import java.util.Date;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import javax.persistence.*;
 
 import org.hibernate.annotations.CreationTimestamp;
 
@@ -36,6 +33,7 @@ public class DecisionWorkflowRequest  extends PanacheEntityBase{
     @Id
     @GeneratedValue
     private Long id;
+    private String csEmpId;
     private Long employeeId;
     private Long managerId;
     private String processTaskId;
@@ -45,6 +43,12 @@ public class DecisionWorkflowRequest  extends PanacheEntityBase{
     @CreationTimestamp
     private Date createdDate;
     private Date approvedDate;
+
+    @Transient
+    private String empPhoto;
+
+    @Transient
+    private String comparePhoto;
 
     public Long getId() {
         return id;
@@ -119,4 +123,27 @@ public class DecisionWorkflowRequest  extends PanacheEntityBase{
         this.approvedDate = approvedDate;
     }
 
+    public String getCsEmpId() {
+        return csEmpId;
+    }
+
+    public void setCsEmpId(String csEmpId) {
+        this.csEmpId = csEmpId;
+    }
+
+    public String getEmpPhoto() {
+        return empPhoto;
+    }
+
+    public void setEmpPhoto(String empPhoto) {
+        this.empPhoto = empPhoto;
+    }
+
+    public String getComparePhoto() {
+        return comparePhoto;
+    }
+
+    public void setComparePhoto(String comparePhoto) {
+        this.comparePhoto = comparePhoto;
+    }
 }

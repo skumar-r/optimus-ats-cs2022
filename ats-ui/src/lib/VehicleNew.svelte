@@ -1,149 +1,157 @@
 <script>
-  import { createForm } from "svelte-forms-lib";
-  import Paper, { Title, Subtitle, Content } from "@smui/paper";
-  let empPhoto, idPhoto, empPhotoInput, idPhotoInput;
-  const { form, handleChange, handleSubmit } = createForm({
-    initialValues: {
-      title: "",
-      name: "",
-      email: "",
-      department: "",
-      empPhoto: undefined
-    },
-    onSubmit: (values) => {
-      debugger;
-      alert(JSON.stringify(values));
-    },
-  });
+  import { createEventDispatcher } from 'svelte';
+  import Paper, { Content } from "@smui/paper";
+  import { toasts, ToastContainer, FlatToast }  from "svelte-toasts";
+  const dispatch = createEventDispatcher();
+  let vehiclePhotoInput;
+  let regNo = "";
+  let vehicleDetails = "";
+  let employeeId = "";
+  export let isRegister =true;
+  let vehiclePhoto =
+    "https://digitalfinger.id/wp-content/uploads/2019/12/no-image-available-icon-6.png";
+  let employees = [];
+  function refreshData() {
+    isRegister = false;
+    dispatch('message', {});
+  }
 
-  const onFileSelectedEmpPhoto = (e) => {
-    let image = e.target.files[0];
-    let reader = new FileReader();
-    reader.readAsDataURL(image);
-    reader.onload = (e) => {
-      empPhoto = e.target.result;
-    };
+  if (typeof fetch !== "undefined") {
+    fetch("http://localhost:9010/employee", {
+      method: "GET",
+    })
+      .then((response) => response.json())
+      .then((json) => (employees = json))
+      .catch((error) => {
+        // Upload failed
+      });
+  }
+
+  let handleSubmit = async (e) => {
+    const dataArray = new FormData();
+    dataArray.append("regNo", regNo);
+    dataArray.append("vehicleDetails", vehicleDetails);
+    dataArray.append("employeeId", employeeId);
+    // @ts-ignore
+    dataArray.append("hasS3Photo", true);
+    dataArray.append("photoFrontFile", vehiclePhotoInput.files[0]);
+debugger;
+    await fetch("http://localhost:9010/vehicle", {
+      method: "POST",
+      body: dataArray,
+    })
+      .then((response) => response.json())
+      .then((response) => {
+        debugger;
+        if (!response.success) {
+          showToast(response.contentMap.message, "error");
+        } else {
+          refreshData();
+        }
+      })
+      .catch((error) => {
+        // Upload failed
+      });
+  }
+
+  let showToast = (message, type) => {
+    const toast = toasts.add({
+      title: "",
+      description: message,
+      duration: 5000, // 0 or negative to avoid auto-remove
+      placement: "top-right",
+      theme: "dark",
+      type: type,
+      onClick: () => {},
+      onRemove: () => {},
+    });
   };
+
+  let handleChange = (e) => {};
 
   const onFileSelectedIdPhoto = (e) => {
     let image = e.target.files[0];
     let reader = new FileReader();
     reader.readAsDataURL(image);
     reader.onload = (e) => {
-      idPhoto = e.target.result;
+      // @ts-ignore
+      vehiclePhoto = e.target.result;
     };
   };
 </script>
 
 <div class="paper-container">
-  <Paper color="primary" variant="outlined" class="mdc-theme--primary">
-    <Title>Add a New Vehicle</Title>
+  <Paper
+    color="primary"
+    variant="outlined"
+    class="mdc-theme--primary no-border"
+    style="margin-top:25px;"
+  >
+    <span class="pageTitle">Add a New Vehicle</span>
     <Content>
-      <form on:submit={handleSubmit}>
-        <label for="title">Title</label>
-        <select
-          id="title"
-          name="title"
-          on:change={handleChange}
-          bind:value={$form.title}
-        >
-          <option />
-          <option>Mr.</option>
-          <option>Mrs.</option>
-          <option>Mx.</option>
-        </select>
+      <form  style="height: 600px;">
+        <div style="width:33%;float:left;">
+          <label for="regNo">Registration No.</label>
+          <input
+            id="regNo"
+            name="regNo"
+            on:change={handleChange}
+            bind:value={regNo}
+          />
 
-        <label for="name">Name</label>
-        <input
-          id="name"
-          name="name"
-          on:change={handleChange}
-          bind:value={$form.name}
-        />
+          <label for="vehicleDetails">Employee Id</label>
+          <select bind:value={employeeId}>
+            {#each employees as value}<option value={value.id}
+                >{value.employeeName}</option
+              >{/each}
+          </select>
 
-        <label for="email">Email Address</label>
-        <input
-          id="email"
-          name="email"
-          on:change={handleChange}
-          bind:value={$form.email}
-        />
-
-        <label for="department">Department</label>
-        <select
-          id="department"
-          name="department"
-          on:change={handleChange}
-          bind:value={$form.department}
-        >
-          <option />
-          <option>Technology</option>
-          <option>Research</option>
-          <option>IT Support</option>
-          <option>Sales & Support</option>
-          <option>Security</option>
-          <option>Facilities</option>
-        </select>
-
-        <label for="employeeImage">Employee Photo</label>
-        <img class="avatar" src={empPhoto} alt="d" />
-        <img
-          class="upload"
-          src="https://static.thenounproject.com/png/625182-200.png"
-          alt=""
-          on:click={() => {
-            empPhotoInput.click();
-          }}
-        />
-        <div
-          class="chan"
-          on:click={() => {
-            empPhotoInput.click();
-          }}
-        >
-          Choose Image
+          <label for="vehicleDetails">Vehicle Details</label>
+          <textarea
+            id="vehicleDetails"
+            name="vehicleDetails"
+            on:change={handleChange}
+            bind:value={vehicleDetails}
+          />
         </div>
-        <input
-          name="employeeImage"
-          id="employeeImage"
-          style="display:none"
-          type="file"
-          accept=".jpg, .jpeg, .png"
-          on:change={(e) => onFileSelectedEmpPhoto(e)}
-          bind:this={empPhotoInput}
-        />
-
-        <label for="idcardImage">ID Card Photo</label>
-        <img class="avatar" src={idPhoto} alt="d" />
-        <img
-          class="upload"
-          src="https://static.thenounproject.com/png/625182-200.png"
-          alt=""
-          on:click={() => {
-            idPhotoInput.click();
-          }}
-        />
-        <div
-          class="chan"
-          on:click={() => {
-            idPhotoInput.click();
-          }}
-        >
-          Choose Image
+        <div style="width:30%;float:left;padding-left:30px;">
+          <label for="vehiclePhoto">Vehicle Photo</label>
+          <img class="avatar" src={vehiclePhoto} alt="d" />
+          <img
+            class="upload"
+            src="https://static.thenounproject.com/png/625182-200.png"
+            alt=""
+            on:click={() => {
+              vehiclePhotoInput.click();
+            }}
+          />
+          <div
+            class="chan"
+            on:click={() => {
+              vehiclePhotoInput.click();
+            }}
+          >
+            Choose Image
+          </div>
+          <input
+            name="vehiclePhoto"
+            id="vehiclePhoto"
+            style="display:none"
+            type="file"
+            accept=".jpg, .jpeg, .png"
+            on:change={(e) => onFileSelectedIdPhoto(e)}
+            bind:this={vehiclePhotoInput}
+          />
         </div>
-        <input
-          name="idcardImage"
-          id="idcardImage"
-          style="display:none"
-          type="file"
-          accept=".jpg, .jpeg, .png"
-          on:change={(e) => onFileSelectedIdPhoto(e)}
-          bind:this={idPhotoInput}
-        />
-        <button type="submit">Submit</button>
+        <div style="display: flex;width:100%;justify-content: end;">
+          <button type="button" on:click={(e)=>handleSubmit(e)}>Submit</button>
+        </div>
       </form>
     </Content>
   </Paper>
+  <ToastContainer placement="bottom-right" let:data={data}>
+    <FlatToast {data} /> <!-- Provider template for your toasts -->
+  </ToastContainer>
 </div>
 
 <style>

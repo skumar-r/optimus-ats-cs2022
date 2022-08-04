@@ -1,24 +1,68 @@
 <script>
-  import { createForm } from "svelte-forms-lib";
-  import Paper, { Title, Subtitle, Content } from "@smui/paper";
-  let empPhoto, idPhoto, empPhotoInput, idPhotoInput;
+  import Paper, { Title, Content } from "@smui/paper";
+  import { toasts, ToastContainer, FlatToast } from "svelte-toasts";
+  import Dialog, { Header, Content as DContent, Actions } from "@smui/Dialog";
+  import Button from "@smui/button";
+  import { Label } from "@smui/data-table";
+  import IconButton from "@smui/icon-button";
+  import CircularProgress from "@smui/circular-progress";
+  let empPhoto =
+    "https://digitalfinger.id/wp-content/uploads/2019/12/no-image-available-icon-6.png";
+  let idPhoto =
+    "https://digitalfinger.id/wp-content/uploads/2019/12/no-image-available-icon-6.png";
+  let empPhotoInput, idPhotoInput;
   let resultAvailable = false;
-  const { form, handleChange, handleSubmit } = createForm({
-    initialValues: {
-      empPhoto: undefined,
-      idPhoto: undefined,
-    },
-    onSubmit: (values) => {
-      resultAvailable = true;
-      alert(JSON.stringify(values));
-    },
-  });
-
+  let actionItem = {};
+  let open = false;
+  let inProgress = false;
+  export let isVerify = true;
+  let showToast = (message, type) => {
+    const toast = toasts.add({
+      title: "",
+      description: message,
+      duration: 5000, // 0 or negative to avoid auto-remove
+      placement: "top-right",
+      theme: "dark",
+      type: type,
+      onClick: () => {},
+      onRemove: () => {},
+    });
+  };
+  let handleSubmit = async (e) => {
+    const dataArray = new FormData();
+    dataArray.append("type", "vehicle");
+    dataArray.append("resourceFile", empPhotoInput.files[0]);
+    dataArray.append("idCardFile", idPhotoInput.files[0]);
+    inProgress = true;
+    await fetch("http://localhost:9011/recognition/vehicle", {
+      method: "POST",
+      body: dataArray,
+    })
+      .then((response) => response.json())
+      .then((response) => {
+        debugger;
+        // Successfully uploaded
+        inProgress = false;
+        if (!response.success) {
+          showToast(response.contentMap.message, "error");
+        } else {
+          response.contentMap.employee.empPhoto = response.contentMap.empPhoto;
+          response.contentMap.employee.StatusType =
+            response.contentMap.StatusType;
+          actionItem = response.contentMap.employee;
+          open = true;
+        }
+      })
+      .catch((error) => {
+        // Upload failed
+      });
+  };
   const onFileSelectedEmpPhoto = (e) => {
     let image = e.target.files[0];
     let reader = new FileReader();
     reader.readAsDataURL(image);
     reader.onload = (e) => {
+      // @ts-ignore
       empPhoto = e.target.result;
     };
   };
@@ -28,6 +72,7 @@
     let reader = new FileReader();
     reader.readAsDataURL(image);
     reader.onload = (e) => {
+      // @ts-ignore
       idPhoto = e.target.result;
     };
   };
@@ -35,39 +80,92 @@
 
 <div class="paper-container">
   {#if !resultAvailable}
-    <Paper color="primary" variant="outlined" class="mdc-theme--primary">
-      <Title>Verify a Vehicle</Title>
+    <Paper
+      color="primary"
+      variant="outlined"
+      class="mdc-theme--primary  no-border"
+      style="margin-top:25px;"
+    >
+      <span class="pageTitle">Verify a Vehicle</span>
       <Content>
-        <form on:submit={handleSubmit}>
-          <label for="vehicleImage">Vehicle Photo</label>
-          <img class="avatar" src={empPhoto} alt="d" />
-          <img
-            class="upload"
-            src="https://static.thenounproject.com/png/625182-200.png"
-            alt=""
-            on:click={() => {
-              empPhotoInput.click();
-            }}
-          />
-          <div
-            class="chan"
-            on:click={() => {
-              empPhotoInput.click();
-            }}
-          >
-            Choose Employee Photo Image
+        <form>
+          <div style="width:40%;float:left;padding-left:20px;">
+            <label for="idcardImage">ID Card Photo</label>
+            <img class="avatar" src={idPhoto} alt="avatar" />
+            <img
+              style="width: 25px;"
+              class="upload"
+              src="https://static.thenounproject.com/png/625182-200.png"
+              alt=""
+              on:click={() => {
+                idPhotoInput.click();
+              }}
+            />
+            <div
+              class="chan"
+              on:click={() => {
+                idPhotoInput.click();
+              }}
+            >
+              Choose ID Card Image
+            </div>
+            <input
+              name="idcardImage"
+              id="idcardImage"
+              style="display:none"
+              type="file"
+              accept=".jpg, .jpeg, .png"
+              on:change={(e) => onFileSelectedIdPhoto(e)}
+              bind:this={idPhotoInput}
+            />
           </div>
-          <input
-            name="vehicleImage"
-            id="vehicleImage"
-            style="display:none"
-            type="file"
-            accept=".jpg, .jpeg, .png"
-            on:change={(e) => onFileSelectedEmpPhoto(e)}
-            bind:this={empPhotoInput}
-          />
-          
-          <button type="submit">Verify</button>
+          <div style="width:40%;float:left;padding-left:20px;">
+            <label for="employeeImage">Vehicle Photo</label>
+            <img class="avatar" src={empPhoto} alt="avatar" />
+            <img
+              style="width: 25px;"
+              class="upload"
+              src="https://static.thenounproject.com/png/625182-200.png"
+              alt=""
+              on:click={() => {
+                empPhotoInput.click();
+              }}
+            />
+            <div
+              class="chan"
+              on:click={() => {
+                empPhotoInput.click();
+              }}
+            >
+              Choose Vehicle Image
+            </div>
+            <input
+              name="employeeImage"
+              id="employeeImage"
+              style="display:none"
+              type="file"
+              accept=".jpg, .jpeg, .png"
+              on:change={(e) => onFileSelectedEmpPhoto(e)}
+              bind:this={empPhotoInput}
+            />
+          </div>
+          <div style="display: flex;width:100%;justify-content: end;">
+            <button
+              type="button"
+              disabled={inProgress}
+              on:click={(e) => handleSubmit(e)}
+              style="display:flex;align-items:center;"
+            >
+              {#if inProgress}
+                <CircularProgress
+                  class="my-four-colors"
+                  style="height: 32px; width: 32px;"
+                  indeterminate
+                />
+              {/if}
+              <span style="margin-left: 10px;">Verify</span></button
+            >
+          </div>
         </form>
       </Content>
     </Paper>
@@ -77,6 +175,48 @@
       <Content />
     </Paper>
   {/if}
+  <Dialog
+    bind:open
+    fullscreen
+    aria-labelledby="fullscreen-title"
+    aria-describedby="fullscreen-content"
+  >
+    <Header>
+      <span class="pageTitle" style="padding-top: 20px;">Vehicle</span>
+      <IconButton
+        action="close"
+        class="material-icons"
+        style="margin: 0;
+      top: -10px;
+      min-width: 20px;
+      padding: 15px;
+      border-radius:50%;
+      width: 20px;
+      height: 20px;">close</IconButton
+      >
+    </Header>
+    <DContent id="fullscreen-content">
+      <form style="height: 250px;">
+        <img
+          style="display:block; width:100px;height:100px;"
+          src={actionItem.empPhoto}
+          alt="Red dot"
+        />
+        <span>Employee ID:{actionItem.csEmployeeId}</span>
+        <span>Employee Name:{actionItem.employeeName}</span>
+        <span>StatusType:{actionItem.StatusType}</span>
+      </form>
+    </DContent>
+    <Actions>
+      <Button on:click={() => (isVerify = false)}>
+        <Label>OK</Label>
+      </Button>
+    </Actions>
+  </Dialog>
+  <ToastContainer placement="bottom-right" let:data>
+    <FlatToast {data} />
+    <!-- Provider template for your toasts -->
+  </ToastContainer>
 </div>
 
 <style>
