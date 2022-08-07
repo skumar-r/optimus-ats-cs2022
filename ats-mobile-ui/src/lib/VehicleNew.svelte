@@ -69,16 +69,39 @@
   };
 
   let handleChange = (e) => {};
-
-  const onFileSelectedIdPhoto = (e) => {
-    let image = e.target.files[0];
-    let reader = new FileReader();
-    reader.readAsDataURL(image);
-    reader.onload = (e) => {
-      // @ts-ignore
-      vehiclePhoto = e.target.result;
-    };
+  const onFileSelectedEmpPhoto = async (e) => {
+   
+   
   };
+  const onFileSelectedIdPhoto = (e) => {
+    Camera.getPhoto({
+      quality: 90,
+      allowEditing: true,
+      resultType: CameraResultType.DataUrl
+    }).then(image=>{
+      vehiclePhotoInput = dataURItoBlob(image.dataUrl);
+      vehiclePhoto = image.dataUrl;
+    }).catch(e => {
+      showToast(e, "warning");
+    });    
+  };
+  function dataURItoBlob(dataURI) {
+    // convert base64 to raw binary data held in a string
+     var byteString = atob(dataURI.split(',')[1]);
+
+    // separate out the mime component
+    var mimeString = dataURI.split(',')[0].split(':')[1].split(';')[0];
+
+    // write the bytes of the string to an ArrayBuffer
+    var ab = new ArrayBuffer(byteString.length);
+    var ia = new Uint8Array(ab);
+    for (var i = 0; i < byteString.length; i++) {
+        ia[i] = byteString.charCodeAt(i);
+    }
+   
+    return new Blob([ab], {type: mimeString});
+
+}
 </script>
 
 <div class="paper-container">
@@ -116,21 +139,18 @@
           />
           <div>
             <label for="vehiclePhoto">Vehicle Photo</label>
-            <img class="avatar" src={vehiclePhoto} alt="d" />
+            <img class="avatar" src={vehiclePhoto} alt="d" on:click={(e) => onFileSelectedIdPhoto(e)}/>
+            
+            <div
+              class="upload"
+              on:click={(e) => onFileSelectedIdPhoto(e)}
+            >
             <img
               class="upload"
               src="https://static.thenounproject.com/png/625182-200.png"
               alt=""
-              on:click={() => {
-                vehiclePhotoInput.click();
-              }}
+              on:click={(e) => onFileSelectedIdPhoto(e)}
             />
-            <div
-              class="chan"
-              on:click={() => {
-                vehiclePhotoInput.click();
-              }}
-            >
               Choose Image
             </div>
             <input
@@ -139,7 +159,6 @@
               style="display:none"
               type="file"
               accept=".jpg, .jpeg, .png"
-              on:change={(e) => onFileSelectedIdPhoto(e)}
               bind:this={vehiclePhotoInput}
             />
           </div>
@@ -160,7 +179,6 @@
   .upload {
     display: flex;
     height: 20px;
-    width: 20px;
     cursor: pointer;
   }
   .avatar {

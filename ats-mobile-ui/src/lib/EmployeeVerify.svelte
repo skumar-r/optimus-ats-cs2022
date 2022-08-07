@@ -114,21 +114,21 @@
       <span class="pageTitle">Verify an Employee</span>
       <Content>
         <form>
-          <div style="width:40%;float:left;padding-left:20px;">
+          <div style="width:50%;float:left;padding-left:10px;">
             <label for="employeeImage">Employee Photo</label>
             <img class="avatar" src={empPhoto} alt="avatar" on:click={(e) => onFileSelectedEmpPhoto(e)}/>
-            <img
-              style="width: 25px;"
-              class="upload"
-              src="https://static.thenounproject.com/png/625182-200.png"
-              alt=""
-              on:click={(e) => onFileSelectedEmpPhoto(e)}
-            />
+           
             <div
-              class="chan"
+              class="upload"
               on:click={(e) => onFileSelectedEmpPhoto(e)}
             >
-              Choose Employee Photo Image
+            <img
+            style="width: 25px;"
+            src="https://static.thenounproject.com/png/625182-200.png"
+            alt=""
+            on:click={(e) => onFileSelectedEmpPhoto(e)}
+          />
+              Choose Image
             </div>
             <input
               name="employeeImage"
@@ -139,21 +139,21 @@
               bind:this={empPhotoInput}
             />
           </div>
-          <div style="width:50%;float:left;padding-left:20px;">
+          <div style="width:50%;float:left;padding-left:10px;">
             <label for="idcardImage">ID Card Photo</label>
             <img class="avatar" src={idPhoto} alt="avatar" on:click={(e) => onFileSelectedIdPhoto(e)}/>
+            
+            <div
+              class="upload"
+              on:click={(e) => onFileSelectedIdPhoto(e)}
+            >
             <img
               style="width: 25px;"
-              class="upload"
               src="https://static.thenounproject.com/png/625182-200.png"
               alt=""
               on:click={(e) => onFileSelectedIdPhoto(e)}
             />
-            <div
-              class="chan"
-              on:click={(e) => onFileSelectedIdPhoto(e)}
-            >
-              Choose ID Card Image
+              Choose Image
             </div>
             <input
               name="idcardImage"
@@ -238,7 +238,6 @@
   .upload {
     display: flex;
     height: 20px;
-    width: 20px;
     cursor: pointer;
   }
   .avatar {

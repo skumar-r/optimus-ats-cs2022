@@ -59,23 +59,31 @@
       });
   };
   const onFileSelectedEmpPhoto = async (e) => {
-    const image = await Camera.getPhoto({
+    Camera.getPhoto({
       quality: 90,
       allowEditing: true,
       resultType: CameraResultType.DataUrl
+    }).then(image=>{
+      empPhotoInput = dataURItoBlob(image.dataUrl);
+      empPhoto = image.dataUrl;
+    }).catch(e => {
+      showToast(e, "warning");
     });
-    empPhotoInput = dataURItoBlob(image.dataUrl);
-    empPhoto = image.dataUrl;
+   
   };
 
   const onFileSelectedIdPhoto = async (e) => {
-    const image = await Camera.getPhoto({
+    Camera.getPhoto({
       quality: 90,
       allowEditing: true,
       resultType: CameraResultType.DataUrl
+    }).then(image=>{
+      idPhotoInput = dataURItoBlob(image.dataUrl);
+      idPhoto=image.dataUrl;
+    }).catch(e => {
+      showToast(e, "warning");
     });
-    idPhotoInput = dataURItoBlob(image.dataUrl);
-    idPhoto=image.dataUrl;
+    
   };
   function dataURItoBlob(dataURI) {
     // convert base64 to raw binary data held in a string
@@ -90,14 +98,7 @@
     for (var i = 0; i < byteString.length; i++) {
         ia[i] = byteString.charCodeAt(i);
     }
-
-    //Old Code
-    //write the ArrayBuffer to a blob, and you're done
-    //var bb = new BlobBuilder();
-    //bb.append(ab);
-    //return bb.getBlob(mimeString);
-
-    //New Code
+   
     return new Blob([ab], {type: mimeString});
 
 }
@@ -117,18 +118,18 @@
           <div style="width:100%;float:left;padding-left:20px;">
             <label for="idcardImage">ID Card Photo</label>
             <img class="avatar" src={idPhoto} alt="avatar"  on:click={(e) => onFileSelectedIdPhoto(e)}/>
-            <img
-              style="width: 25px;"
-              class="upload"
-              src="https://static.thenounproject.com/png/625182-200.png"
-              alt=""
-              on:click={(e) => onFileSelectedIdPhoto(e)}
-            />
+           
             <div
-              class="chan"
+              class="upload"
               on:click={(e) => onFileSelectedIdPhoto(e)}
             >
-              Choose ID Card Image
+            <img
+            style="width: 25px;"
+            src="https://static.thenounproject.com/png/625182-200.png"
+            alt=""
+            on:click={(e) => onFileSelectedIdPhoto(e)}
+          />
+              Choose Image
             </div>
             <input
               name="idcardImage"
@@ -142,18 +143,18 @@
           <div style="width:100%;float:left;padding-left:20px;">
             <label for="employeeImage">Vehicle Photo</label>
             <img class="avatar" src={empPhoto} alt="avatar"  on:click={(e) => onFileSelectedEmpPhoto(e)}/>
-            <img
-              style="width: 25px;"
-              class="upload"
-              src="https://static.thenounproject.com/png/625182-200.png"
-              alt=""
-              on:click={(e) => onFileSelectedEmpPhoto(e)}
-            />
+           
             <div
-              class="chan"
+              class="upload"
               on:click={(e) => onFileSelectedEmpPhoto(e)}
             >
-              Choose Vehicle Image
+            <img
+            style="width: 25px;"
+            src="https://static.thenounproject.com/png/625182-200.png"
+            alt=""
+            on:click={(e) => onFileSelectedEmpPhoto(e)}
+          />
+              Choose Image
             </div>
             <input
               name="employeeImage"
@@ -238,7 +239,6 @@
   .upload {
     display: flex;
     height: 20px;
-    width: 20px;
     cursor: pointer;
   }
   .avatar {
