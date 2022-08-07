@@ -4,7 +4,7 @@
   import DataTable, { Head, Body, Row, Cell, Label } from "@smui/data-table";
   import IconButton from "@smui/icon-button";
   import Paper, { Title, Content } from "@smui/paper";
-  import Dialog, { Header, Content as DContent, Actions } from "@smui/Dialog";
+  import Dialog, { Header, Content as DContent, Actions } from "@smui/dialog";
   import Button from "@smui/button";
   import LinearProgress from "@smui/linear-progress";
   import { onMount, onDestroy } from "svelte";

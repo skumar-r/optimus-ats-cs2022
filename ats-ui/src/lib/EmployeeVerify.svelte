@@ -1,7 +1,7 @@
 <script>
   import Paper, { Title, Content } from "@smui/paper";
   import { toasts, ToastContainer, FlatToast } from "svelte-toasts";
-  import Dialog, { Header, Content as DContent, Actions } from "@smui/Dialog";
+  import Dialog, { Header, Content as DContent, Actions } from "@smui/dialog";
   import Button from "@smui/button";
   import { Label } from "@smui/data-table";
   import IconButton from "@smui/icon-button";

@@ -1,7 +1,7 @@
 <script lang="js">
   // @ts-nocheck
   import DataTable, { Head, Body, Row, Cell, Label } from "@smui/data-table";
-  import Dialog, { Title, Header, Content as DContent } from "@smui/Dialog";
+  import Dialog, { Title, Header, Content as DContent } from "@smui/dialog";
   import IconButton from "@smui/icon-button";
   import Paper, { Content } from "@smui/paper";
   let items = [];

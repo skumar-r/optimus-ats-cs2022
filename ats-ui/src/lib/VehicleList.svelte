@@ -4,7 +4,7 @@
   import Paper, { Content } from "@smui/paper";
   import Card, { Actions } from "@smui/card";
   import Button from "@smui/button";
-  import Dialog, { Header, Content as DContent } from "@smui/Dialog";
+  import Dialog, { Header, Content as DContent } from "@smui/dialog";
   import IconButton from "@smui/icon-button";
   import VehicleNew from "./VehicleNew.svelte";
   import VehicleVerify from "./VehicleVerify.svelte";

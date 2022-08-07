@@ -4,7 +4,7 @@
   import Paper, { Content } from "@smui/paper";
   import Card, { Actions } from "@smui/card";
   import Button from "@smui/button";
-  import Dialog, { Header, Content as DContent } from "@smui/Dialog";
+  import Dialog, { Header, Content as DContent } from "@smui/dialog";
   import { Pulse } from "svelte-loading-spinners";
   import IconButton from "@smui/icon-button";
   import EmployeeNew from "./EmployeeNew.svelte";
