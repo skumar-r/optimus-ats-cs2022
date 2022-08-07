@@ -40,7 +40,6 @@
     })
       .then((response) => response.json())
       .then((response) => {
-        debugger;
         // Successfully uploaded
         inProgress = false;
         if (!response.success) {

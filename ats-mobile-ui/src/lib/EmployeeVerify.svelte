@@ -74,7 +74,6 @@
       allowEditing: true,
       resultType: CameraResultType.DataUrl
     });
-    debugger;
     idPhotoInput = dataURItoBlob(image.dataUrl);
     idPhoto=image.dataUrl;
   };

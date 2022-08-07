@@ -42,7 +42,6 @@
     })
       .then((response) => response.json())
       .then((response) => {
-        debugger;
         // Successfully uploaded
         inProgress = false;
         if (!response.success) {
@@ -75,7 +74,6 @@
       allowEditing: true,
       resultType: CameraResultType.DataUrl
     });
-    debugger;
     idPhotoInput = dataURItoBlob(image.dataUrl);
     idPhoto=image.dataUrl;
   };

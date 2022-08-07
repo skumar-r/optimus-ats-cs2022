@@ -35,14 +35,12 @@
     // @ts-ignore
     dataArray.append("hasS3Photo", true);
     dataArray.append("photoFrontFile", vehiclePhotoInput.files[0]);
-debugger;
     await fetch("http://localhost:9010/vehicle", {
       method: "POST",
       body: dataArray,
     })
       .then((response) => response.json())
       .then((response) => {
-        debugger;
         if (!response.success) {
           showToast(response.contentMap.message, "error");
         } else {

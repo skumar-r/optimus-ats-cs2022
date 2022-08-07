@@ -44,7 +44,6 @@
     })
       .then((response) => response.json())
       .then((response) => {
-        debugger;
         if (!response.success) {
           showToast(response.contentMap.message, "error");
         } else {
