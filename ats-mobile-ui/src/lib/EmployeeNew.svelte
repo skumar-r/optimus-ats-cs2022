@@ -4,13 +4,15 @@
   import Paper, { Content } from "@smui/paper";
   import { toasts, ToastContainer, FlatToast }  from "svelte-toasts";
   import { Camera, CameraResultType } from '@capacitor/camera';
+  import {navigate} from "svelte-navigator";
 
   let empPhoto =
     "https://digitalfinger.id/wp-content/uploads/2019/12/no-image-available-icon-6.png";
   let idPhoto =
     "https://digitalfinger.id/wp-content/uploads/2019/12/no-image-available-icon-6.png";
   let empPhotoInput, idPhotoInput;
-  export let isRegister = true;
+
+  
   let  csEmployeeId= "",
       employeeName= "",
       email= "",
@@ -55,7 +57,7 @@
                 showToast(response.contentMap.message,"error");
               }
               else{
-                isRegister = false;
+                navigate("/", { replace: true });
               }
             })
             .catch((error) => {
@@ -63,24 +65,30 @@
             });
   }
   const onFileSelectedEmpPhoto = async (e) => {
-    const image = await Camera.getPhoto({
+    Camera.getPhoto({
       quality: 90,
       allowEditing: true,
       resultType: CameraResultType.DataUrl
-    });
-    empPhotoInput = dataURItoBlob(image.dataUrl);
-    empPhoto = image.dataUrl;
+    }).then(image => {
+      empPhotoInput = dataURItoBlob(image.dataUrl);
+      empPhoto = image.dataUrl;
+    }).catch(e=>{
+      showToast(e, "error");
+    });    
   };
 
   const onFileSelectedIdPhoto = async (e) => {
-    const image = await Camera.getPhoto({
+   Camera.getPhoto({
       quality: 90,
       allowEditing: true,
       resultType: CameraResultType.DataUrl
+    }).then(image => {
+       idPhotoInput = dataURItoBlob(image.dataUrl);
+       idPhoto=image.dataUrl;
+    }).catch(e=>{
+      showToast(e, "error");
     });
-    debugger;
-    idPhotoInput = dataURItoBlob(image.dataUrl);
-    idPhoto=image.dataUrl;
+   
   };
   function dataURItoBlob(dataURI) {
     // convert base64 to raw binary data held in a string
@@ -111,6 +119,14 @@
       style="margin-top:25px;">
       <span class="pageTitle">Add a New Employee</span>
       <Content>
+        <div style="display: flex;width:100%;justify-content: end;">
+          <button
+          type="button"           
+          on:click={() => navigate("/", { replace: true })}           
+        >              
+          <span style="margin-left: 10px;">Home</span>
+        </button>
+        </div>
         <form style="height: 80%">
           <div style="width:100%;float:left;">
             <label for="csEmployeeId">Employee Id</label>
@@ -223,8 +239,8 @@
             </div>
           </div>
           
-          <div style="display: flex;width:100%;justify-content: end;">
-            <button type="button" on:click={(e)=>handleSubmit(e)}>Submit</button>
+          <div style="display: flex;width:100%;justify-content: end;">            
+            <button type="button" style="margin-left: 10px;" on:click={(e)=>handleSubmit(e)}><span>Submit</span></button>
           </div>
         </form>
       </Content>

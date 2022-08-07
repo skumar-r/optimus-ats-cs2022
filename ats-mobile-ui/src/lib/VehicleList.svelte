@@ -10,8 +10,8 @@
   import VehicleVerify from "./VehicleVerify.svelte";
   import { Pulse } from "svelte-loading-spinners";
   import { onMount } from "svelte";
-  let isRegister = false;
-  let isVerify = false;
+  import {navigate} from "svelte-navigator";
+
   let empPhoto =
     "https://digitalfinger.id/wp-content/uploads/2019/12/no-image-available-icon-6.png";
   let actionItem = {
@@ -60,7 +60,6 @@
 </script>
 
 <div>
-  {#if !isRegister && !isVerify}
     <div>
       <div class="card-container">
         <Card>
@@ -69,7 +68,7 @@
               class="primaryButton"
               variant="outlined"
               on:click={() => {
-                isVerify = true;
+                 navigate("vehicle/verify", { replace: true });
               }}
             >
               <Label>Verify a Vehicle</Label>
@@ -78,7 +77,7 @@
               class="primaryButton"
               variant="outlined"
               on:click={() => {
-                isRegister = true;
+                navigate("vehicle/new", { replace: true });
               }}
             >
               <Label>Register a New Vehicle</Label>
@@ -119,10 +118,6 @@
                       <!-- <IconButton class="material-icons">arrow_upward</IconButton> -->
                       <Label>Employee Id</Label>
                     </Cell>                    
-                    <!-- <Cell columnId="employeeName">
-                    <Label>Employee Name</Label> -->
-                    <!-- <IconButton class="material-icons">arrow_upward</IconButton> -->
-                    <!-- </Cell> -->
                     <Cell columnId="regNo">
                       <Label>Register No.</Label>
                       <!-- <IconButton class="material-icons">arrow_upward</IconButton> -->
@@ -183,45 +178,4 @@
         </DContent>
       </Dialog>
     </div>
-  {/if}
-  {#if isRegister}
-    <div>
-      <div class="card-container">
-        <Card>
-          <Actions class="buttonContainer">
-            <Button
-              class="primaryButton"
-              variant="outlined"
-              on:click={() => {
-                isRegister = false;
-              }}
-            >
-              <Label>Back</Label>
-            </Button>
-          </Actions>
-        </Card>
-      </div>
-      <VehicleNew bind:isRegister on:message={loadData} />
-    </div>
-  {/if}
-  {#if isVerify}
-    <div>
-      <div class="card-container">
-        <Card>
-          <Actions class="buttonContainer">
-            <Button
-              class="primaryButton"
-              variant="outlined"
-              on:click={() => {
-                isVerify = false;
-              }}
-            >
-              <Label>Back</Label>
-            </Button>
-          </Actions>
-        </Card>
-      </div>
-      <VehicleVerify bind:isVerify />
-    </div>
-  {/if}
 </div>

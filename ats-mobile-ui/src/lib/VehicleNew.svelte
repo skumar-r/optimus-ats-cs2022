@@ -3,18 +3,22 @@
   import Paper, { Content } from "@smui/paper";
   import { toasts, ToastContainer, FlatToast }  from "svelte-toasts";
   import { Camera, CameraResultType } from '@capacitor/camera';
-
+  import {navigate} from "svelte-navigator";
+  
   const dispatch = createEventDispatcher();
   let vehiclePhotoInput;
   let regNo = "";
   let vehicleDetails = "";
   let employeeId = "";
   export let isRegister =true;
+  export let isVerify =false;
+
   let vehiclePhoto =
     "https://digitalfinger.id/wp-content/uploads/2019/12/no-image-available-icon-6.png";
   let employees = [];
   function refreshData() {
     isRegister = false;
+    isVerify = false;
     dispatch('message', {});
   }
 
@@ -69,16 +73,37 @@
   };
 
   let handleChange = (e) => {};
-
-  const onFileSelectedIdPhoto = (e) => {
-    let image = e.target.files[0];
-    let reader = new FileReader();
-    reader.readAsDataURL(image);
-    reader.onload = (e) => {
-      // @ts-ignore
-      vehiclePhoto = e.target.result;
-    };
+  
+  const onFileSelectedIdPhoto = async (e) => {
+    Camera.getPhoto({
+      quality: 90,
+      allowEditing: true,
+      resultType: CameraResultType.DataUrl
+    }).then(image => {
+      vehiclePhoto = image.dataUrl;
+    vehiclePhotoInput = dataURItoBlob(image.dataUrl);
+    }).catch(e=>{
+      showToast(e, "error");
+    });   
   };
+
+  function dataURItoBlob(dataURI) {
+    // convert base64 to raw binary data held in a string
+     var byteString = atob(dataURI.split(',')[1]);
+
+    // separate out the mime component
+    var mimeString = dataURI.split(',')[0].split(':')[1].split(';')[0];
+
+    // write the bytes of the string to an ArrayBuffer
+    var ab = new ArrayBuffer(byteString.length);
+    var ia = new Uint8Array(ab);
+    for (var i = 0; i < byteString.length; i++) {
+        ia[i] = byteString.charCodeAt(i);
+    }
+    return new Blob([ab], {type: mimeString});
+
+}
+ 
 </script>
 
 <div class="paper-container">
@@ -90,6 +115,14 @@
   >
     <span class="pageTitle">Add a New Vehicle</span>
     <Content>
+      <div style="display: flex;width:100%;justify-content: end;">
+        <button
+        type="button"           
+        on:click={() => navigate("/", { replace: true })}           
+      >              
+        <span style="margin-left: 10px;">Home</span>
+      </button>
+      </div>
       <form  style="height: 600px;">
         <div style="width:100%;float:left;">
           <label for="regNo">Registration No.</label>
@@ -116,20 +149,16 @@
           />
           <div>
             <label for="vehiclePhoto">Vehicle Photo</label>
-            <img class="avatar" src={vehiclePhoto} alt="d" />
+            <img class="avatar" src={vehiclePhoto} alt="d"  on:click={(e) => onFileSelectedIdPhoto(e)}/>
             <img
               class="upload"
               src="https://static.thenounproject.com/png/625182-200.png"
               alt=""
-              on:click={() => {
-                vehiclePhotoInput.click();
-              }}
+              on:click={(e) => onFileSelectedIdPhoto(e)}
             />
             <div
               class="chan"
-              on:click={() => {
-                vehiclePhotoInput.click();
-              }}
+              on:click={(e) => onFileSelectedIdPhoto(e)}
             >
               Choose Image
             </div>
@@ -139,7 +168,6 @@
               style="display:none"
               type="file"
               accept=".jpg, .jpeg, .png"
-              on:change={(e) => onFileSelectedIdPhoto(e)}
               bind:this={vehiclePhotoInput}
             />
           </div>

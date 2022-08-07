@@ -11,9 +11,9 @@
 
 <Router>
   <Route path="/"><Dashboard /></Route>
-  <Route path="employeeList"><EmployeeList /></Route>
-  <Route path="employeeNew"><EmployeeNew /></Route>
-  <Route path="employeeVerify"><EmployeeVerify /></Route>
+  <Route path="employee/list"><EmployeeList /></Route>
+  <Route path="employee/new"><EmployeeNew /></Route>
+  <Route path="employee/verify"><EmployeeVerify /></Route>
   <Route path="vehicle/list"><VehicleList /></Route>
   <Route path="vehicle/new"><VehicleNew /></Route>
   <Route path="vehicle/verify"><VehicleVerify /></Route>
