@@ -10,7 +10,6 @@
   import EmployeeNew from "./EmployeeNew.svelte";
   import EmployeeVerify from "./EmployeeVerify.svelte";
   import { onMount } from "svelte";
-  import {navigate} from "svelte-navigator";
 
   let items = [];
   let actionItem = {
@@ -66,6 +65,7 @@
 </script>
 
 <div>
+  {#if !isRegister && !isVerify}
     <div>
       <div class="card-container">
         <Card>
@@ -74,7 +74,7 @@
               class="primaryButton"
               variant="outlined"
               on:click={() => {
-                navigate("employee/verify", { replace: true });
+                isVerify = true;
               }}
             >
               <Label>Verify an Employee</Label>
@@ -83,7 +83,7 @@
               class="primaryButton"
               variant="outlined"
               on:click={() => {
-                navigate("employee/new", { replace: true });
+                isRegister = true;
               }}
             >
               <Label>Register a New Employee</Label>
@@ -180,4 +180,45 @@
         </DContent>
       </Dialog>
     </div>
+  {/if}
+  {#if isRegister}
+    <div>
+      <div class="card-container">
+        <Card>
+          <Actions class="buttonContainer">
+            <Button
+              class="primaryButton"
+              variant="outlined"
+              on:click={() => {
+                isRegister = false;
+              }}
+            >
+              <Label>Back</Label>
+            </Button>
+          </Actions>
+        </Card>
+      </div>
+      <EmployeeNew bind:isRegister on:message={loadData} />
+    </div>
+  {/if}
+  {#if isVerify}
+    <div>
+      <div class="card-container">
+        <Card>
+          <Actions class="buttonContainer">
+            <Button
+              class="primaryButton"
+              variant="outlined"
+              on:click={() => {
+                isVerify = false;
+              }}
+            >
+              <Label>Back</Label>
+            </Button>
+          </Actions>
+        </Card>
+      </div>
+      <EmployeeVerify bind:isVerify />
+    </div>
+  {/if}
 </div>

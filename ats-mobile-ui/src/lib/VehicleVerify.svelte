@@ -7,13 +7,6 @@
   import IconButton from "@smui/icon-button";
   import CircularProgress from "@smui/circular-progress";
   import { Camera, CameraResultType } from '@capacitor/camera';
-  import Card, {
-    Content as CardContent,
-    PrimaryAction,
-    Media,
-    MediaContent,
-  } from '@smui/card';
-  import {navigate} from "svelte-navigator";
 
   let empPhoto =
     "https://digitalfinger.id/wp-content/uploads/2019/12/no-image-available-icon-6.png";
@@ -25,7 +18,6 @@
   let open = false;
   let inProgress = false;
   export let isVerify = true;
-  export let isRegister = false;
   let showToast = (message, type) => {
     const toast = toasts.add({
       title: "",
@@ -67,32 +59,24 @@
       });
   };
   const onFileSelectedEmpPhoto = async (e) => {
-    Camera.getPhoto({
+    const image = await Camera.getPhoto({
       quality: 90,
       allowEditing: true,
       resultType: CameraResultType.DataUrl
-    }).then(image => {
-      empPhotoInput = dataURItoBlob(image.dataUrl);
-      empPhoto = image.dataUrl;
-    }).catch(e=>{
-      showToast(e, "error");
-    });    
+    });
+    empPhotoInput = dataURItoBlob(image.dataUrl);
+    empPhoto = image.dataUrl;
   };
 
   const onFileSelectedIdPhoto = async (e) => {
-   Camera.getPhoto({
+    const image = await Camera.getPhoto({
       quality: 90,
       allowEditing: true,
       resultType: CameraResultType.DataUrl
-    }).then(image => {
-       idPhotoInput = dataURItoBlob(image.dataUrl);
-       idPhoto=image.dataUrl;
-    }).catch(e=>{
-      showToast(e, "error");
     });
-   
+    idPhotoInput = dataURItoBlob(image.dataUrl);
+    idPhoto=image.dataUrl;
   };
- 
   function dataURItoBlob(dataURI) {
     // convert base64 to raw binary data held in a string
      var byteString = atob(dataURI.split(',')[1]);
@@ -106,6 +90,14 @@
     for (var i = 0; i < byteString.length; i++) {
         ia[i] = byteString.charCodeAt(i);
     }
+
+    //Old Code
+    //write the ArrayBuffer to a blob, and you're done
+    //var bb = new BlobBuilder();
+    //bb.append(ab);
+    //return bb.getBlob(mimeString);
+
+    //New Code
     return new Blob([ab], {type: mimeString});
 
 }
@@ -121,30 +113,22 @@
     >
       <span class="pageTitle">Verify a Vehicle</span>
       <Content>
-        <div style="display: flex;width:100%;justify-content: end;">
-          <button
-          type="button"           
-          on:click={() => navigate("/", { replace: true })}           
-        >              
-          <span style="margin-left: 10px;">Home</span>
-        </button>
-        </div>
         <form>
-          <div style="width:50%;float:left;padding-left:10px;">
+          <div style="width:100%;float:left;padding-left:20px;">
             <label for="idcardImage">ID Card Photo</label>
             <img class="avatar" src={idPhoto} alt="avatar"  on:click={(e) => onFileSelectedIdPhoto(e)}/>
-           
-            <div
+            <img
+              style="width: 25px;"
               class="upload"
+              src="https://static.thenounproject.com/png/625182-200.png"
+              alt=""
+              on:click={(e) => onFileSelectedIdPhoto(e)}
+            />
+            <div
+              class="chan"
               on:click={(e) => onFileSelectedIdPhoto(e)}
             >
-            <img
-            style="width: 25px;"
-            src="https://static.thenounproject.com/png/625182-200.png"
-            alt=""
-            on:click={(e) => onFileSelectedIdPhoto(e)}
-          />
-              Choose Image
+              Choose ID Card Image
             </div>
             <input
               name="idcardImage"
@@ -155,21 +139,21 @@
               bind:this={idPhotoInput}
             />
           </div>
-          <div style="width:50%;float:left;padding-left:10px;">
+          <div style="width:100%;float:left;padding-left:20px;">
             <label for="employeeImage">Vehicle Photo</label>
             <img class="avatar" src={empPhoto} alt="avatar"  on:click={(e) => onFileSelectedEmpPhoto(e)}/>
-            
-            <div
-              class="upload"
-              on:click={(e) => onFileSelectedEmpPhoto(e)}
-            >
             <img
               style="width: 25px;"
+              class="upload"
               src="https://static.thenounproject.com/png/625182-200.png"
               alt=""
               on:click={(e) => onFileSelectedEmpPhoto(e)}
             />
-              Choose Image
+            <div
+              class="chan"
+              on:click={(e) => onFileSelectedEmpPhoto(e)}
+            >
+              Choose Vehicle Image
             </div>
             <input
               name="employeeImage"
@@ -227,35 +211,19 @@
       >
     </Header>
     <DContent id="fullscreen-content">
-      <div class="card-display">
-        <div class="card-container">
-          <Card>
-            <Media class="card-media-16x9" aspectRatio="16x9">
-              <MediaContent>                
-                <img
-                style="display:block;"
-                src={actionItem.empPhoto}
-                alt="Red dot"
-              />
-              </MediaContent>
-            </Media>
-            <CardContent style="color: #888;">
-              <span>Employee ID:{actionItem.csEmployeeId}</span><br/>
-              <span>Employee Name:{actionItem.employeeName}</span><br/>
-              {#if actionItem.StatusType == "MATCHED"}
-              <span style="color:green">Status:{actionItem.StatusType}</span>
-              {/if}
-              {#if actionItem.StatusType != "MATCHED"}
-              <span style="color:amber">Status:{actionItem.StatusType}</span>
-              {/if}
-              
-            </CardContent>
-          </Card>
-        </div>
-      </div>   
+      <form style="height: 250px;">
+        <img
+          style="display:block; width:100px;height:100px;"
+          src={actionItem.empPhoto}
+          alt="Red dot"
+        />
+        <span>Employee ID:{actionItem.csEmployeeId}</span>
+        <span>Employee Name:{actionItem.employeeName}</span>
+        <span>StatusType:{actionItem.StatusType}</span>
+      </form>
     </DContent>
     <Actions>
-      <Button on:click={() => (isVerify = false, isRegister= false)}>
+      <Button on:click={() => (isVerify = false)}>
         <Label>OK</Label>
       </Button>
     </Actions>
@@ -267,14 +235,15 @@
 </div>
 
 <style>
- .upload {
+  .upload {
     display: flex;
     height: 20px;
+    width: 20px;
     cursor: pointer;
   }
   .avatar {
     display: flex;
-    height: 40px;
-    width: 40px;
+    height: 80px;
+    width: 80px;
   }
 </style>
