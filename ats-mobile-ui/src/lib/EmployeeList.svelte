@@ -119,30 +119,18 @@
               >
                 <Head>
                   <Row>
-                    <Cell numeric columnId="id">
-                      <!-- For numeric columns, icon comes first. -->
-                      <Label>ID</Label>
-                      <!-- <IconButton class="material-icons">arrow_upward</IconButton> -->
-                    </Cell>
                     <Cell numeric columnId="csEmployeeId">
                       <!-- For numeric columns, icon comes first. -->
                       <Label>Employee ID</Label>
                       <!-- <IconButton class="material-icons">arrow_upward</IconButton> -->
-                    </Cell>
-                    <Cell columnId="employeeName">
-                      <Label>Name</Label>
-                      <!-- For non-numeric columns, icon comes second. -->
-                      <!-- <IconButton class="material-icons">arrow_upward</IconButton> -->
-                    </Cell>                    
+                    </Cell>                                       
                     <Cell><Label>Photo</Label></Cell>
                   </Row>
                 </Head>
                 <Body>
                   {#each items as item (item.id)}
                     <Row>
-                      <Cell numeric class="centered">{item.id}</Cell>
-                      <Cell numeric class="centered">{item.csEmployeeId}</Cell>
-                      <Cell>{item.employeeName}</Cell>                     
+                      <Cell numeric class="centered">{item.csEmployeeId}</Cell>                                        
                       <Cell>
                         <Button
                           action="takeAction"

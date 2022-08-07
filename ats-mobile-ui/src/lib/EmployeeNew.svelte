@@ -3,6 +3,8 @@
 
   import Paper, { Content } from "@smui/paper";
   import { toasts, ToastContainer, FlatToast }  from "svelte-toasts";
+  import { Camera, CameraResultType } from '@capacitor/camera';
+
   let empPhoto =
     "https://digitalfinger.id/wp-content/uploads/2019/12/no-image-available-icon-6.png";
   let idPhoto =
@@ -41,8 +43,8 @@
       dataArray.append("email", email);
       dataArray.append("mobile", mobile);
       dataArray.append("hasS3Photo", true);
-      dataArray.append("photoFrontFile", empPhotoInput.files[0]);
-      dataArray.append("photoIDCardFile", idPhotoInput.files[0]);
+      dataArray.append("photoFrontFile", empPhotoInput);
+      dataArray.append("photoIDCardFile", idPhotoInput);
     await fetch("http://localhost:9010/employee", {
         method: "POST",
         body: dataArray,
@@ -60,26 +62,44 @@
               // Upload failed
             });
   }
-  
-
-  const onFileSelectedEmpPhoto = (e) => {
-    let image = e.target.files[0];
-    let reader = new FileReader();
-    reader.readAsDataURL(image);
-    reader.onload = (e) => {
-      empPhoto = e.target.result;
-    };
+  const onFileSelectedEmpPhoto = async (e) => {
+    const image = await Camera.getPhoto({
+      quality: 90,
+      allowEditing: true,
+      resultType: CameraResultType.DataUrl
+    });
+    empPhotoInput = dataURItoBlob(image.dataUrl);
+    empPhoto = image.dataUrl;
   };
 
-  const onFileSelectedIdPhoto = (e) => {
-    let image = e.target.files[0];
-    let reader = new FileReader();
-    reader.readAsDataURL(image);
-    reader.onload = (e) => {
-      // @ts-ignore
-      idPhoto = e.target.result;
-    };
+  const onFileSelectedIdPhoto = async (e) => {
+    const image = await Camera.getPhoto({
+      quality: 90,
+      allowEditing: true,
+      resultType: CameraResultType.DataUrl
+    });
+    debugger;
+    idPhotoInput = dataURItoBlob(image.dataUrl);
+    idPhoto=image.dataUrl;
   };
+  function dataURItoBlob(dataURI) {
+    // convert base64 to raw binary data held in a string
+     var byteString = atob(dataURI.split(',')[1]);
+
+    // separate out the mime component
+    var mimeString = dataURI.split(',')[0].split(':')[1].split(';')[0];
+
+    // write the bytes of the string to an ArrayBuffer
+    var ab = new ArrayBuffer(byteString.length);
+    var ia = new Uint8Array(ab);
+    for (var i = 0; i < byteString.length; i++) {
+        ia[i] = byteString.charCodeAt(i);
+    }
+
+    //New Code
+    return new Blob([ab], {type: mimeString});
+
+}
 </script>
 
 <div>
@@ -155,20 +175,16 @@
             </select>
             <div>
               <label for="employeeImage">Employee Photo</label>
-              <img class="avatar" src={empPhoto} alt="d" />
+              <img class="avatar" src={empPhoto} alt="d" on:click={(e) => onFileSelectedEmpPhoto(e)}/>
               <img
                 class="upload"
                 src="https://static.thenounproject.com/png/625182-200.png"
                 alt=""
-                on:click={() => {
-                  empPhotoInput.click();
-                }}
+                on:click={(e) => onFileSelectedEmpPhoto(e)}
               />
               <div
                 class="chan"
-                on:click={() => {
-                  empPhotoInput.click();
-                }}
+                on:click={(e) => onFileSelectedEmpPhoto(e)}
               >
                 Choose Image
               </div>
@@ -177,27 +193,22 @@
                 id="employeeImage"
                 style="display:none"
                 type="file"
-                accept=".jpg, .jpeg, .png"
-                on:change={(e) => onFileSelectedEmpPhoto(e)}
+                accept=".jpg, .jpeg, .png"               
                 bind:this={empPhotoInput}
               />
             </div>
             <div>
               <label for="idcardImage">ID Card Photo</label>
-              <img class="avatar" src={idPhoto} alt="d" />
+              <img class="avatar" src={idPhoto} alt="d"  on:click={(e) => onFileSelectedIdPhoto(e)}/>
               <img
                 class="upload"
                 src="https://static.thenounproject.com/png/625182-200.png"
                 alt=""
-                on:click={() => {
-                  idPhotoInput.click();
-                }}
+                on:click={(e) => onFileSelectedIdPhoto(e)}
               />
               <div
                 class="chan"
-                on:click={() => {
-                  idPhotoInput.click();
-                }}
+                on:click={(e) => onFileSelectedIdPhoto(e)}
               >
                 Choose Image
               </div>
@@ -206,8 +217,7 @@
                 id="idcardImage"
                 style="display:none"
                 type="file"
-                accept=".jpg, .jpeg, .png"
-                on:change={(e) => onFileSelectedIdPhoto(e)}
+                accept=".jpg, .jpeg, .png"               
                 bind:this={idPhotoInput}
               />
             </div>

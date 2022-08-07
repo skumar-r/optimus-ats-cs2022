@@ -2,6 +2,8 @@
   import { createEventDispatcher } from 'svelte';
   import Paper, { Content } from "@smui/paper";
   import { toasts, ToastContainer, FlatToast }  from "svelte-toasts";
+  import { Camera, CameraResultType } from '@capacitor/camera';
+
   const dispatch = createEventDispatcher();
   let vehiclePhotoInput;
   let regNo = "";
@@ -34,8 +36,8 @@
     dataArray.append("employeeId", employeeId);
     // @ts-ignore
     dataArray.append("hasS3Photo", true);
-    dataArray.append("photoFrontFile", vehiclePhotoInput.files[0]);
-debugger;
+    dataArray.append("photoFrontFile", vehiclePhotoInput);
+
     await fetch("http://localhost:9010/vehicle", {
       method: "POST",
       body: dataArray,
@@ -90,7 +92,7 @@ debugger;
     <span class="pageTitle">Add a New Vehicle</span>
     <Content>
       <form  style="height: 600px;">
-        <div style="width:33%;float:left;">
+        <div style="width:100%;float:left;">
           <label for="regNo">Registration No.</label>
           <input
             id="regNo"
@@ -113,39 +115,40 @@ debugger;
             on:change={handleChange}
             bind:value={vehicleDetails}
           />
-        </div>
-        <div style="width:30%;float:left;padding-left:30px;">
-          <label for="vehiclePhoto">Vehicle Photo</label>
-          <img class="avatar" src={vehiclePhoto} alt="d" />
-          <img
-            class="upload"
-            src="https://static.thenounproject.com/png/625182-200.png"
-            alt=""
-            on:click={() => {
-              vehiclePhotoInput.click();
-            }}
-          />
-          <div
-            class="chan"
-            on:click={() => {
-              vehiclePhotoInput.click();
-            }}
-          >
-            Choose Image
+          <div>
+            <label for="vehiclePhoto">Vehicle Photo</label>
+            <img class="avatar" src={vehiclePhoto} alt="d" />
+            <img
+              class="upload"
+              src="https://static.thenounproject.com/png/625182-200.png"
+              alt=""
+              on:click={() => {
+                vehiclePhotoInput.click();
+              }}
+            />
+            <div
+              class="chan"
+              on:click={() => {
+                vehiclePhotoInput.click();
+              }}
+            >
+              Choose Image
+            </div>
+            <input
+              name="vehiclePhoto"
+              id="vehiclePhoto"
+              style="display:none"
+              type="file"
+              accept=".jpg, .jpeg, .png"
+              on:change={(e) => onFileSelectedIdPhoto(e)}
+              bind:this={vehiclePhotoInput}
+            />
           </div>
-          <input
-            name="vehiclePhoto"
-            id="vehiclePhoto"
-            style="display:none"
-            type="file"
-            accept=".jpg, .jpeg, .png"
-            on:change={(e) => onFileSelectedIdPhoto(e)}
-            bind:this={vehiclePhotoInput}
-          />
+          <div style="display: flex;width:100%;justify-content: end;">
+            <button type="button" on:click={(e)=>handleSubmit(e)}>Submit</button>
+          </div>
         </div>
-        <div style="display: flex;width:100%;justify-content: end;">
-          <button type="button" on:click={(e)=>handleSubmit(e)}>Submit</button>
-        </div>
+        
       </form>
     </Content>
   </Paper>

@@ -5,8 +5,8 @@
 
   // List of tab items with labels, values and assigned components
   let items = [
-    { label: "Employee Management", value: 1, component: EmployeeTab },
-    { label: "Vehicle Management", value: 2, component: VehicleTab }
+    { label: "Employee", value: 1, component: EmployeeTab },
+    { label: "Vehicle", value: 2, component: VehicleTab }
   ];
 </script>
 

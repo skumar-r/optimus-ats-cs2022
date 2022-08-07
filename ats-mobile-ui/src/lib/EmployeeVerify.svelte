@@ -64,13 +64,6 @@
       allowEditing: true,
       resultType: CameraResultType.DataUrl
     });
-   // const photoInTempStorage = await Filesystem.readFile({ path: image.dataUrl });
-    //debugger;
-    //let reader = new FileReader(image.path);
-    //reader.readAsDataURL(photoInTempStorage.data);
-   // reader.onload = (e) => {
-   //   empPhoto = e.target.result;
-    //};
     empPhotoInput = dataURItoBlob(image.dataUrl);
     empPhoto = image.dataUrl;
   };
@@ -168,8 +161,7 @@
               id="idcardImage"
               style="display:none"
               type="file"
-              accept=".jpg, .jpeg, .png"
-              on:change={(e) => onFileSelectedIdPhoto(e)}
+              accept=".jpg, .jpeg, .png"             
               bind:this={idPhotoInput}
             />
           </div>

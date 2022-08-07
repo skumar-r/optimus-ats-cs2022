@@ -38,6 +38,7 @@
   }
   li {
     margin-bottom: -1px;
+    width:50%;
   }
 
   span {
@@ -65,8 +66,8 @@
   }
 
   li.active > span {
-    color: #fff;
-    background-color: #cf3845;
-    border-color: #dee2e6 #dee2e6 #fff;
+    color: #000;
+    background-color: #fff;
+    border-color: #cf3845 #dee2e6 #fff;
   }
 </style>

@@ -118,12 +118,7 @@
                       <!-- For numeric columns, icon comes first. -->
                       <!-- <IconButton class="material-icons">arrow_upward</IconButton> -->
                       <Label>Employee Id</Label>
-                    </Cell>
-                    <Cell columnId="emplyeeName">
-                      <Label>Employee Name</Label>
-                      <!-- For non-numeric columns, icon comes second. -->
-                      <!-- <IconButton class="material-icons">arrow_upward</IconButton> -->
-                    </Cell>
+                    </Cell>                    
                     <!-- <Cell columnId="employeeName">
                     <Label>Employee Name</Label> -->
                     <!-- <IconButton class="material-icons">arrow_upward</IconButton> -->
@@ -137,9 +132,7 @@
                 <Body>
                   {#each items as item (item.id)}
                     <Row>
-                      <Cell numeric class="centered">{item.csEmployeeId}</Cell>
-                      <Cell class="centered">{item.emplyeeName}</Cell>
-                      <!-- <Cell>{item.employeeName}</Cell> -->
+                      <Cell numeric class="centered">{item.csEmployeeId}</Cell>                     
                       <Cell class="centered">{item.regNo}</Cell>                    
                     </Row>
                   {/each}
