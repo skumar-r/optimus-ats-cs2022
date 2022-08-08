@@ -38,7 +38,7 @@
     dataArray.append("hasS3Photo", true);
     dataArray.append("photoFrontFile", vehiclePhotoInput);
 
-    await fetch("http://localhost:9010/vehicle", {
+    await fetch("http://34.68.184.19:9010/vehicle", {
       method: "POST",
       body: dataArray,
     })

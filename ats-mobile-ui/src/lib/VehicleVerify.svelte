@@ -7,6 +7,12 @@
   import IconButton from "@smui/icon-button";
   import CircularProgress from "@smui/circular-progress";
   import { Camera, CameraResultType } from '@capacitor/camera';
+  import Card, {
+    Content as CardContent,
+    PrimaryAction,
+    Media,
+    MediaContent,
+  } from '@smui/card';
 
   let empPhoto =
     "https://digitalfinger.id/wp-content/uploads/2019/12/no-image-available-icon-6.png";
@@ -36,7 +42,7 @@
     dataArray.append("resourceFile", empPhotoInput);
     dataArray.append("idCardFile", idPhotoInput);
     inProgress = true;
-    await fetch("http://localhost:9011/recognition/vehicle", {
+    await fetch("http://34.68.184.19:9011/recognition/vehicle", {
       method: "POST",
       body: dataArray,
     })
@@ -212,16 +218,32 @@
       >
     </Header>
     <DContent id="fullscreen-content">
-      <form style="height: 250px;">
-        <img
-          style="display:block; width:100px;height:100px;"
-          src={actionItem.empPhoto}
-          alt="Red dot"
-        />
-        <span>Employee ID:{actionItem.csEmployeeId}</span>
-        <span>Employee Name:{actionItem.employeeName}</span>
-        <span>StatusType:{actionItem.StatusType}</span>
-      </form>
+      <div class="card-display">
+        <div class="card-container">
+          <Card>
+            <Media class="card-media-16x9" aspectRatio="16x9">
+              <MediaContent>                
+                <img
+                style="display:block;"
+                src={actionItem.empPhoto}
+                alt="Red dot"
+              />
+              </MediaContent>
+            </Media>
+            <CardContent style="color: #888;">
+              <span>Employee ID:{actionItem.csEmployeeId}</span><br/>
+              <span>Employee Name:{actionItem.employeeName}</span><br/>
+              {#if actionItem.StatusType == "MATCHED"}
+              <span style="color:green">Status:{actionItem.StatusType}</span>
+              {/if}
+              {#if actionItem.StatusType != "MATCHED"}
+              <span style="color:amber">Status:{actionItem.StatusType}</span>
+              {/if}
+              
+            </CardContent>
+          </Card>
+        </div>
+      </div>
     </DContent>
     <Actions>
       <Button on:click={() => (isVerify = false)}>

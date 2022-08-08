@@ -32,7 +32,7 @@
   function loadData() {
     loading = true;
     if (typeof fetch !== "undefined") {
-      fetch("http://localhost:9010/employee", {
+      fetch("http://34.68.184.19:9010/employee", {
         method: "GET",
       })
         .then((response) => {

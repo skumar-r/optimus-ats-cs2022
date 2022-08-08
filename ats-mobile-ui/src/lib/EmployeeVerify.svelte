@@ -7,6 +7,12 @@
   import IconButton from "@smui/icon-button";
   import CircularProgress from "@smui/circular-progress";
   import { Camera, CameraResultType } from '@capacitor/camera';
+  import Card, {
+    Content as CardContent,
+    PrimaryAction,
+    Media,
+    MediaContent,
+  } from '@smui/card';
  
   let empPhoto =
     "https://digitalfinger.id/wp-content/uploads/2019/12/no-image-available-icon-6.png";
@@ -36,7 +42,7 @@
     dataArray.append("resourceFile", empPhotoInput);
     dataArray.append("idCardFile", idPhotoInput);
     inProgress = true;
-    await fetch("http://localhost:9011/recognition", {
+    await fetch("http://34.68.184.19:9011/recognition", {
       method: "POST",
       body: dataArray,
     })
@@ -211,16 +217,32 @@
       >
     </Header>
     <DContent id="fullscreen-content">
-      <form style="height: 250px;">
-        <img
-          style="display:block; width:100px;height:100px;"
-          src={actionItem.empPhoto}
-          alt="Red dot"
-        />
-        <span>Employee ID:{actionItem.csEmployeeId}</span>
-        <span>Employee Name:{actionItem.employeeName}</span>
-        <span>StatusType:{actionItem.StatusType}</span>
-      </form>
+      <div class="card-display">
+        <div class="card-container">
+          <Card>
+            <Media class="card-media-16x9" aspectRatio="16x9">
+              <MediaContent>                
+                <img
+                style="display:block;width:200px;height:150px;"
+                src={actionItem.empPhoto}
+                alt="Red dot"
+              />
+              </MediaContent>
+            </Media>
+            <CardContent style="color: #888;">
+              {#if actionItem.StatusType == "MATCHED"}
+              <h2 style="color:green">Status: {actionItem.StatusType}</h2>
+              {/if}
+              {#if actionItem.StatusType != "MATCHED"}
+              <h2 style="color:amber">Status: {actionItem.StatusType}</h2>
+              {/if}
+              <br/>
+              <h3>Employee ID:{actionItem.csEmployeeId}</h3><br/>
+              <h3>Employee Name:{actionItem.employeeName}</h3>
+            </CardContent>
+          </Card>
+        </div>
+      </div>
     </DContent>
     <Actions>
       <Button on:click={() => (isVerify = false)}>
