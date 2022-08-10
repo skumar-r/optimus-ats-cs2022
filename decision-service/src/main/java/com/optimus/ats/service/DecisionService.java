@@ -29,6 +29,8 @@ public class DecisionService {
     DecisionRepository decisionRepository;
     @Inject
     EmployeeRepository employeeRepository;
+    @Inject
+    EmailService emailSrv;
 
     @Inject
     EventBus bus;
@@ -40,6 +42,8 @@ public class DecisionService {
         log.info("Retrieved DecisionWorkflowRequest-> {}", Objects.nonNull(retrieved)?JsonObject.mapFrom(retrieved).toString():"");  
         if(Objects.nonNull(retrieved)){
             EmployeeData employee = employeeRepository.findById(retrieved.getEmployeeId());
+            if(Objects.nonNull(employee))
+                emailSrv.sendEmailNotification(employee.getEmail(), employee.getEmployeeName(), employee.getCsEmpId());
             log.info("Retrieved EmployeeData-> {}", Objects.nonNull(employee)?JsonObject.mapFrom(employee).toString():"");
             dto.setValidRequest(Objects.isNull(retrieved)? false: true);
             dto.setWorkflowRequest(retrieved);
@@ -71,7 +75,18 @@ public class DecisionService {
         System.out.println("After process");
         log.info("approved:{},remarks:{},incomingId:{}",approved, remarks,incomingId);
         decisionRepository.update("approved=?1,approvalRemarks=?2, workflowStatus=?3 where id=?4", Objects.requireNonNullElse(approved, Boolean.TRUE), Objects.requireNonNullElse(remarks, "Auto Approved by Decision Rule"), Objects.requireNonNullElse(approved, Boolean.TRUE).booleanValue() ? 1 : 2, incomingId);
+        sendEmailNotification(incomingId, approved.booleanValue());
         eventLog("Post Processing-Kogito",null,  "approved:"+approved+",remarks:"+remarks+",incomingId:"+incomingId);
+    }
+
+    private void sendEmailNotification(Long incomingId, boolean approved){
+        DecisionWorkflowRequest retrieved = decisionRepository.findById(Long.valueOf(incomingId));
+        log.info("sendEmailNotification -> Retrieved DecisionWorkflowRequest-> {}", Objects.nonNull(retrieved)?JsonObject.mapFrom(retrieved).toString():"");  
+        if(Objects.nonNull(retrieved)){
+            EmployeeData employee = employeeRepository.findById(retrieved.getEmployeeId());
+            if(Objects.nonNull(employee))
+                emailSrv.sendActionUpdateEmail(employee.getEmail(), employee.getEmployeeName(), employee.getCsEmpId(),approved?"Approved":"Rejected");
+        }
     }
 
     @Transactional

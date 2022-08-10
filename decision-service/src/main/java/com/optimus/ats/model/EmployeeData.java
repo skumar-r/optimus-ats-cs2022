@@ -15,7 +15,9 @@ public class EmployeeData {
     private String employeeName;
     private String department;
     private String designation;
-
+    @Column(name="cs_employee_id")
+    private String csEmpId;
+    private String email;
 
     public Long getId() {
         return id;
@@ -41,5 +43,18 @@ public class EmployeeData {
     public void setDesignation(String designation) {
         this.designation = designation;
     }
+    public String getCsEmpId() {
+        return csEmpId;
+    }
+    public void setCsEmpId(String csEmpId) {
+        this.csEmpId = csEmpId;
+    }
+    public String getEmail() {
+        return email;
+    }
+    public void setEmail(String email) {
+        this.email = email;
+    }
+    
     
 }

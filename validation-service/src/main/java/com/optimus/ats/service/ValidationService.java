@@ -96,7 +96,7 @@ public class ValidationService {
     }
 
     public List<DecisionWorkflowRequest> getAll() {
-        List<DecisionWorkflowRequest> list = DecisionWorkflowRequest.list("approved=?1 and processInstanceId != null and processTaskId != null and (workflowStatus != 3 or workflowStatus is null)",false);
+        List<DecisionWorkflowRequest> list = DecisionWorkflowRequest.list("approved=?1 and processInstanceId != null and processTaskId != null and (workflowStatus = 0 or workflowStatus is null)",false);
        return list.stream().map(req->{
            if(!Objects.isNull(Employee.findByName(req.getCsEmpId()))) {
                Employee emp = Employee.findByName(req.getCsEmpId());
